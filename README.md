@@ -9,7 +9,7 @@ See the final website report at: [https://ldaniel.github.io/Predictive-Analysis]
 ## Professor
 - João Rafael Dias
 
-## Authors / Alunos
+## Authors / Students
 |Profile|Name|E-mail|
 |---|---|---|
 |<a href="https://github.com/DanielFCampos"><img src="https://avatars2.githubusercontent.com/u/31582602?s=460&v=4" title="DanielFCampos" width="80" height="80"></a>|Daniel Campos|[(daniel.ferraz.campos@gmail.com)](daniel.ferraz.campos@gmail.com)|
