@@ -9,11 +9,14 @@ output:
 ```{r child = 'index.Rmd'}
 ```
 
-```{r child = '01_exploration_report.Rmd'}
+```{r child = '01_about_the_data.Rmd'}
 ```
 
-```{r child = '02_logistic_regression_report.Rmd'}
+```{r child = '02_data_preparation.Rmd'}
 ```
 
-```{r child = '03_conclusion.Rmd'}
+```{r child = '03_logistic_regression_report.Rmd'}
+```
+
+```{r child = '04_conclusion.Rmd'}
 ```
