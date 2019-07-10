@@ -1,0 +1,19 @@
+---  
+title: "FGV MBA: Business Analytics & Big Data"  
+output: 
+  pdf_document: 
+    keep_tex: yes
+    toc: yes
+---
+
+```{r child = 'index.Rmd'}
+```
+
+```{r child = '01_exploration_report.Rmd'}
+```
+
+```{r child = '02_logistic_regression_report.Rmd'}
+```
+
+```{r child = '03_conclusion.Rmd'}
+```
