@@ -11,7 +11,7 @@
 
 
 
-<title>FGV MBA: Business Analytics &amp; Big Data</title>
+<title>Conclusion</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -287,48 +287,25 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">FGV MBA: Business Analytics &amp; Big Data</h1>
+<h1 class="title toc-ignore">Conclusion</h1>
+<h4 class="date">July, 2019</h4>
 
 </div>
 
-<div id="TOC">
-<ul>
-<li><a href="#predictive-analysis"><span class="toc-section-number">1</span> Predictive analysis</a><ul>
-<li><a href="#professor"><span class="toc-section-number">1.1</span> Professor</a></li>
-<li><a href="#authors-students"><span class="toc-section-number">1.2</span> Authors / students</a></li>
-<li><a href="#where-to-find-the-source-code-of-this-project"><span class="toc-section-number">1.3</span> Where to find the source code of this project?</a></li>
-</ul></li>
-</ul>
-</div>
 
-<div id="predictive-analysis" class="section level1">
-<h1><span class="header-section-number">1</span> Predictive analysis</h1>
-<p>This website intends to present the work analysis for the <em>“Análise Preditiva”</em> class.</p>
-<p>The ideia is Practing R using a real anonymized Czech bank transactions, account info, and loan records released for PKDD’99 Discovery Challenge.</p>
-<p>Use the menu above to navigate and see the final report.</p>
-<div id="professor" class="section level2">
-<h2><span class="header-section-number">1.1</span> Professor</h2>
+<p>The final model can accurately segregate the loan contracts likely to default with test set accuracy of 76.47% using 0.1 as the threshold to assign the observation to defaulter class.</p>
+<p>Model was also able to predict 72% of real defaulters in our test dataset.</p>
+<p>In practice, the probabilities returned by the logistic regression model can be used to decide on grant or not the loan and help on correctly price the interest rate based on the likelihood of default.</p>
+<p>Model 2 shows that below variables are associated with the probability of default in a loan contract:</p>
 <ul>
-<li>João Rafael Dias (<a href="mailto:magister.analytica@gmail.com" class="email">magister.analytica@gmail.com</a>)</li>
+<li><strong>x_loan_amount</strong>;</li>
+<li><strong>x_loan_duration</strong>;</li>
+<li><strong>x_has_card</strong>;</li>
+<li><strong>x_prop_interest_credited</strong>.</li>
 </ul>
-</div>
-<div id="authors-students" class="section level2">
-<h2><span class="header-section-number">1.2</span> Authors / students</h2>
-<ul>
-<li>Daniel Campos (A57549661 / <a href="mailto:daniel.ferraz.campos@gmail.com" class="email">daniel.ferraz.campos@gmail.com</a>)</li>
-<li>Leandro Daniel (A57622988 / <a href="mailto:contato@leandrodaniel.com" class="email">contato@leandrodaniel.com</a>)</li>
-<li>Rodrigo Goncalves (A57566093 / <a href="mailto:rodrigo.goncalves@me.com" class="email">rodrigo.goncalves@me.com</a>)</li>
-<li>Ygor Lima (A57549661 / <a href="mailto:ygor_redesocial@hotmail.com" class="email">ygor_redesocial@hotmail.com</a>)</li>
-</ul>
-</div>
-<div id="where-to-find-the-source-code-of-this-project" class="section level2">
-<h2><span class="header-section-number">1.3</span> Where to find the source code of this project?</h2>
-<p>This project can be found and downloaded on GitHub: <a href="https://github.com/ldaniel/R_Bank_Berka" class="uri">https://github.com/ldaniel/R_Bank_Berka</a></p>
-<blockquote>
-<p>Valar Morghulis! :)</p>
-</blockquote>
-</div>
-</div>
+<p>The threshold definition depends on the tradeoff we accept between correctly identifying the true defaulters and incorrectly set a non-defaulter as a defaulter.</p>
+<p>This balance must be decided by the managers and the bank should keep seeking and experimenting with more variables to find a better model.</p>
+<p>This exercise was in no way a definitive answer to Berka Bank on how to perform their client credit analysis, but it served very well to exercise the new techniques learned in this class.</p>
 
 
 

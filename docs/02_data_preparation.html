@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Data preparation</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  { background-color: #f8f8f8; }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #c4a000; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #000000; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #000000; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #000000; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">FGV MBA</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="01_about_the_data.html">About the Data</a>
+</li>
+<li>
+  <a href="02_data_preparation.html">Data preparation</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Data preparation</h1>
+<h4 class="date">July, 2019</h4>
+
+</div>
+
+<div id="TOC">
+<ul>
+<li><a href="#data-ingestion-cleaning-translation-and-enhancement"><span class="toc-section-number">1</span> Data ingestion, cleaning, translation and enhancement</a><ul>
+<li><a href="#create-functions"><span class="toc-section-number">1.1</span> Create Functions</a><ul>
+<li><a href="#getgenderfrombirthnumber"><span class="toc-section-number">1.1.1</span> GetGenderFromBirthnumber</a></li>
+<li><a href="#getbirthdatefrombirthnumber"><span class="toc-section-number">1.1.2</span> GetBirthdateFromBirthnumber</a></li>
+<li><a href="#converttodate"><span class="toc-section-number">1.1.3</span> ConvertToDate</a></li>
+<li><a href="#getagefrombirthnumber"><span class="toc-section-number">1.1.4</span> GetAgeFromBirthnumber</a></li>
+</ul></li>
+<li><a href="#data-ingestion"><span class="toc-section-number">1.2</span> Data Ingestion</a></li>
+<li><a href="#data-cleaning"><span class="toc-section-number">1.3</span> Data Cleaning</a></li>
+<li><a href="#label-translation"><span class="toc-section-number">1.4</span> Label Translation</a></li>
+<li><a href="#data-enhancement"><span class="toc-section-number">1.5</span> Data Enhancement</a></li>
+</ul></li>
+</ul>
+</div>
+
+<div id="data-ingestion-cleaning-translation-and-enhancement" class="section level1">
+<h1><span class="header-section-number">1</span> Data ingestion, cleaning, translation and enhancement</h1>
+<p>Before starting the Berka Analysis, a few important steps were taken in order to prepare the source data files. These steps are listed below:</p>
+<ul>
+<li><strong>Step 01</strong>: Create Functions;</li>
+<li><strong>Step 02</strong>: Data Ingestion;</li>
+<li><strong>Step 03</strong>: Data Cleaning;</li>
+<li><strong>Step 04</strong>: Label Translation;</li>
+<li><strong>Step 05</strong>: Data Enhancement.</li>
+</ul>
+<div id="create-functions" class="section level2">
+<h2><span class="header-section-number">1.1</span> Create Functions</h2>
+<p>This step create functions to be used in the next steps. Following, all functions created are described.</p>
+<div id="getgenderfrombirthnumber" class="section level3">
+<h3><span class="header-section-number">1.1.1</span> GetGenderFromBirthnumber</h3>
+<p>The birth_number column is given in the form of YYMMDD for men, and YYMM+50DD for women. The objective of this function is to return the gender of the client via the birth_number.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">GetGenderFromBirthnumber &lt;-<span class="st"> </span><span class="cf">function</span>(var_birth_number) {</a>
+<a class="sourceLine" id="cb1-2" title="2">  month &lt;-<span class="st"> </span><span class="kw">substr</span>(var_birth_number, <span class="dv">3</span>, <span class="dv">4</span>)</a>
+<a class="sourceLine" id="cb1-3" title="3">  result &lt;-<span class="st"> </span><span class="kw">ifelse</span>(<span class="kw">as.integer</span>(month) <span class="op">&gt;</span><span class="st"> </span><span class="dv">50</span>, <span class="st">&quot;female&quot;</span>, <span class="st">&quot;male&quot;</span>)</a>
+<a class="sourceLine" id="cb1-4" title="4">  </a>
+<a class="sourceLine" id="cb1-5" title="5">  <span class="kw">return</span>(<span class="kw">as.factor</span>(result))</a>
+<a class="sourceLine" id="cb1-6" title="6">}</a></code></pre></div>
+</div>
+<div id="getbirthdatefrombirthnumber" class="section level3">
+<h3><span class="header-section-number">1.1.2</span> GetBirthdateFromBirthnumber</h3>
+<p>The birth_number column is given in the form of YYMMDD for men, # and YYMM+50DD for women. The objective of this function is to return the final birthday as Date.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">GetBirthdateFromBirthnumber &lt;-<span class="st"> </span><span class="cf">function</span>(var_birth_number, var_gender) {</a>
+<a class="sourceLine" id="cb2-2" title="2">  year &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="st">&quot;19&quot;</span>, <span class="kw">substr</span>(var_birth_number, <span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">sep=</span><span class="st">&quot;&quot;</span>)</a>
+<a class="sourceLine" id="cb2-3" title="3">  month &lt;-<span class="st"> </span><span class="kw">ifelse</span>(var_gender <span class="op">==</span><span class="st"> &quot;male&quot;</span>, <span class="kw">substr</span>(var_birth_number, <span class="dv">3</span>, <span class="dv">4</span>), </a>
+<a class="sourceLine" id="cb2-4" title="4">  <span class="kw">as.integer</span>(<span class="kw">substr</span>(var_birth_number, <span class="dv">3</span>, <span class="dv">4</span>)) <span class="op">-</span><span class="st"> </span><span class="dv">50</span>)</a>
+<a class="sourceLine" id="cb2-5" title="5">  day &lt;-<span class="st"> </span><span class="kw">substr</span>(var_birth_number, <span class="dv">5</span>, <span class="dv">6</span>)</a>
+<a class="sourceLine" id="cb2-6" title="6">  result &lt;-<span class="st"> </span><span class="kw">as.Date</span>(<span class="kw">paste</span>(year, <span class="st">&quot;-&quot;</span>, month, <span class="st">&quot;-&quot;</span>, day, <span class="dt">sep=</span><span class="st">&quot;&quot;</span>), <span class="dt">format =</span> <span class="st">&quot;%Y-%m-%d&quot;</span>)</a>
+<a class="sourceLine" id="cb2-7" title="7">  </a>
+<a class="sourceLine" id="cb2-8" title="8">  <span class="kw">return</span>(result)</a>
+<a class="sourceLine" id="cb2-9" title="9">}</a></code></pre></div>
+</div>
+<div id="converttodate" class="section level3">
+<h3><span class="header-section-number">1.1.3</span> ConvertToDate</h3>
+<p>The objective of this function is to convert the strange bank date style to the regular R Date datatype.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">ConvertToDate &lt;-<span class="st"> </span><span class="cf">function</span>(var_date) {</a>
+<a class="sourceLine" id="cb3-2" title="2">  year &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="st">&quot;19&quot;</span>, <span class="kw">substr</span>(var_date, <span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">sep=</span><span class="st">&quot;&quot;</span>)</a>
+<a class="sourceLine" id="cb3-3" title="3">  month &lt;-<span class="st"> </span><span class="kw">substr</span>(var_date, <span class="dv">3</span>, <span class="dv">4</span>)</a>
+<a class="sourceLine" id="cb3-4" title="4">  day &lt;-<span class="st"> </span><span class="kw">substr</span>(var_date, <span class="dv">5</span>, <span class="dv">6</span>)</a>
+<a class="sourceLine" id="cb3-5" title="5">  result &lt;-<span class="st"> </span><span class="kw">as.Date</span>(<span class="kw">paste</span>(year, <span class="st">&quot;-&quot;</span>, month, <span class="st">&quot;-&quot;</span>, day, <span class="dt">sep=</span><span class="st">&quot;&quot;</span>), <span class="dt">format =</span> <span class="st">&quot;%Y-%m-%d&quot;</span>)</a>
+<a class="sourceLine" id="cb3-6" title="6">  </a>
+<a class="sourceLine" id="cb3-7" title="7">  <span class="kw">return</span>(result)</a>
+<a class="sourceLine" id="cb3-8" title="8">}</a></code></pre></div>
+</div>
+<div id="getagefrombirthnumber" class="section level3">
+<h3><span class="header-section-number">1.1.4</span> GetAgeFromBirthnumber</h3>
+<p>The objective of this function is to get age given the birth_number.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">GetAgeFromBirthnumber &lt;-<span class="st"> </span><span class="cf">function</span>(var_birth_number) {</a>
+<a class="sourceLine" id="cb4-2" title="2">  base_year &lt;-<span class="st"> </span><span class="dv">99</span> <span class="co"># considering 1999 as the base year for this exercise</span></a>
+<a class="sourceLine" id="cb4-3" title="3">  year &lt;-<span class="st"> </span><span class="kw">substr</span>(var_birth_number, <span class="dv">1</span>, <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb4-4" title="4">  result &lt;-<span class="st"> </span>base_year <span class="op">-</span><span class="st"> </span><span class="kw">as.integer</span>(year)</a>
+<a class="sourceLine" id="cb4-5" title="5">  </a>
+<a class="sourceLine" id="cb4-6" title="6">  <span class="kw">return</span>(result)</a>
+<a class="sourceLine" id="cb4-7" title="7">}</a></code></pre></div>
+</div>
+</div>
+<div id="data-ingestion" class="section level2">
+<h2><span class="header-section-number">1.2</span> Data Ingestion</h2>
+<p>The process of data ingestion — preparing data for analysis — usually includes steps called extract (taking the data from its current location), transform (cleansing and normalizing the data), and load (placing the data in a database where it can be analyzed).</p>
+<p>During this step, in addition to the loading data processes, it was performed data casting, column renaming and small touch-ups. The list below describe each table adjustment taken:</p>
+<ul>
+<li><strong>District</strong>: renaming columns and casting columns with decimal or “?” values;</li>
+<li><strong>Credit Card</strong>: casting column issued in creditcard table from string to datetime data type;</li>
+<li><strong>Account</strong>: casting column date in account table from string to datetime data type;</li>
+<li><strong>Loan</strong>: casting columns in table loan to the right data types;</li>
+<li><strong>Permanent Order</strong>: casting columns with decimal values;</li>
+<li><strong>Transaction</strong>: casting columns in table transaction to the right data types.</li>
+</ul>
+</div>
+<div id="data-cleaning" class="section level2">
+<h2><span class="header-section-number">1.3</span> Data Cleaning</h2>
+<p>The objective of this step is analysing missing values and other strange conditions. In order to accomplish this task, a few R functions were used to quickly discover missing values, like NA and empty fields.</p>
+<p>First thing done, was fixing observations in k_symbol transaction table with ’ ’ (one space) to empty string (’’), using the following command.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">transaction<span class="op">$</span>k_symbol =<span class="st"> </span><span class="kw">trimws</span>(transaction<span class="op">$</span>k_symbol)</a></code></pre></div>
+<p>Then, the command below was used to find out any NA values in each table.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw">sapply</span>(TableName, <span class="cf">function</span>(x) <span class="kw">sum</span>(<span class="kw">is.na</span>(x)))</a></code></pre></div>
+<p>Solely the <strong>transaction</strong> table has NA values, in the following columns:</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">x</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>trans_id</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td>account_id</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td>date</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td>type</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td>operation</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td>amount</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td>balance</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td>k_symbol</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td>bank</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td>account</td>
+<td align="right">760931</td>
+</tr>
+</tbody>
+</table>
+<p>Finally, the following command was used in each table to find out where empty values was hidden.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw">sapply</span>(TableName, <span class="cf">function</span>(x) <span class="kw">table</span>(<span class="kw">as.character</span>(x) <span class="op">==</span><span class="st">&quot;&quot;</span>)[<span class="st">&quot;TRUE&quot;</span>])</a></code></pre></div>
+<p>Again, only the <strong>transaction</strong> table had empty values, according to the table below:</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">x</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>trans_id.NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td>account_id.NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td>date.NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td>type.NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td>operation.TRUE</td>
+<td align="right">183114</td>
+</tr>
+<tr class="even">
+<td>amount.NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td>balance.NA</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td>k_symbol.TRUE</td>
+<td align="right">535314</td>
+</tr>
+<tr class="odd">
+<td>bank.TRUE</td>
+<td align="right">782812</td>
+</tr>
+<tr class="even">
+<td>account.NA</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<p>For the exploration analysis report, we did not take any additional action, since the missing values was not relevant.</p>
+</div>
+<div id="label-translation" class="section level2">
+<h2><span class="header-section-number">1.4</span> Label Translation</h2>
+<p>In order to make the data information more understandable, it was translated some relevant labels and domains from Czech to English.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="co"># Translating relevant labels and domains to english --------------------------------------------</span></a>
+<a class="sourceLine" id="cb8-2" title="2"></a>
+<a class="sourceLine" id="cb8-3" title="3">disposition<span class="op">$</span>type &lt;-<span class="st"> </span>plyr<span class="op">::</span><span class="kw">mapvalues</span>(disposition<span class="op">$</span>type, <span class="kw">c</span>(<span class="st">&#39;OWNER&#39;</span>, <span class="st">&#39;DISPONENT&#39;</span>), </a>
+<a class="sourceLine" id="cb8-4" title="4">                                    <span class="kw">c</span>(<span class="st">&#39;Owner&#39;</span>, <span class="st">&#39;User&#39;</span>))</a>
+<a class="sourceLine" id="cb8-5" title="5"></a>
+<a class="sourceLine" id="cb8-6" title="6">account<span class="op">$</span>frequency &lt;-<span class="st"> </span>plyr<span class="op">::</span><span class="kw">mapvalues</span>(account<span class="op">$</span>frequency,</a>
+<a class="sourceLine" id="cb8-7" title="7">                                     <span class="kw">c</span>(<span class="st">&#39;POPLATEK MESICNE&#39;</span>, <span class="st">&#39;POPLATEK TYDNE&#39;</span>, </a>
+<a class="sourceLine" id="cb8-8" title="8">                                       <span class="st">&#39;POPLATEK PO OBRATU&#39;</span>),</a>
+<a class="sourceLine" id="cb8-9" title="9">                                     <span class="kw">c</span>(<span class="st">&#39;Monthly&#39;</span>, <span class="st">&#39;Weekly&#39;</span>, <span class="st">&#39;On Transaction&#39;</span>))</a>
+<a class="sourceLine" id="cb8-10" title="10"></a>
+<a class="sourceLine" id="cb8-11" title="11">permanent_order<span class="op">$</span>k_symbol &lt;-<span class="st"> </span>plyr<span class="op">::</span><span class="kw">mapvalues</span>(permanent_order<span class="op">$</span>k_symbol,</a>
+<a class="sourceLine" id="cb8-12" title="12">                                            <span class="kw">c</span>(<span class="st">&#39;POJISTNE&#39;</span>, <span class="st">&#39;SIPO&#39;</span>, <span class="st">&#39;LEASING&#39;</span>, <span class="st">&#39;UVER&#39;</span>),</a>
+<a class="sourceLine" id="cb8-13" title="13">                                            <span class="kw">c</span>(<span class="st">&#39;insurrance payment&#39;</span>, <span class="st">&#39;household&#39;</span>, </a>
+<a class="sourceLine" id="cb8-14" title="14">                                              <span class="st">&#39;leasing&#39;</span>, <span class="st">&#39;loan payment&#39;</span>))</a>
+<a class="sourceLine" id="cb8-15" title="15"></a>
+<a class="sourceLine" id="cb8-16" title="16">transaction<span class="op">$</span>type &lt;-<span class="st"> </span>plyr<span class="op">::</span><span class="kw">mapvalues</span>(transaction<span class="op">$</span>type,</a>
+<a class="sourceLine" id="cb8-17" title="17">                                    <span class="kw">c</span>(<span class="st">&#39;PRIJEM&#39;</span>, <span class="st">&#39;VYDAJ&#39;</span>, <span class="st">&#39;VYBER&#39;</span>),</a>
+<a class="sourceLine" id="cb8-18" title="18">                                    <span class="kw">c</span>(<span class="st">&#39;credit&#39;</span>, <span class="st">&#39;withdrawal&#39;</span>, <span class="st">&#39;withdrawal in cash&#39;</span>))</a>
+<a class="sourceLine" id="cb8-19" title="19"></a>
+<a class="sourceLine" id="cb8-20" title="20">transaction<span class="op">$</span>operation &lt;-<span class="st"> </span>plyr<span class="op">::</span><span class="kw">mapvalues</span>(transaction<span class="op">$</span>operation,</a>
+<a class="sourceLine" id="cb8-21" title="21">                                         <span class="kw">c</span>(<span class="st">&#39;VYBER KARTOU&#39;</span>, <span class="st">&#39;VKLAD&#39;</span>, <span class="st">&#39;PREVOD Z UCTU&#39;</span>, </a>
+<a class="sourceLine" id="cb8-22" title="22">                                           <span class="st">&#39;VYBER&#39;</span>, <span class="st">&#39;PREVOD NA UCET&#39;</span>),</a>
+<a class="sourceLine" id="cb8-23" title="23">                                         <span class="kw">c</span>(<span class="st">&#39;credit card withdrawal&#39;</span>, <span class="st">&#39;credit in cash&#39;</span>, </a>
+<a class="sourceLine" id="cb8-24" title="24">                                           <span class="st">&#39;collection from another bank&#39;</span>, </a>
+<a class="sourceLine" id="cb8-25" title="25">                                           <span class="st">&#39;withdrawal in cash&#39;</span>, <span class="st">&#39;remittance to nother bank&#39;</span>))</a>
+<a class="sourceLine" id="cb8-26" title="26"></a>
+<a class="sourceLine" id="cb8-27" title="27">transaction<span class="op">$</span>k_symbol &lt;-<span class="st"> </span>plyr<span class="op">::</span><span class="kw">mapvalues</span>(transaction<span class="op">$</span>k_symbol, </a>
+<a class="sourceLine" id="cb8-28" title="28">                                        <span class="kw">c</span>(<span class="st">&#39;POJISTNE&#39;</span>, <span class="st">&#39;SLUZBY&#39;</span>, <span class="st">&#39;UROK&#39;</span>, <span class="st">&#39;SANKC. UROK&#39;</span>, </a>
+<a class="sourceLine" id="cb8-29" title="29">                                          <span class="st">&#39;SIPO&#39;</span>, <span class="st">&#39;DUCHOD&#39;</span>, <span class="st">&#39;UVER&#39;</span>),</a>
+<a class="sourceLine" id="cb8-30" title="30">                                        <span class="kw">c</span>(<span class="st">&#39;insurance payment&#39;</span>, <span class="st">&#39;statement&#39;</span>, </a>
+<a class="sourceLine" id="cb8-31" title="31">                                          <span class="st">&#39;interest credited&#39;</span>, <span class="st">&#39;sanction interest&#39;</span>, </a>
+<a class="sourceLine" id="cb8-32" title="32">                                          <span class="st">&#39;household&#39;</span>, <span class="st">&#39;old age pension&#39;</span>, <span class="st">&#39;loan payment&#39;</span>))</a></code></pre></div>
+</div>
+<div id="data-enhancement" class="section level2">
+<h2><span class="header-section-number">1.5</span> Data Enhancement</h2>
+<p>This step aims to improve the analysis by adding auxiliary information. Data enhancement is all about making sure any data that is coming into the business is being looked at with a critical eye and is being filtered down to maximize its value.</p>
+<p>The code below get gender, birthday and age from birth_number column using <em>GetGenderFromBirthnumber</em> and <em>GetBirthdateFromBirthnumber</em> functions.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">client &lt;-<span class="st"> </span>client <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">gender =</span> <span class="kw">GetGenderFromBirthnumber</span>(birth_number)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb9-3" title="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">birth_date =</span> <span class="kw">GetBirthdateFromBirthnumber</span>(birth_number, gender)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb9-4" title="4"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">age =</span> <span class="kw">GetAgeFromBirthnumber</span>(birth_number))</a></code></pre></div>
+<p>The code below improved loan data by having a classification regarding its payment status.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">loan &lt;-<span class="st"> </span><span class="kw">mutate</span>(loan, <span class="dt">defaulter =</span> </a>
+<a class="sourceLine" id="cb10-2" title="2">                <span class="kw">as.logical</span>(plyr<span class="op">::</span><span class="kw">mapvalues</span>(status, <span class="kw">c</span> (<span class="st">&#39;A&#39;</span>,<span class="st">&#39;B&#39;</span>,<span class="st">&#39;C&#39;</span>,<span class="st">&#39;D&#39;</span>), </a>
+<a class="sourceLine" id="cb10-3" title="3">                                           <span class="kw">c</span>(<span class="ot">FALSE</span>,<span class="ot">TRUE</span>,<span class="ot">FALSE</span>,<span class="ot">TRUE</span>))),</a>
+<a class="sourceLine" id="cb10-4" title="4">                <span class="dt">contract_status =</span> plyr<span class="op">::</span><span class="kw">mapvalues</span>(status, <span class="kw">c</span> (<span class="st">&#39;A&#39;</span>,<span class="st">&#39;B&#39;</span>,<span class="st">&#39;C&#39;</span>,<span class="st">&#39;D&#39;</span>), </a>
+<a class="sourceLine" id="cb10-5" title="5">                                 <span class="kw">c</span>(<span class="st">&#39;finished&#39;</span>,<span class="st">&#39;finished&#39;</span>,<span class="st">&#39;running&#39;</span>,<span class="st">&#39;running&#39;</span>)),</a>
+<a class="sourceLine" id="cb10-6" title="6">                                 <span class="dt">type =</span> <span class="st">&#39;Owner&#39;</span>)</a></code></pre></div>
+<p>The code below improved client data by having its age group.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">client &lt;-<span class="st"> </span><span class="kw">mutate</span>(client, <span class="dt">age_bin =</span> <span class="kw">paste</span>(<span class="kw">findInterval</span>(age, </a>
+<a class="sourceLine" id="cb11-2" title="2">                 <span class="kw">c</span>(<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="dv">40</span>, <span class="dv">50</span>, <span class="dv">60</span>, <span class="dv">70</span>, <span class="dv">80</span>, <span class="dv">90</span>, <span class="dv">100</span>)) <span class="op">*</span><span class="st"> </span><span class="dv">10</span>,<span class="st">&#39;+&#39;</span>))</a></code></pre></div>
+<p>The code below calculate an additional table with current and average account balance for each account.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">account_balance &lt;-<span class="st"> </span><span class="kw">arrange</span>(transaction, <span class="kw">desc</span>(date), account_id) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="st">  </span><span class="kw">group_by</span>(account_id) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-3" title="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">avg_balance =</span> <span class="kw">mean</span>(balance)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-4" title="4"><span class="st">  </span><span class="kw">filter</span>(<span class="kw">row_number</span>() <span class="op">==</span><span class="st"> </span><span class="dv">1</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-5" title="5"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(account_id, date, balance, avg_balance)</a>
+<a class="sourceLine" id="cb12-6" title="6"></a>
+<a class="sourceLine" id="cb12-7" title="7"><span class="kw">colnames</span>(account_balance) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;account_id&quot;</span>, <span class="st">&quot;last_transaction_date&quot;</span>, <span class="st">&#39;account_balance&#39;</span>, <span class="st">&#39;avg_balance&#39;</span>)</a></code></pre></div>
+<p>The code below calculate an additional table with the proportion of each transaction type (k_symbol) on total transaction amount of each account. That data will be used to fit a logistic model on loan dataset.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1">account_transaction_pattern &lt;-<span class="st"> </span><span class="kw">select</span>(transaction, <span class="kw">c</span>(trans_id, account_id, date, amount, k_symbol)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb13-2" title="2"><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">k_symbol =</span> <span class="kw">ifelse</span>(k_symbol <span class="op">==</span><span class="st"> &#39;&#39;</span> <span class="op">|</span><span class="st"> </span><span class="kw">is.na</span>(k_symbol), <span class="st">&#39;other&#39;</span>, k_symbol)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb13-3" title="3"><span class="st">    </span><span class="kw">spread</span>(<span class="dt">key =</span> k_symbol, <span class="dt">value =</span> amount) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb13-4" title="4"><span class="st">    </span><span class="kw">replace</span>(<span class="kw">is.na</span>(.), <span class="dv">0</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb13-5" title="5"><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">amount =</span> <span class="kw">rowSums</span>(.[<span class="dv">4</span><span class="op">:</span><span class="dv">11</span>])) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb13-6" title="6"><span class="st">    </span><span class="kw">group_by</span>(account_id) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb13-7" title="7"><span class="st">    </span><span class="kw">summarise</span>(<span class="dt">transaction_count =</span> <span class="kw">n</span>(),</a>
+<a class="sourceLine" id="cb13-8" title="8">              <span class="dt">last_transaction_date =</span> <span class="kw">max</span>(date),</a>
+<a class="sourceLine" id="cb13-9" title="9">              <span class="dt">amount =</span> <span class="kw">sum</span>(amount),</a>
+<a class="sourceLine" id="cb13-10" title="10">              <span class="dt">prop_household =</span> <span class="kw">sum</span>(household) <span class="op">/</span><span class="st"> </span>amount,</a>
+<a class="sourceLine" id="cb13-11" title="11">              <span class="dt">prop_insurance_payment =</span> <span class="kw">sum</span>(<span class="st">`</span><span class="dt">insurance payment</span><span class="st">`</span>) <span class="op">/</span><span class="st"> </span>amount,</a>
+<a class="sourceLine" id="cb13-12" title="12">              <span class="dt">prop_interest_credited =</span> <span class="kw">sum</span>(<span class="st">`</span><span class="dt">interest credited</span><span class="st">`</span>) <span class="op">/</span><span class="st"> </span>amount,</a>
+<a class="sourceLine" id="cb13-13" title="13">              <span class="dt">prop_loan_payment =</span> <span class="kw">sum</span>(<span class="st">`</span><span class="dt">loan payment</span><span class="st">`</span>) <span class="op">/</span><span class="st"> </span>amount,</a>
+<a class="sourceLine" id="cb13-14" title="14">              <span class="dt">prop_old_age_pension =</span> <span class="kw">sum</span>(<span class="st">`</span><span class="dt">old age pension</span><span class="st">`</span>) <span class="op">/</span><span class="st"> </span>amount,</a>
+<a class="sourceLine" id="cb13-15" title="15">              <span class="dt">prop_other =</span> <span class="kw">sum</span>(<span class="st">`</span><span class="dt">other</span><span class="st">`</span>) <span class="op">/</span><span class="st"> </span>amount,</a>
+<a class="sourceLine" id="cb13-16" title="16">              <span class="dt">prop_sanction_interest =</span> <span class="kw">sum</span>(<span class="st">`</span><span class="dt">sanction interest</span><span class="st">`</span>) <span class="op">/</span><span class="st"> </span>amount,</a>
+<a class="sourceLine" id="cb13-17" title="17">              <span class="dt">prop_statement =</span> <span class="kw">sum</span>(<span class="st">`</span><span class="dt">statement</span><span class="st">`</span>) <span class="op">/</span><span class="st"> </span>amount)</a></code></pre></div>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
