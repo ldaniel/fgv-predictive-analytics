@@ -8,7 +8,7 @@ navbar:
       href: 01_about_the_data.html
     - text: "Data preparation"
       href: 02_data_preparation.html
-    - text: "Logistic Regression"
+    - text: "Logistic regression"
       href: 03_logistic_regression_report.html
     - text: "Conclusion"
       href: 04_conclusion.html
