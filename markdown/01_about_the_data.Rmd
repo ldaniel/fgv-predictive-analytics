@@ -19,7 +19,7 @@ The bank managers hope to improve their undestanding of customers and seed speci
 
 This database was prepared by Petr Berka and Marta Sochorova.
 
-![Simplified logical data model of Berka Bank.](https://raw.githubusercontent.com/ldaniel/Predictive-Analysis/master/images/data_model.png)
+![Simplified logical data model of Berka Bank.](https://raw.githubusercontent.com/ldaniel/Predictive-Analytics/master/images/data_model.png)
 
 # About the data
 Data from a real Czech bank. From 1999.
