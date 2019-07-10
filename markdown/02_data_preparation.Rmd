@@ -1,0 +1,255 @@
+---
+title: "Data preparation"
+date: "July, 2019"
+---
+
+```{r setup_exploration, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.pos =  "h")
+knitr::opts_knit$set(root.dir = "../")
+
+# loading required libraries
+library(rmarkdown)
+library(dplyr)
+library(ggplot2)
+library(ggthemes)
+library(ggalluvial)
+library(tidyr)
+library(lubridate)
+library(stringr)
+library(VIM)
+library(psych)
+library(feather)
+library(tinytex)
+library(knitr)
+library(leaflet)
+library(geojsonio)
+```
+
+```{r include=FALSE}
+# loading required steps before performing the analysis
+source("./scripts/step_01_create_functions.R")
+source("./scripts/step_02_data_ingestion.R")
+source("./scripts/step_03_data_cleaning.R")
+source("./scripts/step_04_label_translation.R")
+source("./scripts/step_05_data_enhancement.R")
+```
+
+# Data ingestion, cleaning, translation and enhancement
+
+Before starting the Berka Analysis, a few important steps were taken in order to prepare the source data files. These steps are listed below:
+
+- **Step 01**: Create Functions;
+- **Step 02**: Data Ingestion;
+- **Step 03**: Data Cleaning;
+- **Step 04**: Label Translation;
+- **Step 05**: Data Enhancement.
+
+## Create Functions
+This step create functions to be used in the next steps. Following, all functions created are described.
+
+### GetGenderFromBirthnumber 
+The birth_number column is given in the form of YYMMDD for men, and YYMM+50DD for women. The objective of this function is to return the gender of the client via the birth_number.
+
+``` {r GetGenderFromBirthnumber, eval = FALSE}
+GetGenderFromBirthnumber <- function(var_birth_number) {
+  month <- substr(var_birth_number, 3, 4)
+  result <- ifelse(as.integer(month) > 50, "female", "male")
+  
+  return(as.factor(result))
+}
+```
+
+### GetBirthdateFromBirthnumber
+The birth_number column is given in the form of YYMMDD for men, # and YYMM+50DD for women. The objective of this function is to return the final birthday as Date.
+
+``` {r GetBirthdateFromBirthnumber, eval = FALSE}
+GetBirthdateFromBirthnumber <- function(var_birth_number, var_gender) {
+  year <- paste("19", substr(var_birth_number, 1, 2), sep="")
+  month <- ifelse(var_gender == "male", substr(var_birth_number, 3, 4), 
+  as.integer(substr(var_birth_number, 3, 4)) - 50)
+  day <- substr(var_birth_number, 5, 6)
+  result <- as.Date(paste(year, "-", month, "-", day, sep=""), format = "%Y-%m-%d")
+  
+  return(result)
+}
+```
+
+### ConvertToDate
+The objective of this function is to convert the strange bank date style to the regular R Date datatype.
+
+``` {r ConvertToDate, eval = FALSE}
+ConvertToDate <- function(var_date) {
+  year <- paste("19", substr(var_date, 1, 2), sep="")
+  month <- substr(var_date, 3, 4)
+  day <- substr(var_date, 5, 6)
+  result <- as.Date(paste(year, "-", month, "-", day, sep=""), format = "%Y-%m-%d")
+  
+  return(result)
+}
+```
+
+### GetAgeFromBirthnumber
+The objective of this function is to get age given the birth_number.
+
+``` {r GetAgeFromBirthnumber, eval = FALSE}
+GetAgeFromBirthnumber <- function(var_birth_number) {
+  base_year <- 99 # considering 1999 as the base year for this exercise
+  year <- substr(var_birth_number, 1, 2)
+  result <- base_year - as.integer(year)
+  
+  return(result)
+}
+```
+
+## Data Ingestion
+The process of data ingestion — preparing data for analysis — usually includes steps called extract (taking the data from its current location), transform (cleansing and normalizing the data), and load (placing the data in a database where it can be analyzed).
+
+During this step, in addition to the loading data processes, it was performed data casting, column renaming and small touch-ups. The list below describe each table adjustment taken:
+
+- **District**: renaming columns and casting columns with decimal or "?" values;
+- **Credit Card**: casting column issued in creditcard table from string to datetime data type;
+- **Account**: casting column date in account table from string to datetime data type;
+- **Loan**: casting columns in table loan to the right data types;
+- **Permanent Order**: casting columns with decimal values;
+- **Transaction**: casting columns in table transaction to the right data types.
+
+## Data Cleaning
+
+The objective of this step is analysing missing values and other strange conditions. In order to accomplish this task, a few R functions were used to quickly discover missing values, like NA and empty fields.
+
+First thing done, was fixing observations in k_symbol transaction table with ' ' (one space) to empty string (''), using the following command.
+
+``` {r fix_ksymbol, eval = FALSE}
+transaction$k_symbol = trimws(transaction$k_symbol)
+```
+
+Then, the command below was used to find out any NA values in each table.
+
+``` {r find_na, eval = FALSE}
+sapply(TableName, function(x) sum(is.na(x)))
+```
+
+Solely the **transaction** table has NA values, in the following columns:
+
+```{r echo=FALSE, results = 'asis'}
+kable(transaction_na_cols)
+```
+
+Finally, the following command was used in each table to find out where empty values was hidden. 
+
+``` {r find_empty, eval = FALSE}
+sapply(TableName, function(x) table(as.character(x) =="")["TRUE"])
+```
+
+Again, only the **transaction** table had empty values, according to the table below:
+
+```{r echo=FALSE, results = 'asis'}
+kable(transaction_empty_cols)
+```
+
+For the exploration analysis report, we did not take any additional action, since the missing values was not relevant.
+
+## Label Translation
+In order to make the data information more understandable, it was translated some relevant labels and domains from Czech to English.
+
+``` {r translate, eval = FALSE}
+# Translating relevant labels and domains to english --------------------------------------------
+
+disposition$type <- plyr::mapvalues(disposition$type, c('OWNER', 'DISPONENT'), 
+                                    c('Owner', 'User'))
+
+account$frequency <- plyr::mapvalues(account$frequency,
+                                     c('POPLATEK MESICNE', 'POPLATEK TYDNE', 
+                                       'POPLATEK PO OBRATU'),
+                                     c('Monthly', 'Weekly', 'On Transaction'))
+
+permanent_order$k_symbol <- plyr::mapvalues(permanent_order$k_symbol,
+                                            c('POJISTNE', 'SIPO', 'LEASING', 'UVER'),
+                                            c('insurrance payment', 'household', 
+                                              'leasing', 'loan payment'))
+
+transaction$type <- plyr::mapvalues(transaction$type,
+                                    c('PRIJEM', 'VYDAJ', 'VYBER'),
+                                    c('credit', 'withdrawal', 'withdrawal in cash'))
+
+transaction$operation <- plyr::mapvalues(transaction$operation,
+                                         c('VYBER KARTOU', 'VKLAD', 'PREVOD Z UCTU', 
+                                           'VYBER', 'PREVOD NA UCET'),
+                                         c('credit card withdrawal', 'credit in cash', 
+                                           'collection from another bank', 
+                                           'withdrawal in cash', 'remittance to nother bank'))
+
+transaction$k_symbol <- plyr::mapvalues(transaction$k_symbol, 
+                                        c('POJISTNE', 'SLUZBY', 'UROK', 'SANKC. UROK', 
+                                          'SIPO', 'DUCHOD', 'UVER'),
+                                        c('insurance payment', 'statement', 
+                                          'interest credited', 'sanction interest', 
+                                          'household', 'old age pension', 'loan payment'))
+
+```
+
+
+## Data Enhancement
+This step aims to improve the analysis by adding auxiliary information. Data enhancement is all about making sure any data that is coming into the business is being looked at with a critical eye and is being filtered down to maximize its value.
+
+The code below get gender, birthday and age from birth_number column using *GetGenderFromBirthnumber* and *GetBirthdateFromBirthnumber* functions.
+
+``` {r client, eval = FALSE}
+client <- client %>% 
+  mutate(gender = GetGenderFromBirthnumber(birth_number)) %>% 
+  mutate(birth_date = GetBirthdateFromBirthnumber(birth_number, gender)) %>% 
+  mutate(age = GetAgeFromBirthnumber(birth_number))
+```
+
+The code below improved loan data by having a classification regarding its payment status.
+
+``` {r loan, eval = FALSE}
+loan <- mutate(loan, defaulter = 
+                as.logical(plyr::mapvalues(status, c ('A','B','C','D'), 
+                                           c(FALSE,TRUE,FALSE,TRUE))),
+                contract_status = plyr::mapvalues(status, c ('A','B','C','D'), 
+                                 c('finished','finished','running','running')),
+                                 type = 'Owner')
+```
+
+The code below improved client data by having its age group.
+
+``` {r client_age, eval = FALSE}
+client <- mutate(client, age_bin = paste(findInterval(age, 
+                 c(10, 20, 30, 40, 50, 60, 70, 80, 90, 100)) * 10,'+'))
+```
+
+The code below calculate an additional table with current and average account balance for each account.
+
+``` {r account_balance, eval = FALSE}
+account_balance <- arrange(transaction, desc(date), account_id) %>%
+  group_by(account_id) %>%
+  mutate(avg_balance = mean(balance)) %>%
+  filter(row_number() == 1) %>%
+  dplyr::select(account_id, date, balance, avg_balance)
+
+colnames(account_balance) <- c("account_id", "last_transaction_date", 'account_balance', 'avg_balance')
+```
+
+The code below calculate an additional table with the proportion of each transaction type (k_symbol) on total transaction amount of each account. That data will be used to fit a logistic model on loan dataset.
+
+``` {r account_transaction_pattern, eval = FALSE}
+account_transaction_pattern <- select(transaction, c(trans_id, account_id, date, amount, k_symbol)) %>% 
+    mutate(k_symbol = ifelse(k_symbol == '' | is.na(k_symbol), 'other', k_symbol)) %>% 
+    spread(key = k_symbol, value = amount) %>%
+    replace(is.na(.), 0) %>% 
+    mutate(amount = rowSums(.[4:11])) %>%
+    group_by(account_id) %>%
+    summarise(transaction_count = n(),
+              last_transaction_date = max(date),
+              amount = sum(amount),
+              prop_household = sum(household) / amount,
+              prop_insurance_payment = sum(`insurance payment`) / amount,
+              prop_interest_credited = sum(`interest credited`) / amount,
+              prop_loan_payment = sum(`loan payment`) / amount,
+              prop_old_age_pension = sum(`old age pension`) / amount,
+              prop_other = sum(`other`) / amount,
+              prop_sanction_interest = sum(`sanction interest`) / amount,
+              prop_statement = sum(`statement`) / amount)
+```
