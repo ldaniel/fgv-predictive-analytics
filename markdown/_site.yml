@@ -6,6 +6,8 @@ navbar:
       href: index.html
     - text: "About the Data"
       href: 01_about_the_data.html
+    - text: "Data preparation"
+      href: 02_data_preparation.html
 output:
   html_document: 
     theme: cosmo
