@@ -20,7 +20,7 @@ Use the menu above to navigate and see the final report.
 - Ygor Lima (A57549661 / ygor_redesocial@hotmail.com)
 
 ## Where to find the source code of this project?
-This project can be found and downloaded on GitHub: https://github.com/ldaniel/R_Bank_Berka
+This project can be found and downloaded on GitHub: https://github.com/ldaniel/Predictive-Analytics
 
 > Valar Morghulis!
 > :)
