@@ -6,7 +6,7 @@ title: 'FGV MBA: Business Analytics & Big Data'
 
 This website intends to present the work analysis for the *"Análise Preditiva"* class.
 
-The ideia is Practing R using a real anonymized Czech bank transactions, account info, and loan records released for PKDD'99 Discovery Challenge.
+The ideia is Practicing R using a real anonymized Czech bank transactions, account info, and loan records released for PKDD'99 Discovery Challenge.
 
 Use the menu above to navigate and see the final report.
 
