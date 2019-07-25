@@ -105,7 +105,8 @@ DataPrep <- function() {
                       "x_prop_sanction_interest","x_prop_household","x_prop_statement",
                       "x_prop_interest_credited", "x_prop_loan_payment", "x_prop_other")
 
-  temp <- select(temp, -c("x_loan_status", "x_loan_contract_status", 'x_prop_sanction_interest'))
+  temp <- dplyr::select(temp, -c("x_loan_status", "x_loan_contract_status", 
+                                 'x_prop_sanction_interest'))
   
   temp$x_card_type = ifelse(is.na(temp$x_card_type), 'no card', 
                             as.character(temp$x_card_type))
@@ -115,10 +116,10 @@ DataPrep <- function() {
   
   temp$y_loan_defaulter = as.integer(temp$y_loan_defaulter)
 
-  temp <- dummy_cols(temp, 
-                     remove_first_dummy = TRUE,
-                     select_columns = c("x_client_gender", "x_district_name", "x_region", 
-                                        "x_card_type"))
+  temp <- fastDummies::dummy_cols(temp,
+                                  remove_first_dummy = TRUE,
+                                  select_columns = c("x_client_gender", "x_district_name", 
+                                                     "x_region", "x_card_type"))
   
   temp <- dplyr::select(temp, -c("x_client_gender", "x_district_name", "x_region", 
                           "x_card_type"))
