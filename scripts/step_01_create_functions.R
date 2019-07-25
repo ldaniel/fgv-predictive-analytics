@@ -104,8 +104,8 @@ DataPrep <- function() {
                       "x_prop_old_age_pension", "x_prop_insurance_payment", 
                       "x_prop_sanction_interest","x_prop_household","x_prop_statement",
                       "x_prop_interest_credited", "x_prop_loan_payment", "x_prop_other")
-  
-  
+
+  temp <- select(temp, -c("x_loan_status", "x_loan_contract_status", 'x_prop_sanction_interest'))
   
   temp$x_card_type = ifelse(is.na(temp$x_card_type), 'no card', 
                             as.character(temp$x_card_type))
@@ -113,10 +113,8 @@ DataPrep <- function() {
   temp$x_card_age_month = ifelse(is.na(temp$x_card_age_month), 0, 
                                  temp$x_card_age_month)
   
-  temp$y_loan_defaulter = as.numeric(temp$y_loan_defaulter)
-  
-  temp <- select(temp, -c("x_loan_status", "x_loan_contract_status"))
-  
+  temp$y_loan_defaulter = as.integer(temp$y_loan_defaulter)
+
   temp <- dummy_cols(temp, 
                      remove_first_dummy = TRUE,
                      select_columns = c("x_client_gender", "x_district_name", "x_region", 
@@ -130,8 +128,8 @@ DataPrep <- function() {
   temp <- dplyr::select(temp, y_loan_defaulter, everything())
   
   colnames(temp) <- stringr::str_replace_all(names(temp), ' ', '_')
-  
-  temp <- dplyr::select(temp, -c('x_prop_sanction_interest'))
+  colnames(temp) <- trimws(names(temp))
+  colnames(temp) <- textclean::replace_non_ascii(names(temp))
 
   return(temp)
 
