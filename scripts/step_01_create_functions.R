@@ -115,19 +115,23 @@ DataPrep <- function() {
   
   temp$y_loan_defaulter = as.numeric(temp$y_loan_defaulter)
   
+  temp <- select(temp, -c("x_loan_status", "x_loan_contract_status"))
+  
   temp <- dummy_cols(temp, 
                      remove_first_dummy = TRUE,
-                     select_columns = c("x_loan_status", "x_loan_contract_status",
-                                        "x_client_gender", "x_district_name", "x_region", 
+                     select_columns = c("x_client_gender", "x_district_name", "x_region", 
                                         "x_card_type"))
   
-  temp <- dplyr::select(temp, -c("x_loan_status", "x_loan_contract_status",
-                          "x_client_gender", "x_district_name", "x_region", 
+  temp <- dplyr::select(temp, -c("x_client_gender", "x_district_name", "x_region", 
                           "x_card_type"))
   
   temp <- temp[ , order(names(temp))]
   
   temp <- dplyr::select(temp, y_loan_defaulter, everything())
+  
+  colnames(temp) <- stringr::str_replace_all(names(temp), ' ', '_')
+  
+  temp <- dplyr::select(temp, -c('x_prop_sanction_interest'))
 
   return(temp)
 
