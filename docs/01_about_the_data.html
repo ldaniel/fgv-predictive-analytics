@@ -21,6 +21,8 @@
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
 
 
@@ -256,25 +258,50 @@ $(document).ready(function () {
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="index.html">Home</a>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
 </li>
 <li>
-  <a href="01_about_the_data.html">About the Data</a>
+  <a href="01_about_the_data.html">
+    <span class="fa fa-info"></span>
+     
+    About the Data
+  </a>
 </li>
 <li>
   <a href="02_data_preparation.html">Data preparation</a>
 </li>
-<li>
-  <a href="03_logistic_regression_report.html">Logistic regression</a>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fa fa-gear"></span>
+     
+    Model's reports
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-header">Analytical Methods</li>
+    <li>
+      <a href="03_logistic_regression_report.html">Logistic regression</a>
+    </li>
+    <li>
+      <a href="04_decision_tree_report.html">Decision Tree</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Ensembe Methods</li>
+    <li>
+      <a href="05_boosting_report.html">Boosting</a>
+    </li>
+    <li>
+      <a href="06_random_forest_report.html">Random Forest</a>
+    </li>
+  </ul>
 </li>
 <li>
-  <a href="04_decision_tree_report.html">Decision Tree</a>
-</li>
-<li>
-  <a href="05_boosting_report.html">Boosting</a>
-</li>
-<li>
-  <a href="06_conclusion.html">Conclusion</a>
+  <a href="07_conclusion.html">Conclusion</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
