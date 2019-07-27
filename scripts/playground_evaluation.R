@@ -39,36 +39,25 @@ source('scripts/playground_boosting.R')
 
 ## making preditions -----------------------------------------------------------------
 
-logistic.full.prob.train <- predict(logistic.full, type = "response")
-logistic.full.prob.test <- predict(logistic.full, 
-                                   newdata = data.test, type= "response")
-
-logistic.step.prob.train <- predict(logistic.step, type = "response")
-logistic.step.prob.test <- predict(logistic.step, 
-                                   newdata = data.test, type= "response")
+logistic.prob.train <- predict(logistic.step, type = "response")
+logistic.prob.test <- predict(logistic.step,
+                              newdata = data.test, type= "response")
 
 decision.tree.prob.train <- predict(tree.full, type = "prob")[,2]
-decision.tree.prob.test  <- predict(tree.full, 
+decision.tree.prob.test  <- predict(tree.full,
                                     newdata = data.test, type = "prob")[,2]
 
-boost.prob.train <- predict.boosting(boost, data.train)$prob[,2]
-boost.prob.test  <- predict.boosting(boost, data.test)$prob[,2]
+boosting.prob.train <- predict.boosting(boost, data.train)$prob[,2]
+boosting.prob.test  <- predict.boosting(boost, data.test)$prob[,2]
 
 ## getting measures -----------------------------------------------------------------
-measures.logistic.full.train <- HMeasure(data.train$y_loan_defaulter, 
-                                         logistic.full.prob.train, 
+
+measures.logistic.train <- HMeasure(data.train$y_loan_defaulter, 
+                                         logistic.prob.train, 
                                          threshold = 0.5)
 
-measures.logistic.full.test  <- HMeasure(data.test$y_loan_defaulter, 
-                                         logistic.full.prob.test, 
-                                         threshold = 0.5)
-
-measures.logistic.step.train <- HMeasure(data.train$y_loan_defaulter, 
-                                         logistic.step.prob.train, 
-                                         threshold = 0.5)
-
-measures.logistic.step.test <- HMeasure(data.test$y_loan_defaulter, 
-                                        logistic.step.prob.test, 
+measures.logistic.test <- HMeasure(data.test$y_loan_defaulter, 
+                                        logistic.prob.test, 
                                         threshold = 0.5)
 
 measures.decision.tree.train <- HMeasure(data.train$y_loan_defaulter, 
@@ -79,27 +68,24 @@ measures.decision.tree.test <- HMeasure(data.test$y_loan_defaulter,
                                         decision.tree.prob.test, 
                                         threshold = 0.5)
 
-measures.boost.train <- HMeasure(data.train$y_loan_defaulter, 
+measures.boosting.train <- HMeasure(data.train$y_loan_defaulter, 
                                  boost.prob.train,
                                  threshold = 0.5)
 
-measures.boost.test  <- HMeasure(data.test$y_loan_defaulter, 
+measures.boosting.test  <- HMeasure(data.test$y_loan_defaulter, 
                                  boost.prob.test,
                                  threshold = 0.5)
 
 
-measures <- t(bind_rows(measures.logistic.full.train$metrics,
-                        measures.logistic.full.test$metrics,
-                        measures.logistic.step.train$metrics,
-                        measures.logistic.step.test$metrics,
+measures <- t(bind_rows(measures.logistic.train$metrics,
+                        measures.logistic.test$metrics,
                         measures.decision.tree.train$metrics,
                         measures.decision.tree.test$metrics,
-                        measures.boost.train$metrics,
-                        measures.boost.test$metrics,
+                        measures.boosting.train$metrics,
+                        measures.boosting.test$metrics,
                         )) %>% as_tibble(., rownames = NA)
 
-colnames(measures) <- c('logistic.full - train', 'logistic.full - test',
-                        'logistic.step - train', 'logistic.step - test',
+colnames(measures) <- c('logistic - train', 'logistic - test',
                         'decision.tree - train', 'decision.tree - test',
                         'boosting - train', 'boosting - test')
 
@@ -110,54 +96,44 @@ measures <- dplyr::select(measures, metric, everything())
 kable(measures, row.names = FALSE)
 
 ## boxplot -------------------------------------------------------------------------
-boxplot(logistic.full.prob.test ~ data.test$y_loan_defaulter,
-        col= c("red", "green"), 
-        horizontal= T,
-        xlab = 'Probability Prediction',
-        ylab = 'Loan Defaulter')
 
-boxplot(logistic.step.prob.test ~ data.test$y_loan_defaulter,
-        col= c("red", "green"), 
+boxplot(logistic.prob.test ~ data.test$y_loan_defaulter,
+        col= c("green", "red"), 
         horizontal= T,
         xlab = 'Probability Prediction',
         ylab = 'Loan Defaulter')
 
 boxplot(decision.tree.prob.test ~ data.test$y_loan_defaulter,
-        col= c("red", "green"), 
+        col= c("green", "red"), 
         horizontal= T,
         xlab = 'Probability Prediction',
         ylab = 'Loan Defaulter')
 
-boxplot(boost.prob.test ~ data.test$y_loan_defaulter
+boxplot(boosting.prob.test ~ data.test$y_loan_defaulter
         ,col= c("green", "red"),
         horizontal= T,
         xlab = 'Probability Prediction',
         ylab = 'Loan Defaulter')
 
 ## ROC Curve ----------------------------------------------------------------------
-roc_logistic.full <- roc(data.test$y_loan_defaulter, 
-                         logistic.full.prob.test)
 
-roc_logistic.step <- roc(data.test$y_loan_defaulter, 
-                         logistic.step.prob.test)
+roc_logistic <- roc(data.test$y_loan_defaulter,
+                    logistic.prob.test)
 
 roc_decision.tree <- roc(data.test$y_loan_defaulter, 
                          decision.tree.prob.test)
 
 roc_boosting <- roc(data.test$y_loan_defaulter,
-                    boost.prob.test)
+                    boosting.prob.test)
 
-y1 <- roc_logistic.full$sensitivities
-x1 <- 1 - roc_logistic.full$specificities
+y1 <- roc_logistic$sensitivities
+x1 <- 1 - roc_logistic$specificities
 
-y2 <- roc_logistic.step$sensitivities
-x2 <- 1 - roc_logistic.step$specificities
+y2 <- roc_decision.tree$sensitivities
+x2 <- 1 - roc_decision.tree$specificities
 
-y3 <- roc_decision.tree$sensitivities
-x3 <- 1 - roc_decision.tree$specificities
-
-y4 <- roc_boosting$sensitivities
-x4 <- 1 - roc_boosting$specificities
+y3 <- roc_boosting$sensitivities
+x3 <- 1 - roc_boosting$specificities
 
 plot(x1, y1,  type="n",
      xlab = "False Positive Rate (Specificities)", 
@@ -166,12 +142,9 @@ plot(x1, y1,  type="n",
 lines(x1, y1, lwd = 3, lty = 1, col="red") 
 lines(x2, y2, lwd = 3, lty = 1, col="blue")
 lines(x3, y3, lwd = 3, lty = 1, col="green")
-lines(x4, y4, lwd = 3, lty = 1, col="purple")
 
-legend("topright", 'Logistic.full', lty=1, col="red", inset=c(0, 0.15), cex=.8)
-legend("topright", 'logistic.step', lty=1, col="blue", inset=c(0, 0.25), cex=.8)
-legend("topright", 'decision.tree', lty=1, col="green", inset=c(0, 0.35), cex=.8)
-legend("topright", 'boosting', lty=1, col="purple", inset=c(0, 0.45), cex=.8)
+legend("bottomright", c('Logistic', 'Decision Tree', 'Boosting'), 
+       lty = 1, col = c('red', 'blue', 'green'))
 
 abline(0, 1, lty = 2)
 
@@ -194,7 +167,6 @@ accuracy <- function(x, threshold = 0.5) {
               round(misClassCount$metrics['TPR'] * 100, 2), '%', sep = ''))
 }
 
-accuracy(logistic.full.prob.test, 0.1)
-accuracy(logistic.step.prob.test, 0.1)
+accuracy(logistic.prob.test, 0.1)
 accuracy(decision.tree.prob.test, 0.1)
-accuracy(boost.prob.test, 0.4)
+accuracy(boosting.prob.test, 0.4)
