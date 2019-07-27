@@ -3,19 +3,29 @@ navbar:
   title: "FGV MBA"
   left:
     - text: "Home"
+      icon: fa-home
       href: index.html
     - text: "About the Data"
+      icon: fa-info
       href: 01_about_the_data.html
     - text: "Data preparation"
       href: 02_data_preparation.html
-    - text: "Logistic regression"
-      href: 03_logistic_regression_report.html
-    - text: "Decision Tree"
-      href: 04_decision_tree_report.html
-    - text: "Boosting"
-      href: 05_boosting_report.html
+    - text: "Model's reports"
+      icon: fa-gear
+      menu: 
+        - text: "Analytical Methods"
+        - text: "Logistic regression"
+          href: 03_logistic_regression_report.html
+        - text: "Decision Tree"
+          href: 04_decision_tree_report.html
+        - text: "---------"
+        - text: "Ensembe Methods"
+        - text: "Boosting"
+          href: 05_boosting_report.html
+        - text: "Random Forest"
+          href: 06_random_forest_report.html
     - text: "Conclusion"
-      href: 06_conclusion.html
+      href: 07_conclusion.html
 output:
   html_document: 
     theme: cosmo
