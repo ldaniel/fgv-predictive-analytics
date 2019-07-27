@@ -67,4 +67,8 @@ permanent_order <- permanent_order %>%
 transaction <- transaction %>% 
   mutate(date = ConvertToDate(date)) %>% 
   mutate(amount = as.double(amount)) %>% 
-  mutate(balance = as.double(balance)) 
+  mutate(balance = as.double(balance))
+
+# casting columns in table transaction to the right data types
+disposition <- disposition %>% 
+  mutate(type = as.character(type))
