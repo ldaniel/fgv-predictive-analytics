@@ -129,6 +129,7 @@ DataPrep <- function() {
   temp <- dplyr::select(temp, y_loan_defaulter, everything())
   
   colnames(temp) <- stringr::str_replace_all(names(temp), ' ', '_')
+  colnames(temp) <- stringr::str_replace_all(names(temp), '_-_', '_')
   colnames(temp) <- trimws(names(temp))
   colnames(temp) <- textclean::replace_non_ascii(names(temp))
 
