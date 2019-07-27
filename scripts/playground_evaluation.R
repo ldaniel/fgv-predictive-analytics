@@ -45,12 +45,12 @@ logistic.prob.train <- predict(logistic.step, type = "response")
 logistic.prob.test <- predict(logistic.step,
                               newdata = data.test_logistic, type= "response")
 
-decision.tree.prob.train <- predict(tree.full, type = "prob")[,2]
+decision.tree.prob.train <- predict(tree.full, type = "prob")[, 2]
 decision.tree.prob.test  <- predict(tree.full,
-                                    newdata = data.test_DT, type = "prob")[,2]
+                                    newdata = data.test_DT, type = "prob")[, 2]
 
-boosting.prob.train <- predict.boosting(boost, data.train_boost)$prob[,2]
-boosting.prob.test  <- predict.boosting(boost, data.test_boost)$prob[,2]
+boosting.prob.train <- predict.boosting(boost, data.train_boost)$prob[, 2]
+boosting.prob.test  <- predict.boosting(boost, data.test_boost)$prob[, 2]
 
 ## getting measures -----------------------------------------------------------------
 
