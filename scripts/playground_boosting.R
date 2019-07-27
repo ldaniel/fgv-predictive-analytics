@@ -1,29 +1,29 @@
 
 # data prep -------------------------------------------------------------------
-temp <- DataPrep()
-temp <- dplyr::select(temp, -starts_with('x_district'), 
+loan_dataset_boost <- DataPrep()
+loan_dataset_boost <- dplyr::select(loan_dataset_boost,
                       -x_prop_old_age_pension)
 
-kable(tibble(variables = names(temp)))
+kable(tibble(variables = names(loan_dataset_boost)))
 
 #Analysis on base
-summary(temp)
-aggr(temp)
+summary(loan_dataset_boost)
+aggr(loan_dataset_boost)
 
-boxplot(temp$x_account_balance ~ temp$y_loan_defaulter)
-boxplot(temp$x_avg_account_balance ~ temp$y_loan_defaulter)
+boxplot(loan_dataset_boost$x_account_balance ~ loan_dataset_boost$y_loan_defaulter)
+boxplot(loan_dataset_boost$x_avg_account_balance ~ loan_dataset_boost$y_loan_defaulter)
 
 # sampling ----------------------------------------------------------------------------
 
 set.seed(12345)
-index <- caret::createDataPartition(temp$y_loan_defaulter, 
+index <- caret::createDataPartition(loan_dataset_boost$y_loan_defaulter, 
                                     p= 0.7,list = FALSE)
-data.train <- temp[index, ]
-data.test  <- temp[-index,]
+data.train_boost <- loan_dataset_boost[index, ]
+data.test_boost  <- loan_dataset_boost[-index,]
 
-event_proportion <- bind_rows(prop.table(table(temp$y_loan_defaulter)),
-                              prop.table(table(data.train$y_loan_defaulter)),
-                              prop.table(table(data.test$y_loan_defaulter)))
+event_proportion <- bind_rows(prop.table(table(loan_dataset_boost$y_loan_defaulter)),
+                              prop.table(table(data.train_boost$y_loan_defaulter)),
+                              prop.table(table(data.test_boost$y_loan_defaulter)))
 
 event_proportion$scope = ''
 event_proportion$scope[1] = 'full dataset'
@@ -36,13 +36,13 @@ kable(event_proportion)
 
 # transforming the answer var on factor------------------------------------------------------
 
-data.train$y_loan_defaulter <- as.factor(data.train$y_loan_defaulter)
-data.test$y_loan_defaulter  <- as.factor(data.test$y_loan_defaulter)
+data.train_boost$y_loan_defaulter <- as.factor(data.train_boost$y_loan_defaulter)
+data.test_boost$y_loan_defaulter  <- as.factor(data.test_boost$y_loan_defaulter)
 
 
 # MODELAGEM DOS DADOS - M?TODOS DE ENSEMBLE
 
-names  <- names(data.train) # saving the name of all vars to put on formula
+names  <- names(data.train_boost) # saving the name of all vars to put on formula
 f_full <- as.formula(paste("y_loan_defaulter ~",
                            paste(names[!names %in% "y_loan_defaulter"], collapse = " + ")))
 
@@ -51,13 +51,12 @@ f_full <- as.formula(paste("y_loan_defaulter ~",
 
 library(adabag)
 
-boost <- boosting(f_full, data= data.train, mfinal= 250, 
+boost <- boosting(f_full, data= data.train_boost, mfinal= 250, 
                   coeflearn = "Freund", 
                   control = rpart.control(minbucket= 50,maxdepth = 1))
 
-
 # analysing the error evolution by each interation
-plot(errorevol(boost, data.train))
+plot(errorevol(boost, data.train_boost))
 
 
 # Analysing var importance on model
@@ -67,19 +66,13 @@ importanceplot(boost)
 
 
 # Applying the boosted model on data test to test
-boost.prob.train <- predict.boosting(boost, data.train)$prob[,2]
-boost.prob.test  <- predict.boosting(boost, data.test)$prob[,2]
+boost.prob.train <- predict.boosting(boost, data.train_boost)$prob[,2]
+boost.prob.test  <- predict.boosting(boost, data.test_boost)$prob[,2]
 
 
 # Comportamento da saida do modelo
-hist(boost.prob.test, breaks = 25, col = "lightblue",xlab= "Probabilidades",
-     ylab= "Frequ?ncia",main= "Boosting")
+hist(boost.prob.test, breaks = 25, col = "lightblue",xlab= "Probability",
+     ylab= "Frequency",main= "Boosting")
 
 
-boxplot(boost.prob.test ~ data.test$y_loan_defaulter,col= c("green", "red"), horizontal= T)
-
-
-
-
-
-
+boxplot(boost.prob.test ~ data.test_boost$y_loan_defaulter,col= c("green", "red"), horizontal= T)
