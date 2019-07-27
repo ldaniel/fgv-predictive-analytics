@@ -50,6 +50,9 @@ decision.tree.prob.train <- predict(tree.full, type = "prob")[,2]
 decision.tree.prob.test  <- predict(tree.full, 
                                     newdata = data.test, type = "prob")[,2]
 
+boost.prob.train <- predict.boosting(boost, data.train)$prob[,2]
+boost.prob.test  <- predict.boosting(boost, data.test)$prob[,2]
+
 ## getting measures -----------------------------------------------------------------
 measures.logistic.full.train <- HMeasure(data.train$y_loan_defaulter, 
                                          logistic.full.prob.train, 
@@ -75,17 +78,24 @@ measures.decition.tree.test <- HMeasure(data.test$y_loan_defaulter,
                                         decision.tree.prob.test, 
                                         threshold = 0.5)
 
+measures.boost.train <- HMeasure(data.train$y_loan_defaulter, boost.prob.train)
+measures.boost.test  <- HMeasure(data.test$y_loan_defaulter, boost.prob.test)
+
+
 measures <- t(bind_rows(measures.logistic.full.train$metrics,
                         measures.logistic.full.test$metrics,
                         measures.logistic.step.train$metrics,
                         measures.logistic.step.test$metrics,
                         measures.decition.tree.train$metrics,
-                        measures.decition.tree.test$metrics
+                        measures.decition.tree.test$metrics,
+                        measures.boost.train$metrics,
+                        measures.boost.test$metrics,
                         )) %>% as_tibble(., rownames = NA)
 
-colnames(measures) <- c('logistic.full - train','logistic.full - test',
-                        'logistic.step - train','logistic.step - test',
-                        'decision.tree - train','decision.tree - test')
+colnames(measures) <- c('logistic.full - train', 'logistic.full - test',
+                        'logistic.step - train', 'logistic.step - test',
+                        'decision.tree - train', 'decision.tree - test',
+                        'boosting - train', 'boosting - test')
 
 measures$metric = rownames(measures)
 
@@ -112,6 +122,12 @@ boxplot(decision.tree.prob.test ~ data.test$y_loan_defaulter,
         xlab = 'Probability Prediction',
         ylab = 'Loan Defaulter')
 
+boxplot(boost.prob.test ~ data.test$y_loan_defaulter
+        ,col= c("green", "red"),
+        horizontal= T,
+        xlab = 'Probability Prediction',
+        ylab = 'Loan Defaulter')
+
 ## ROC Curve ----------------------------------------------------------------------
 roc_logistic.full <- roc(data.test$y_loan_defaulter, 
                          logistic.full.prob.test)
@@ -122,6 +138,9 @@ roc_logistic.step <- roc(data.test$y_loan_defaulter,
 roc_decision.tree <- roc(data.test$y_loan_defaulter, 
                          decision.tree.prob.test)
 
+roc_boosting <- roc(data.test$y_loan_defaulter,
+                    boost.prob.test)
+
 y1 <- roc_logistic.full$sensitivities
 x1 <- 1 - roc_logistic.full$specificities
 
@@ -131,6 +150,9 @@ x2 <- 1 - roc_logistic.step$specificities
 y3 <- roc_decision.tree$sensitivities
 x3 <- 1 - roc_decision.tree$specificities
 
+y4 <- roc_boosting$sensitivities
+x4 <- 1 - roc_boosting$specificities
+
 plot(x1, y1,  type="n",
      xlab = "False Positive Rate (Specificities)", 
      ylab = "True Positive Rate (Sensitivities)")
@@ -138,9 +160,14 @@ plot(x1, y1,  type="n",
 lines(x1, y1, lwd = 3, lty = 1, col="red") 
 lines(x2, y2, lwd = 3, lty = 1, col="blue")
 lines(x3, y3, lwd = 3, lty = 1, col="green")
+lines(x4, y4, lwd = 3, lty = 1, col="purple")
+
+legend("topright", 'Logistic.full', lty=1, col="red", inset=c(0, 0.15), cex=.8)
+legend("topright", 'logistic.step', lty=1, col="blue", inset=c(0, 0.25), cex=.8)
+legend("topright", 'decision.tree', lty=1, col="green", inset=c(0, 0.35), cex=.8)
+legend("topright", 'Boosting', lty=1, col="purple", inset=c(0, 0.45), cex=.8)
 
 abline(0, 1, lty = 2)
-
 
 # accuracy metrics ---------------------------------------------------------------
 
@@ -164,3 +191,4 @@ accuracy <- function(x, threshold = 0.5) {
 accuracy(logistic.full.prob.test, 0.1)
 accuracy(logistic.step.prob.test, 0.1)
 accuracy(decision.tree.prob.test, 0.1)
+accuracy(boost.prob.test, 0.4)
