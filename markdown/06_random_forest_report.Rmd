@@ -1,0 +1,43 @@
+---
+title: "The random forest on loan's report"
+date: "July, 2019"
+---
+
+```{r setup_logit, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.pos =  "h")
+knitr::opts_knit$set(root.dir = "../")
+
+# loading required libraries
+library(rmarkdown)
+library(dplyr)
+library(tidyr)
+library(forcats)
+library(lubridate)
+library(tinytex)
+library(feather)
+library(corrplot)
+library(mctest)
+library(caret)
+library(hmeasure)
+library(pROC)
+library(rms)
+library(knitr)
+library(ggplot2)
+library(ggcorrplot)
+library(ggthemes)
+
+```
+
+```{r scripts, include=FALSE}
+# loading required steps before performing the analysis
+source("./scripts/step_01_create_functions.R")
+source("./scripts/step_02_data_ingestion.R")
+source("./scripts/step_03_data_cleaning.R")
+source("./scripts/step_04_label_translation.R")
+source("./scripts/step_05_data_enhancement.R")
+```
+
+# Objective
+
+To-do.
