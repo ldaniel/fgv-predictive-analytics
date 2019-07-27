@@ -1,7 +1,7 @@
 # data prep -------------------------------------------------------------------
 
 loan_dataset_logistic <- DataPrep()
-loan_dataset_logistic <- dplyr::select(loan_dataset,
+loan_dataset_logistic <- dplyr::select(loan_dataset_logistic,
                       -x_prop_old_age_pension)
 
 # removed -starts_with('x_district')
@@ -27,7 +27,7 @@ high_VIF_dataset <- dplyr::select(loan_dataset_logistic, high_VIF)
 cor_mtx_high_VIF <- cor(high_VIF_dataset)
 
 ggcorrplot(cor_mtx_high_VIF, hc.order = TRUE,
-           lab = TRUE, 
+           lab = FALSE, 
            lab_size = 3, 
            method="square", 
            colors = c("tomato2", "white", "springgreen3"),
@@ -56,6 +56,8 @@ reject_variables_vector <- tibble(var_1 = row.names(cor_mtx_full)) %>%
 
 reject_variables_vector <- reject_variables_vector$reject
 
+reject_variables_vector
+
 reject_variables <- tibble(var_1 = row.names(cor_mtx_full)) %>% 
   bind_cols(as_tibble(cor_mtx_full)) %>% 
   melt(id = c("var_1")) %>% 
@@ -63,6 +65,8 @@ reject_variables <- tibble(var_1 = row.names(cor_mtx_full)) %>%
   mutate(abs_value = abs(value)) %>%
   filter(abs_value > 0.6) %>%
   distinct(value, .keep_all = TRUE)
+
+reject_variables
 
 clean_dataset <- dplyr::select(loan_dataset_logistic, -reject_variables_vector)
 
