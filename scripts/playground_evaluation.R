@@ -18,6 +18,7 @@ library(rms)
 library(rpart)
 library(rpart.plot)
 library(tidyverse)
+library(adabag)
 
 # loading other scripts do be used here ----------------------------------------------
 source("./scripts/step_00_config_environment.R")
@@ -31,6 +32,7 @@ source("./scripts/step_05_data_enhancement.R")
 
 source('scripts/playground_logistic_regression.R')
 source('scripts/playground_decision_tree.R')
+source('scripts/playground_boosting.R')
 
 # model evaluation -------------------------------------------------------------------
 
