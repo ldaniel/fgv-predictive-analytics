@@ -1,0 +1,23 @@
+---
+title: "Conclusion"
+date: "July, 2019"
+---
+
+The final model can accurately segregate the loan contracts likely to default with test set accuracy of 76.47% using 0.1 as the threshold to assign the observation to defaulter class.
+
+Model was also able to predict 72% of real defaulters in our test dataset.
+
+In practice, the probabilities returned by the logistic regression model can be used to decide on grant or not the loan and help on correctly price the interest rate based on the likelihood of default.
+
+Model 2 shows that below variables are associated with the probability of default in a loan contract:
+
+- **x_loan_amount**;
+- **x_loan_duration**; 
+- **x_has_card**;
+- **x_prop_interest_credited**.
+
+The threshold definition depends on the tradeoff we accept between correctly identifying the true defaulters and incorrectly set a non-defaulter as a defaulter.
+
+This balance must be decided by the managers and the bank should keep seeking and experimenting with more variables to find a better model.
+
+This exercise was in no way a definitive answer to Berka Bank on how to perform their client credit analysis, but it served very well to exercise the new techniques learned in this class.
