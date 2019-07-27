@@ -10,8 +10,12 @@ navbar:
       href: 02_data_preparation.html
     - text: "Logistic regression"
       href: 03_logistic_regression_report.html
+    - text: "Decision Tree"
+      href: 04_decision_tree_report.html
+    - text: "Boosting"
+      href: 05_boosting_report.html
     - text: "Conclusion"
-      href: 04_conclusion.html
+      href: 06_conclusion.html
 output:
   html_document: 
     theme: cosmo
