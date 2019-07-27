@@ -1,14 +1,16 @@
 # data prep -------------------------------------------------------------------
 
-temp <- DataPrep()
-temp <- dplyr::select(temp, -starts_with('x_district'), 
+loan_dataset_logistic <- DataPrep()
+loan_dataset_logistic <- dplyr::select(loan_dataset,
                       -x_prop_old_age_pension)
 
-kable(tibble(variables = names(temp)))
+# removed -starts_with('x_district')
+
+kable(tibble(variables = names(loan_dataset_logistic)))
 
 # evaluating multicolinearity of remaining variables.
-vars.quant <- select_if(temp, is.numeric)
-VIF <- imcdiag(vars.quant, temp$y_loan_defaulter)
+vars.quant <- select_if(loan_dataset_logistic, is.numeric)
+VIF <- imcdiag(vars.quant, loan_dataset_logistic$y_loan_defaulter)
 
 VIF_Table_Before <- tibble(variable = names(VIF$idiags[,1]),
                     VIF = VIF$idiags[,1]) %>% 
@@ -16,40 +18,91 @@ VIF_Table_Before <- tibble(variable = names(VIF$idiags[,1]),
 
 knitr::kable(VIF_Table_Before)
 
-# taking multicolinear variables from the dataset.
+# taking multicolinear variables from the dataset via VIF.
 low_VIF <- filter(VIF_Table_Before, VIF <= 5)$variable
 high_VIF <- filter(VIF_Table_Before, VIF > 5)$variable
 
-high_VIF_dataset <- dplyr::select(temp, high_VIF)
+high_VIF_dataset <- dplyr::select(loan_dataset_logistic, high_VIF)
 
-cor_mtx <- cor(high_VIF_dataset)
+cor_mtx_high_VIF <- cor(high_VIF_dataset)
 
-ggcorrplot(cor_mtx, hc.order = TRUE, 
-           type = "lower", 
+ggcorrplot(cor_mtx_high_VIF, hc.order = TRUE,
            lab = TRUE, 
            lab_size = 3, 
-           method="circle", 
-           colors = c("tomato2", "white", "springgreen3"), 
-           title="Correlation Matrix of Loan Dataset", 
-           ggtheme=theme_bw)
+           method="square", 
+           colors = c("tomato2", "white", "springgreen3"),
+           title="Correlation Matrix of Loan Dataset") +
+  theme(axis.text = element_blank(),
+        legend.position = 0)
 
-loan_dataset <- dplyr::select(temp, low_VIF, 
-                       x_prop_interest_credited,
-                       x_average_salary,
-                       x_transaction_amount)
+# taking multicolinear variables from the dataset via Correlogram.
+
+cor_mtx_full <- cor(loan_dataset_logistic)
+
+reject_variables_vector <- tibble(var_1 = row.names(cor_mtx_full)) %>% 
+  bind_cols(as_tibble(cor_mtx_full)) %>% 
+  melt(id = c("var_1")) %>% 
+  filter(value < 1) %>%
+  mutate(abs_value = abs(value)) %>%
+  filter(abs_value > 0.6) %>%
+  group_by(var_1) %>% 
+  mutate(sum_1 = sum(abs_value)) %>% 
+  ungroup() %>% 
+  group_by(variable) %>% 
+  mutate(sum_2 = sum(abs_value)) %>% 
+  ungroup() %>% 
+  mutate(reject = ifelse(sum_1 > sum_2, var_1, as.character(variable))) %>% 
+  distinct(reject)
+
+reject_variables_vector <- reject_variables_vector$reject
+
+reject_variables <- tibble(var_1 = row.names(cor_mtx_full)) %>% 
+  bind_cols(as_tibble(cor_mtx_full)) %>% 
+  melt(id = c("var_1")) %>% 
+  filter(value < 1) %>%
+  mutate(abs_value = abs(value)) %>%
+  filter(abs_value > 0.6) %>%
+  distinct(value, .keep_all = TRUE)
+
+clean_dataset <- dplyr::select(loan_dataset_logistic, -reject_variables_vector)
+
+cor_mtx_clean <- cor(clean_dataset)
+
+full = ggcorrplot(cor_mtx_full, hc.order = TRUE,
+           lab = FALSE, 
+           lab_size = 3, 
+           method="square", 
+           colors = c("tomato2", "white", "springgreen3"),
+           title="Correlation Matrix of Full Loan Dataset") +
+  theme(axis.text = element_blank(),
+        legend.position = 0)
+
+clean = ggcorrplot(cor_mtx_clean, hc.order = TRUE,
+           lab = FALSE, 
+           lab_size = 3, 
+           method="square", 
+           colors = c("tomato2", "white", "springgreen3"),
+           title="Correlation Matrix of Clean Loan Dataset") +
+  theme(axis.text = element_blank(),
+        legend.position = 0)
+
+ggarrange(full, clean)
+
+loan_dataset_logistic <- clean_dataset
 
 # evaluating multicolinearity of remaining variables.
-vars.quant <- select_if(loan_dataset, is.numeric)
+vars.quant <- select_if(loan_dataset_logistic, is.numeric)
 
-VIF <- imcdiag(vars.quant, loan_dataset$y_loan_defaulter)
+VIF <- imcdiag(vars.quant, loan_dataset_logistic$y_loan_defaulter)
 
 VIF_Table_After <- tibble(variable = names(VIF$idiags[,1]),
-                          VIF = VIF$idiags[,1]) %>% 
+                          VIF = VIF$idiags[,1]) %>%
   arrange(desc(VIF))
 
 kable(VIF_Table_After)
 
-ggplot(VIF_Table_After, aes(x = fct_reorder(variable, VIF), y = log(VIF), label = round(VIF, 2))) + 
+ggplot(VIF_Table_After, aes(x = fct_reorder(variable, VIF), 
+                            y = log(VIF), label = round(VIF, 2))) + 
   geom_point(stat='identity', fill="black", size=15)  +
   geom_segment(aes(y = 0, 
                    yend = log(VIF), 
@@ -69,29 +122,18 @@ ggplot(VIF_Table_After, aes(x = fct_reorder(variable, VIF), y = log(VIF), label 
        subtitle="Checking for multicolinearity in X's variables.
        Variables with VIF more than 5 will be droped from the model")
 
-cor_mtx <- cor(vars.quant)
-
-ggcorrplot(cor_mtx, hc.order = TRUE, 
-           type = "lower", 
-           lab = TRUE, 
-           lab_size = 3, 
-           method="circle", 
-           colors = c("tomato2", "white", "springgreen3"), 
-           title="Correlation Matrix of Loan Dataset", 
-           ggtheme=theme_bw)
-
-
 # sampling ----------------------------------------------------------------------------
 
 set.seed(12345)
-index <- caret::createDataPartition(loan_dataset$y_loan_defaulter, 
+index <- caret::createDataPartition(loan_dataset_logistic$y_loan_defaulter, 
                                     p= 0.7,list = FALSE)
-data.train <- loan_dataset[index, ]
-data.test  <- loan_dataset[-index,]
 
-event_proportion <- bind_rows(prop.table(table(loan_dataset$y_loan_defaulter)),
-                              prop.table(table(data.train$y_loan_defaulter)),
-                              prop.table(table(data.test$y_loan_defaulter)))
+data.train_logistic <- loan_dataset_logistic[index, ]
+data.test_logistic  <- loan_dataset_logistic[-index,]
+
+event_proportion <- bind_rows(prop.table(table(loan_dataset_logistic$y_loan_defaulter)),
+                              prop.table(table(data.train_logistic$y_loan_defaulter)),
+                              prop.table(table(data.test_logistic$y_loan_defaulter)))
 
 event_proportion$scope = ''
 event_proportion$scope[1] = 'full dataset'
@@ -102,20 +144,17 @@ event_proportion <- select(event_proportion, scope, everything())
 
 kable(event_proportion)
 
-
 # fit the logistic model -------------------------------------------------------------
 
-names  <- names(loan_dataset)
-f_full <- as.formula(paste("y_loan_defaulter ~",
-                           paste(names[!names %in% "y_loan_defaulter"], collapse = " + ")))
-
-logistic.full <- glm(f_full, data= data.train, family= binomial(link='logit'))
+logistic.full <- glm(formula =y_loan_defaulter ~ .,
+                     data= data.train_logistic, 
+                     family= binomial(link='logit'))
 
 names(logistic.full$coefficients) <- stringr::str_sub(names(logistic.full$coefficients), 1, 25)
 summary(logistic.full)
 
 #logistic.step <- stepAIC(logistic.full, direction = 'both', trace = TRUE)
-logistic.step <- step(logistic.full, direction = "backward", test = "F")
+logistic.step <- step(logistic.full, direction = "both", test = "F")
 
 names(logistic.step$coefficients) <- stringr::str_sub(names(logistic.step$coefficients), 1, 25)
 summary(logistic.step)
