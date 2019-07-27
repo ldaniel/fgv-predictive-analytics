@@ -71,24 +71,29 @@ measures.logistic.step.test <- HMeasure(data.test$y_loan_defaulter,
                                         logistic.step.prob.test, 
                                         threshold = 0.5)
 
-measures.decition.tree.train <- HMeasure(data.train$y_loan_defaulter, 
+measures.decision.tree.train <- HMeasure(data.train$y_loan_defaulter, 
                                          decision.tree.prob.train, 
                                          threshold = 0.5)
 
-measures.decition.tree.test <- HMeasure(data.test$y_loan_defaulter, 
+measures.decision.tree.test <- HMeasure(data.test$y_loan_defaulter, 
                                         decision.tree.prob.test, 
                                         threshold = 0.5)
 
-measures.boost.train <- HMeasure(data.train$y_loan_defaulter, boost.prob.train)
-measures.boost.test  <- HMeasure(data.test$y_loan_defaulter, boost.prob.test)
+measures.boost.train <- HMeasure(data.train$y_loan_defaulter, 
+                                 boost.prob.train,
+                                 threshold = 0.5)
+
+measures.boost.test  <- HMeasure(data.test$y_loan_defaulter, 
+                                 boost.prob.test,
+                                 threshold = 0.5)
 
 
 measures <- t(bind_rows(measures.logistic.full.train$metrics,
                         measures.logistic.full.test$metrics,
                         measures.logistic.step.train$metrics,
                         measures.logistic.step.test$metrics,
-                        measures.decition.tree.train$metrics,
-                        measures.decition.tree.test$metrics,
+                        measures.decision.tree.train$metrics,
+                        measures.decision.tree.test$metrics,
                         measures.boost.train$metrics,
                         measures.boost.test$metrics,
                         )) %>% as_tibble(., rownames = NA)
@@ -166,7 +171,7 @@ lines(x4, y4, lwd = 3, lty = 1, col="purple")
 legend("topright", 'Logistic.full', lty=1, col="red", inset=c(0, 0.15), cex=.8)
 legend("topright", 'logistic.step', lty=1, col="blue", inset=c(0, 0.25), cex=.8)
 legend("topright", 'decision.tree', lty=1, col="green", inset=c(0, 0.35), cex=.8)
-legend("topright", 'Boosting', lty=1, col="purple", inset=c(0, 0.45), cex=.8)
+legend("topright", 'boosting', lty=1, col="purple", inset=c(0, 0.45), cex=.8)
 
 abline(0, 1, lty = 2)
 
