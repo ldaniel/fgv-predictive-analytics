@@ -354,19 +354,26 @@ $(document).ready(function () {
     Home
   </a>
 </li>
-<li>
-  <a href="01_about_the_data.html">
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
     <span class="fa fa-info"></span>
      
-    About the Data
+    Business Case
+     
+    <span class="caret"></span>
   </a>
-</li>
-<li>
-  <a href="02_data_preparation.html">Data preparation</a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="01_about_the_data.html">About the Data</a>
+    </li>
+    <li>
+      <a href="02_data_preparation.html">Data preparation</a>
+    </li>
+  </ul>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    <span class="fa fa-gear"></span>
+    <span class="fa fa-file"></span>
      
     Model's reports
      
@@ -391,7 +398,11 @@ $(document).ready(function () {
   </ul>
 </li>
 <li>
-  <a href="07_conclusion.html">Conclusion</a>
+  <a href="07_conclusion.html">
+    <span class="fa fa-gear"></span>
+     
+    Conclusion
+  </a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">

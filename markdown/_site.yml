@@ -5,13 +5,15 @@ navbar:
     - text: "Home"
       icon: fa-home
       href: index.html
-    - text: "About the Data"
+    - text: "Business Case"
       icon: fa-info
-      href: 01_about_the_data.html
-    - text: "Data preparation"
-      href: 02_data_preparation.html
+      menu: 
+        - text: "About the Data"
+          href: 01_about_the_data.html
+        - text: "Data preparation"
+          href: 02_data_preparation.html
     - text: "Model's reports"
-      icon: fa-gear
+      icon: fa-file
       menu: 
         - text: "Analytical Methods"
         - text: "Logistic regression"
@@ -25,6 +27,7 @@ navbar:
         - text: "Random Forest"
           href: 06_random_forest_report.html
     - text: "Conclusion"
+      icon: fa-gear
       href: 07_conclusion.html
 output:
   html_document: 
