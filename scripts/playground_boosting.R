@@ -9,12 +9,9 @@ kable(tibble(variables = names(temp)))
 #Analysis on base
 summary(temp)
 aggr(temp)
-View(temp)
 
 boxplot(temp$x_account_balance ~ temp$y_loan_defaulter)
 boxplot(temp$x_avg_account_balance ~ temp$y_loan_defaulter)
-
-
 
 # sampling ----------------------------------------------------------------------------
 
