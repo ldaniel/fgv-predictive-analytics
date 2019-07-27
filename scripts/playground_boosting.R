@@ -1,13 +1,4 @@
 
-# loading other scripts do be used here ---------------------------------------
-# source("./scripts/step_00_load_packages.R")
-# source("./scripts/step_00_config_environment.R")
-# source("./scripts/step_01_create_functions.R")
-# source("./scripts/step_02_data_ingestion.R")
-# source("./scripts/step_03_data_cleaning.R")
-# source("./scripts/step_04_label_translation.R")
-# source("./scripts/step_05_data_enhancement.R")
-
 # data prep -------------------------------------------------------------------
 temp <- DataPrep()
 temp <- dplyr::select(temp, -starts_with('x_district'), 
@@ -89,30 +80,6 @@ hist(boost.prob.test, breaks = 25, col = "lightblue",xlab= "Probabilidades",
 
 
 boxplot(boost.prob.test ~ data.test$y_loan_defaulter,col= c("green", "red"), horizontal= T)
-
-################################################################################################
-# AVALIANDO A PERFORMANCE
-
-# Matricas de discrimina??o para ambos modelos
-library(hmeasure) 
-
-boost.train <- HMeasure(data.train$y_loan_defaulter,boost.prob.train)
-boost.test  <- HMeasure(data.test$y_loan_defaulter,boost.prob.test)
-boost.train$metrics
-boost.test$metrics
-
-
-library(pROC)
-roc1 <- roc(data.test$y_loan_defaulter,boost.prob.test)
-y1 <- roc1$sensitivities
-x1 <- 1-roc1$specificities
-
-
-plot(x1,y1, type="n",
-     xlab = "1 - Especificidade", 
-     ylab= "Sensitividade")
-lines(x1, y1,lwd=3,lty=1, col="purple") 
-legend("topright", 'Boosting', lty=1, col="purple")
 
 
 
