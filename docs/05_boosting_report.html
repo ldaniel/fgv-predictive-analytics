@@ -7,11 +7,12 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 
 
-<title>Conclusion</title>
+<title>The boosting on loan’s report</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -227,18 +228,6 @@ $(document).ready(function () {
 }
 </style>
 
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
-});
-</script>
-
 <!-- code folding -->
 
 
@@ -279,7 +268,13 @@ $(document).ready(function () {
   <a href="03_logistic_regression_report.html">Logistic regression</a>
 </li>
 <li>
-  <a href="04_conclusion.html">Conclusion</a>
+  <a href="04_decision_tree_report.html">Decision Tree</a>
+</li>
+<li>
+  <a href="05_boosting_report.html">Boosting</a>
+</li>
+<li>
+  <a href="06_conclusion.html">Conclusion</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -293,25 +288,21 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Conclusion</h1>
+<h1 class="title toc-ignore">The boosting on loan’s report</h1>
 <h4 class="date">July, 2019</h4>
 
 </div>
 
-
-<p>The final model can accurately segregate the loan contracts likely to default with test set accuracy of 76.47% using 0.1 as the threshold to assign the observation to defaulter class.</p>
-<p>Model was also able to predict 72% of real defaulters in our test dataset.</p>
-<p>In practice, the probabilities returned by the logistic regression model can be used to decide on grant or not the loan and help on correctly price the interest rate based on the likelihood of default.</p>
-<p>Model 2 shows that below variables are associated with the probability of default in a loan contract:</p>
+<div id="TOC">
 <ul>
-<li><strong>x_loan_amount</strong>;</li>
-<li><strong>x_loan_duration</strong>;</li>
-<li><strong>x_has_card</strong>;</li>
-<li><strong>x_prop_interest_credited</strong>.</li>
+<li><a href="#objective"><span class="toc-section-number">1</span> Objective</a></li>
 </ul>
-<p>The threshold definition depends on the tradeoff we accept between correctly identifying the true defaulters and incorrectly set a non-defaulter as a defaulter.</p>
-<p>This balance must be decided by the managers and the bank should keep seeking and experimenting with more variables to find a better model.</p>
-<p>This exercise was in no way a definitive answer to Berka Bank on how to perform their client credit analysis, but it served very well to exercise the new techniques learned in this class.</p>
+</div>
+
+<div id="objective" class="section level1">
+<h1><span class="header-section-number">1</span> Objective</h1>
+<p>To-do.</p>
+</div>
 
 
 
@@ -330,6 +321,23 @@ $(document).ready(function () {
 
 
 </script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
