@@ -19,6 +19,7 @@ library(rpart)
 library(rpart.plot)
 library(tidyverse)
 library(adabag)
+library(VIM)
 
 # loading other scripts do be used here ----------------------------------------------
 source("./scripts/step_00_config_environment.R")
