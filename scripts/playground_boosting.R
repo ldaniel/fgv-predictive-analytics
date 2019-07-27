@@ -1,14 +1,5 @@
-
-inst# loading other scripts do be used here ---------------------------------------
-source("./scripts/step_00_load_packages.R")
-source("./scripts/step_00_config_environment.R")
-source("./scripts/step_01_create_functions.R")
-source("./scripts/step_02_data_ingestion.R")
-source("./scripts/step_03_data_cleaning.R")
-source("./scripts/step_04_label_translation.R")
-source("./scripts/step_05_data_enhancement.R")
-
 # data prep -------------------------------------------------------------------
+
 temp <- DataPrep()
 temp <- dplyr::select(temp, -starts_with('x_district'), 
                       -x_prop_old_age_pension)
@@ -16,14 +7,13 @@ temp <- dplyr::select(temp, -starts_with('x_district'),
 kable(tibble(variables = names(temp)))
 
 #Analysis on base
+
 summary(temp)
 aggr(temp)
 View(temp)
 
 boxplot(temp$x_account_balance ~ temp$y_loan_defaulter)
 boxplot(temp$x_avg_account_balance ~ temp$y_loan_defaulter)
-
-
 
 # sampling ----------------------------------------------------------------------------
 
@@ -52,7 +42,7 @@ data.train$y_loan_defaulter <- as.factor(data.train$y_loan_defaulter)
 data.test$y_loan_defaulter  <- as.factor(data.test$y_loan_defaulter)
 
 
-# MODELAGEM DOS DADOS - M?TODOS DE ENSEMBLE
+# MODELAGEM DOS DADOS - METODOS DE ENSEMBLE
 
 names  <- names(data.train) # saving the name of all vars to put on formula
 f_full <- as.formula(paste("y_loan_defaulter ~",
@@ -93,7 +83,7 @@ boxplot(boost.prob.test ~ data.test$y_loan_defaulter,col= c("green", "red"), hor
 ################################################################################################
 # AVALIANDO A PERFORMANCE
 
-# Matricas de discrimina??o para ambos modelos
+# Metricas de discriminacao para ambos modelos
 library(hmeasure) 
 
 boost.train <- HMeasure(data.train$y_loan_defaulter,boost.prob.train)
