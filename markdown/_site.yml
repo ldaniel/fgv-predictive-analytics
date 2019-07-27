@@ -16,7 +16,7 @@ navbar:
       icon: fa-file
       menu: 
         - text: "Analytical Methods"
-        - text: "Logistic regression"
+        - text: "Logistic Regression"
           href: 03_logistic_regression_report.html
         - text: "Decision Tree"
           href: 04_decision_tree_report.html
