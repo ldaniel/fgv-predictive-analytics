@@ -20,6 +20,8 @@ library(rpart.plot)
 library(tidyverse)
 library(adabag)
 library(VIM)
+library(reshape2)
+library(ggpubr)
 
 # loading other scripts do be used here ----------------------------------------------
 source("./scripts/step_00_config_environment.R")
@@ -41,38 +43,38 @@ source('scripts/playground_boosting.R')
 
 logistic.prob.train <- predict(logistic.step, type = "response")
 logistic.prob.test <- predict(logistic.step,
-                              newdata = data.test, type= "response")
+                              newdata = data.test_logistic, type= "response")
 
 decision.tree.prob.train <- predict(tree.full, type = "prob")[,2]
 decision.tree.prob.test  <- predict(tree.full,
-                                    newdata = data.test, type = "prob")[,2]
+                                    newdata = data.test_DT, type = "prob")[,2]
 
-boosting.prob.train <- predict.boosting(boost, data.train)$prob[,2]
-boosting.prob.test  <- predict.boosting(boost, data.test)$prob[,2]
+boosting.prob.train <- predict.boosting(boost, data.train_boost)$prob[,2]
+boosting.prob.test  <- predict.boosting(boost, data.test_boost)$prob[,2]
 
 ## getting measures -----------------------------------------------------------------
 
-measures.logistic.train <- HMeasure(data.train$y_loan_defaulter, 
+measures.logistic.train <- HMeasure(data.train_logistic$y_loan_defaulter, 
                                          logistic.prob.train, 
                                          threshold = 0.5)
 
-measures.logistic.test <- HMeasure(data.test$y_loan_defaulter, 
+measures.logistic.test <- HMeasure(data.test_logistic$y_loan_defaulter, 
                                         logistic.prob.test, 
                                         threshold = 0.5)
 
-measures.decision.tree.train <- HMeasure(data.train$y_loan_defaulter, 
+measures.decision.tree.train <- HMeasure(data.train_DT$y_loan_defaulter, 
                                          decision.tree.prob.train, 
                                          threshold = 0.5)
 
-measures.decision.tree.test <- HMeasure(data.test$y_loan_defaulter, 
+measures.decision.tree.test <- HMeasure(data.test_DT$y_loan_defaulter, 
                                         decision.tree.prob.test, 
                                         threshold = 0.5)
 
-measures.boosting.train <- HMeasure(data.train$y_loan_defaulter, 
+measures.boosting.train <- HMeasure(data.train_boost$y_loan_defaulter, 
                                  boost.prob.train,
                                  threshold = 0.5)
 
-measures.boosting.test  <- HMeasure(data.test$y_loan_defaulter, 
+measures.boosting.test  <- HMeasure(data.test_boost$y_loan_defaulter, 
                                  boost.prob.test,
                                  threshold = 0.5)
 
@@ -97,19 +99,19 @@ kable(measures, row.names = FALSE)
 
 ## boxplot -------------------------------------------------------------------------
 
-boxplot(logistic.prob.test ~ data.test$y_loan_defaulter,
+boxplot(logistic.prob.test ~ data.test_logistic$y_loan_defaulter,
         col= c("green", "red"), 
         horizontal= T,
         xlab = 'Probability Prediction',
         ylab = 'Loan Defaulter')
 
-boxplot(decision.tree.prob.test ~ data.test$y_loan_defaulter,
+boxplot(decision.tree.prob.test ~ data.test_DT$y_loan_defaulter,
         col= c("green", "red"), 
         horizontal= T,
         xlab = 'Probability Prediction',
         ylab = 'Loan Defaulter')
 
-boxplot(boosting.prob.test ~ data.test$y_loan_defaulter
+boxplot(boosting.prob.test ~ data.test_boost$y_loan_defaulter
         ,col= c("green", "red"),
         horizontal= T,
         xlab = 'Probability Prediction',
@@ -117,13 +119,13 @@ boxplot(boosting.prob.test ~ data.test$y_loan_defaulter
 
 ## ROC Curve ----------------------------------------------------------------------
 
-roc_logistic <- roc(data.test$y_loan_defaulter,
+roc_logistic <- roc(data.test_logistic$y_loan_defaulter,
                     logistic.prob.test)
 
-roc_decision.tree <- roc(data.test$y_loan_defaulter, 
+roc_decision.tree <- roc(data.test_DT$y_loan_defaulter, 
                          decision.tree.prob.test)
 
-roc_boosting <- roc(data.test$y_loan_defaulter,
+roc_boosting <- roc(data.test_boost$y_loan_defaulter,
                     boosting.prob.test)
 
 y1 <- roc_logistic$sensitivities
@@ -150,13 +152,13 @@ abline(0, 1, lty = 2)
 
 # accuracy metrics ---------------------------------------------------------------
 
-accuracy <- function(x, threshold = 0.5) {
+accuracy <- function(score, actual, threshold = 0.5) {
   
-  fitted.results <- ifelse(x > threshold ,1 ,0)
+  fitted.results <- ifelse(score > threshold ,1 ,0)
   
-  misClasificError <- mean(fitted.results != data.test$y_loan_defaulter)
+  misClasificError <- mean(fitted.results != actual)
   
-  misClassCount <- misclassCounts(fitted.results, data.test$y_loan_defaulter)
+  misClassCount <- misclassCounts(fitted.results, actual)
 
   print(kable(misClassCount$conf.matrix))
 
@@ -167,6 +169,14 @@ accuracy <- function(x, threshold = 0.5) {
               round(misClassCount$metrics['TPR'] * 100, 2), '%', sep = ''))
 }
 
-accuracy(logistic.prob.test, 0.1)
-accuracy(decision.tree.prob.test, 0.1)
-accuracy(boosting.prob.test, 0.4)
+accuracy(score = logistic.prob.test, 
+         actual = data.test_logistic$y_loan_defaulter, 
+         threshold = 0.1)
+
+accuracy(score = decision.tree.prob.test, 
+         actual = data.test_DT$y_loan_defaulter, 
+         threshold = 0.1)
+
+accuracy(score = boosting.prob.test, 
+         actual = data.test_boost$y_loan_defaulter, 
+         threshold = 0.4)
