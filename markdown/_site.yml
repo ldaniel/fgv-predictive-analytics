@@ -10,7 +10,7 @@ navbar:
       menu: 
         - text: "About the Data"
           href: 01_about_the_data.html
-	- text: "---------"
+        - text: "---------"
         - text: "Initial Analysis"
         - text: "Data Preparation"
           href: 02_data_preparation.html
