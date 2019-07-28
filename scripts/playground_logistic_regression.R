@@ -1,12 +1,45 @@
 # data prep -------------------------------------------------------------------
 
 loan_dataset_logistic <- DataPrep()
-loan_dataset_logistic <- dplyr::select(loan_dataset_logistic,
-                      -x_prop_old_age_pension)
-
-# removed -starts_with('x_district')
 
 kable(tibble(variables = names(loan_dataset_logistic)))
+
+
+# looking for low variability in the dummy variables.
+
+dummy_variables <- dplyr::select(loan_dataset_logistic, 
+                                 starts_with('x_client_gender'), 
+                                 starts_with('x_district_name'),
+                                 starts_with('x_region'),
+                                 starts_with('x_card_type'))
+
+dummy_variables_high <- tibble(variables = names(dummy_variables),
+       zeros = sapply(dummy_variables, 
+                      function(x) table(as.character(x) == 0)["TRUE"]),
+       ones = sapply(dummy_variables, 
+                     function(x) table(as.character(x) == 1)["TRUE"])) %>% 
+  mutate(prop_ones = round(ones / (zeros + ones) * 100, 2)) %>% 
+  arrange(prop_ones) %>% 
+  filter(prop_ones  > 5)
+
+kable(dummy_variables_high)
+
+dummy_variables_high <- dummy_variables_high$variables
+dummy_variables_low <- names(dplyr::select(dummy_variables, -dummy_variables_high))
+
+loan_dataset_logistic <- dplyr::select(loan_dataset_logistic, -dummy_variables_low)
+
+
+# looking for low variability in the transaction proportion variables.
+
+prop_variables <- dplyr::select(loan_dataset_logistic, 
+                                starts_with('x_prop'))
+
+prop_variables <- summary(prop_variables)
+
+kable(t(prop_variables))
+
+loan_dataset_logistic <- dplyr::select(loan_dataset_logistic, -x_prop_old_age_pension)
 
 # evaluating multicolinearity of remaining variables.
 vars.quant <- select_if(loan_dataset_logistic, is.numeric)
@@ -19,6 +52,7 @@ VIF_Table_Before <- tibble(variable = names(VIF$idiags[,1]),
 knitr::kable(VIF_Table_Before)
 
 # taking multicolinear variables from the dataset via VIF.
+
 low_VIF <- filter(VIF_Table_Before, VIF <= 5)$variable
 high_VIF <- filter(VIF_Table_Before, VIF > 5)$variable
 
@@ -26,25 +60,27 @@ high_VIF_dataset <- dplyr::select(loan_dataset_logistic, high_VIF)
 
 cor_mtx_high_VIF <- cor(high_VIF_dataset)
 
-ggcorrplot(cor_mtx_high_VIF, hc.order = TRUE,
-           lab = FALSE, 
-           lab_size = 3, 
-           method="square", 
-           colors = c("tomato2", "white", "springgreen3"),
-           title="Correlation Matrix of Loan Dataset") +
+high_VIF_correlogram_before <- ggcorrplot(cor_mtx_high_VIF, 
+                                hc.order = TRUE,
+                                lab = FALSE,
+                                lab_size = 3, 
+                                method="square",
+                                colors = c("tomato2", "white", "springgreen3"),
+                                title="Correlation Matrix of Loan Dataset Variables with high VIF") +
   theme(axis.text = element_blank(),
         legend.position = 0)
 
-# taking multicolinear variables from the dataset via Correlogram.
+print(high_VIF_correlogram_before)
 
-cor_mtx_full <- cor(loan_dataset_logistic)
+# selecting variables to reject -----------------------------------------------
+correl_threshold <- 0.6
 
-reject_variables_vector <- tibble(var_1 = row.names(cor_mtx_full)) %>% 
-  bind_cols(as_tibble(cor_mtx_full)) %>% 
+reject_variables_vector <- tibble(var_1 = row.names(cor_mtx_high_VIF)) %>% 
+  bind_cols(as_tibble(cor_mtx_high_VIF)) %>% 
   melt(id = c("var_1")) %>% 
-  filter(value < 1) %>%
+  filter(var_1 != variable) %>%
   mutate(abs_value = abs(value)) %>%
-  filter(abs_value > 0.6) %>%
+  filter(abs_value > correl_threshold) %>%
   group_by(var_1) %>% 
   mutate(sum_1 = sum(abs_value)) %>% 
   ungroup() %>% 
@@ -58,18 +94,13 @@ reject_variables_vector <- reject_variables_vector$reject
 
 reject_variables_vector
 
-reject_variables <- tibble(var_1 = row.names(cor_mtx_full)) %>% 
-  bind_cols(as_tibble(cor_mtx_full)) %>% 
-  melt(id = c("var_1")) %>% 
-  filter(value < 1) %>%
-  mutate(abs_value = abs(value)) %>%
-  filter(abs_value > 0.6) %>%
-  distinct(value, .keep_all = TRUE)
-
-reject_variables
-
 clean_dataset <- dplyr::select(loan_dataset_logistic, -reject_variables_vector)
 
+print('rejected variables')
+kable(reject_variables_vector)
+
+# comparing correlograms before and after --------------------------------------
+cor_mtx_full <- cor(loan_dataset_logistic)
 cor_mtx_clean <- cor(clean_dataset)
 
 full = ggcorrplot(cor_mtx_full, hc.order = TRUE,
@@ -90,11 +121,11 @@ clean = ggcorrplot(cor_mtx_clean, hc.order = TRUE,
   theme(axis.text = element_blank(),
         legend.position = 0)
 
-ggarrange(full, clean)
+print(ggarrange(full, clean))
 
 loan_dataset_logistic <- clean_dataset
 
-# evaluating multicolinearity of remaining variables.
+# evaluating multicolinearity of remaining variables ---------------------------
 vars.quant <- select_if(loan_dataset_logistic, is.numeric)
 
 VIF <- imcdiag(vars.quant, loan_dataset_logistic$y_loan_defaulter)
@@ -102,8 +133,6 @@ VIF <- imcdiag(vars.quant, loan_dataset_logistic$y_loan_defaulter)
 VIF_Table_After <- tibble(variable = names(VIF$idiags[,1]),
                           VIF = VIF$idiags[,1]) %>%
   arrange(desc(VIF))
-
-kable(VIF_Table_After)
 
 ggplot(VIF_Table_After, aes(x = fct_reorder(variable, VIF), 
                             y = log(VIF), label = round(VIF, 2))) + 
@@ -125,6 +154,8 @@ ggplot(VIF_Table_After, aes(x = fct_reorder(variable, VIF),
        title = 'Variance Inflation Factor',
        subtitle="Checking for multicolinearity in X's variables.
        Variables with VIF more than 5 will be droped from the model")
+
+loan_dataset_logistic <- dplyr::select(loan_dataset_logistic, -x_average_salary)
 
 # sampling ----------------------------------------------------------------------------
 
