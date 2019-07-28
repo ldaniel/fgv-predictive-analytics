@@ -1,5 +1,5 @@
 ---
-title: "FGV MBA: Business Analytics & Big Data"
+title: "Business Case"
 ---
 
 # Setting the scene
