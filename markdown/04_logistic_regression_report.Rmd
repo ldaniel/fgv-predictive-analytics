@@ -26,6 +26,8 @@ library(knitr)
 library(ggplot2)
 library(ggcorrplot)
 library(ggthemes)
+library(reshape2)
+library(ggpubr)
 
 ```
 
@@ -48,201 +50,182 @@ The goal of this report is trying to fit a logistic regression model on Loan dat
 
 ## Dataset preparation
 
-Using the vanilla transaction dataset, we calculated several derived variables for each account.
+Using the vanilla transaction dataset, we calculated several derived variables for each account as described in the Data Preparation session.
 
-First, we calculated an additional table with the current account balance and average account balance of each account.
+This dataset is joined with Loan, Client, Credit Card, District, Account and Account Balance tables.
 
-Later on, we calculated another auxiliary table that contains the proportion of each kind of transaction (k_symbol) for each account. The idea of these variable is to capture the spend pattern of each client.
+We ended up having a data set with **118 variables**.
 
-Finally, we combine the 682 Loan Contracts observations with client, district, credit card and the auxiliary tables we calculated early.
 
-```{r data_prep, echo=TRUE, warning=FALSE, message=FALSE}
-
-temp <- left_join(loan, disposition, by = c('account_id', 'type')) %>% 
-  left_join(client, by = 'client_id') %>%
-  left_join(district, by = 'district_id') %>% 
-  left_join(creditcard, by = 'disp_id') %>% 
-  left_join(account_balance, by = 'account_id') %>% 
-  left_join(account_transaction_pattern, by = 'account_id') %>% 
-  mutate(card_age_month = (issued %--% 
-                             make_date(1998, 12, 31)) / months(1),
-         last_transaction_age_days = ((last_transaction_date.y %--% 
-                                         make_date(1998, 12, 31)) / days(1)),
-         has_card = ifelse(type.y == 'no card', 0, 1)) %>% 
-  dplyr::select(c("amount.x", "duration", "payments", "status", "defaulter", 
-                  "contract_status", "gender", "age", "district_name", 
-                  "region", "no_of_inhabitants", 
-                  "no_of_municip_inhabitants_less_499", 
-                  "no_of_municip_500_to_1999", "no_of_municip_2000_to_9999", 
-                  "no_of_municip_greater_10000", "no_of_cities", 
-                  "ratio_of_urban_inhabitants", 
-                  "average_salary", "unemploymant_rate_1995", 
-                  "unemploymant_rate_1996", 
-                  "no_of_enterpreneurs_per_1000_inhabitants", 
-                  "no_of_commited_crimes_1995", 
-                  "no_of_commited_crimes_1996", "type.y", 
-                  "card_age_month","account_balance", 
-                  "avg_balance","transaction_count", "amount.y", 
-                  "last_transaction_age_days", "prop_old_age_pension", 
-                  "prop_insurance_payment", 
-                  "prop_sanction_interest","prop_household", 
-                  "prop_statement", "prop_interest_credited", 
-                  "prop_loan_payment", "prop_other", "has_card"))
-
-colnames(temp) <- c("x_loan_amount", "x_loan_duration", "x_loan_payments", 
-                    "x_loan_status", "y_loan_defaulter", "x_loan_contract_status",
-                    "x_client_gender", "x_client_age", 
-                    "x_district_name", "x_region", 
-                    "x_no_of_inhabitants", "x_no_of_municip_inhabitants_less_499", 
-                    "x_no_of_municip_500_to_1999", "x_no_of_municip_2000_to_9999", 
-                    "x_no_of_municip_greater_10000", "x_no_of_cities", 
-                    "x_ratio_of_urban_inhabitants", 
-                    "x_average_salary", "x_unemploymant_rate_1995", 
-                    "x_unemploymant_rate_1996", 
-                    "x_no_of_enterpreneurs_per_1000_inhabitants", 
-                    "x_no_of_commited_crimes_1995", 
-                    "x_no_of_commited_crimes_1996", "x_card_type", 
-                    "x_card_age_month","x_account_balance", 
-                    "x_avg_account_balance","x_transaction_count", 
-                    "x_transaction_amount", "x_last_transaction_age_days", 
-                    "x_prop_old_age_pension", "x_prop_insurance_payment", 
-                    "x_prop_sanction_interest","x_prop_household","x_prop_statement",
-                    "x_prop_interest_credited", "x_prop_loan_payment", "x_prop_other",
-                    "x_has_card")
-
-temp <- dplyr::select(temp, y_loan_defaulter, everything())
-
-temp$x_card_type = ifelse(is.na(temp$x_card_type), 'no card', 
-                          as.character(temp$x_card_type))
-
-temp$x_has_card = ifelse(temp$x_card_type == 'no card', 0, 1)
-
-temp$x_card_age_month = ifelse(is.na(temp$x_card_age_month), 0, 
-                               temp$x_card_age_month)
-
-temp$y_loan_defaulter = as.numeric(temp$y_loan_defaulter)
-
-```
-
-We ended up having a data set with 39 variables.
-
-```{r variables, echo=FALSE}
-kable(tibble(variables = names(temp)))
+```{r variables, echo=TRUE}
+loan_dataset_logistic <- DataPrep()
+kable(tibble(variables = names(loan_dataset_logistic)))
 ```
 
 ## Variable selection
 
-From this dataset, we excluded 6 variables that are redundant, shows no variability on the 682 Loan contract observations or have no applicability for the exercise:
+Starting from this dataset we investigate the presence of redundant or variables not useful for the model such as the ones with not enough variability.
 
-- **x_prop_old_age_pension** (no variation on selected sample);
-- **x_district_name** (sample have not enough variability to fit a model);
-- **x_region** (sample have not enough variability to fit a model);
-- **x_loan_status** (redundant);
-- **x_loan_contract_status** (redundant); 
-- **x_prop_sanction_interest** (seems not to be valid for this analysis, as the reason for interest payment in the account is exactly the delinquency in the observation contact itself).
+Starting with the dummy variables.
 
-```{r remove_variables_1}
-temp <- dplyr::select(temp, -c(x_prop_old_age_pension, 
-                               x_district_name, 
-                               x_region, 
-                               x_loan_status, 
-                               x_loan_contract_status, 
-                               x_prop_sanction_interest))
+We will keep only dummies that has the event in at least 5% in the dataset:
+
+```{r dummies_high, echo=TRUE}
+dummy_variables <- dplyr::select(loan_dataset_logistic, 
+                                 starts_with('x_client_gender'), 
+                                 starts_with('x_district_name'),
+                                 starts_with('x_region'),
+                                 starts_with('x_card_type'))
+
+dummy_variables_high <- tibble(variables = names(dummy_variables),
+       zeros = sapply(dummy_variables, 
+                      function(x) table(as.character(x) == 0)["TRUE"]),
+       ones = sapply(dummy_variables, 
+                     function(x) table(as.character(x) == 1)["TRUE"])) %>% 
+  mutate(prop_ones = round(ones / (zeros + ones) * 100, 2)) %>% 
+  arrange(prop_ones) %>% 
+  filter(prop_ones  > 5)
+
+kable(dummy_variables_high)
+```
+
+
+The remaining dummies will be excluded from the dataset as they do not have enough variability to fit a logistic model on them.
+
+```{r dummies_reject, echo=FALSE}
+dummy_variables_high <- dummy_variables_high$variables
+dummy_variables_low <- names(dplyr::select(dummy_variables, -dummy_variables_high))
+
+loan_dataset_logistic <- dplyr::select(loan_dataset_logistic, -dummy_variables_low)
+```
+
+After we investigated the low variability in the dummies we look at the calculated variables on the transaction type proportion we calculated dutring the data enhancement process.
+
+```{r prop, echo=TRUE}
+prop_variables <- dplyr::select(loan_dataset_logistic, 
+                                starts_with('x_prop'))
+prop_variables <- summary(prop_variables)
+kable(t(prop_variables))
+
+loan_dataset_logistic <- dplyr::select(loan_dataset_logistic, -x_prop_old_age_pension)
+```
+
+Variable **x_prop_old_age_pension** is also excluded from the data set as in the dataset no observation has this type of transaction.
+
+We ended up having a data set with **40 variables**.
+
+```{r variables_2, echo=FALSE}
+kable(tibble(variables = names(loan_dataset_logistic)))
 ```
 
 ## Investigating Multicollinearity
 
 With the remaining variables we ran a multicollinearity test to identify additional variables to drop from the model specification.
 
-```{r check_correl, out.width = '100%'}
-
-vars.quant <- select_if(temp, is.numeric)
-VIF <- imcdiag(vars.quant, temp$y_loan_defaulter)
+```{r check_correl, out.width = '100%', warning=FALSE}
+vars.quant <- select_if(loan_dataset_logistic, is.numeric)
+VIF <- imcdiag(vars.quant, loan_dataset_logistic$y_loan_defaulter)
 
 VIF_Table_Before <- tibble(variable = names(VIF$idiags[,1]),
                     VIF = VIF$idiags[,1]) %>% 
              arrange(desc(VIF))
 
-kable(VIF_Table_Before)
+knitr::kable(VIF_Table_Before)
 ```
 
-```{r plot_correl, out.width = '100%', echo=TRUE}
-ggplot(VIF_Table_Before, aes(x = fct_reorder(variable, VIF), y = log(VIF), label = round(VIF, 2))) + 
-  geom_point(stat='identity', fill="black", size=15)  +
-  geom_segment(aes(y = 0, 
-                   yend = log(VIF), 
-                   xend = variable), 
-               color = "black") +
-  geom_text(color="white", size=4) +
-  geom_hline(aes(yintercept = log(5)), color = 'red', size = 2) +
-  scale_y_continuous(labels = NULL, breaks = NULL) +
-  coord_flip() +
-  theme_economist() +
-  theme(legend.position = 'none', 
-        panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank()) +
-  labs(x = 'Variable',
-       y = NULL,
-       title = 'Variance Inflation Factor',
-       subtitle="Checking for multicolinearity in X's variables.
-       Variables with VIF more than 5 will 
-       be droped from the model")
+Then we look at the correlogram in the high VIF variables.
+
+```{r check_correl_2, out.width = '100%'}
+low_VIF <- filter(VIF_Table_Before, VIF <= 5)$variable
+high_VIF <- filter(VIF_Table_Before, VIF > 5)$variable
+
+high_VIF_dataset <- dplyr::select(loan_dataset_logistic, high_VIF)
+
+cor_mtx_high_VIF <- cor(high_VIF_dataset)
+
+high_VIF_correlogram_before <- ggcorrplot(cor_mtx_high_VIF, 
+                                hc.order = TRUE,
+                                lab = FALSE,
+                                lab_size = 3, 
+                                method ="square",
+                                colors = c("tomato2", "white", "springgreen3"),
+                                title = "Correlation Matrix of Loan Dataset Variables with high VIF") +
+  theme(axis.text = element_blank(),
+        legend.position = 0)
+
+print(high_VIF_correlogram_before)
+
 ```
 
-We decided to exclude any variable with a VIF greater than 5.
+Then we exclude the variables with high correlation keeping the variables with less correlation with the others.
 
-Below variables were excluded based on the multicollinear presence on them.
+```{r check_correl_3, out.width = '100%'}
+correl_threshold <- 0.6
 
-- **x_prop_insurance_payment**;
-- **x_prop_household**;
-- **x_prop_statement** ;
-- **x_prop_loan_payment**; 
-- **x_prop_other**;
-- **x_no_of_inhabitants**; 
-- **x_no_of_commited_crimes_1996**;
-- **x_transaction_amount**;
-- **x_transaction_count**;
-- **x_unemploymant_rate_1996**; 
-- **x_unemploymant_rate_1995**;
-- **x_average_salary**;
-- **x_no_of_cities**.
+reject_variables_vector <- tibble(var_1 = row.names(cor_mtx_high_VIF)) %>% 
+  bind_cols(as_tibble(cor_mtx_high_VIF)) %>% 
+  melt(id = c("var_1")) %>% 
+  filter(var_1 != variable) %>%
+  mutate(abs_value = abs(value)) %>%
+  filter(abs_value > correl_threshold) %>%
+  group_by(var_1) %>% 
+  mutate(sum_1 = sum(abs_value)) %>% 
+  ungroup() %>% 
+  group_by(variable) %>% 
+  mutate(sum_2 = sum(abs_value)) %>% 
+  ungroup() %>% 
+  mutate(reject = ifelse(sum_1 > sum_2, var_1, as.character(variable))) %>% 
+  distinct(reject)
 
-```{r remove_variables_2}
-temp <- dplyr::select(temp, -c(x_prop_insurance_payment,
-                               x_prop_household,
-                               x_prop_statement,
-                               x_prop_loan_payment,
-                               x_prop_other,
-                               x_no_of_inhabitants,
-                               x_no_of_commited_crimes_1996,
-                               x_transaction_amount,
-                               x_transaction_count,
-                               x_unemploymant_rate_1996,
-                               x_unemploymant_rate_1995,
-                               x_average_salary,
-                               x_no_of_cities))
+reject_variables_vector <- reject_variables_vector$reject
 
-loan_reg_dataset <- temp
+clean_dataset <- dplyr::select(loan_dataset_logistic, -reject_variables_vector)
+
+kable(reject_variables_vector)
 ```
 
-Here is the final correlation matrix we got:
+We finally look on the complete dataset correlogram with the clean data set.
 
-```{r check_correl_2, out.width = '100%', echo=FALSE}
-vars.quant <- select_if(loan_reg_dataset, is.numeric)
+```{r check_correl_4, out.width = '100%'}
+cor_mtx_full <- cor(loan_dataset_logistic)
+cor_mtx_clean <- cor(clean_dataset)
 
-VIF <- imcdiag(vars.quant, loan_reg_dataset$y_loan_defaulter)
+full = ggcorrplot(cor_mtx_full, hc.order = TRUE,
+           lab = FALSE, 
+           lab_size = 3, 
+           method="square", 
+           colors = c("tomato2", "white", "springgreen3"),
+           title="Correlation Matrix of Full Loan Dataset") +
+  theme(axis.text = element_blank(),
+        legend.position = 0)
+
+clean = ggcorrplot(cor_mtx_clean, hc.order = TRUE,
+           lab = FALSE, 
+           lab_size = 3, 
+           method="square", 
+           colors = c("tomato2", "white", "springgreen3"),
+           title="Correlation Matrix of Clean Loan Dataset") +
+  theme(axis.text = element_blank(),
+        legend.position = 0)
+
+loan_dataset_logistic <- clean_dataset
+
+print(ggarrange(full, clean))
+```
+
+We also look again at the VIF estimates for the clena dataset.
+
+```{r check_correl_5, out.width = '100%'}
+vars.quant <- select_if(loan_dataset_logistic, is.numeric)
+
+VIF <- imcdiag(vars.quant, loan_dataset_logistic$y_loan_defaulter)
 
 VIF_Table_After <- tibble(variable = names(VIF$idiags[,1]),
-                    VIF = VIF$idiags[,1]) %>% 
+                          VIF = VIF$idiags[,1]) %>%
   arrange(desc(VIF))
 
-kable(VIF_Table_After)
-```
-
-Plot of VIF values:
-
-```{r plot_correl_2, out.width = '100%', echo=TRUE}
-ggplot(VIF_Table_After, aes(x = fct_reorder(variable, VIF), y = log(VIF), label = round(VIF, 2))) + 
+ggplot(VIF_Table_After, aes(x = fct_reorder(variable, VIF), 
+                            y = log(VIF), label = round(VIF, 2))) + 
   geom_point(stat='identity', fill="black", size=15)  +
   geom_segment(aes(y = 0, 
                    yend = log(VIF), 
@@ -260,23 +243,48 @@ ggplot(VIF_Table_After, aes(x = fct_reorder(variable, VIF), y = log(VIF), label 
        y = NULL,
        title = 'Variance Inflation Factor',
        subtitle="Checking for multicolinearity in X's variables.
-       Variables with VIF more than 5 will 
-       be droped from the model")
+       Variables with VIF more than 5 will be droped from the model")
 ```
 
-Correlation Matrix Plot: no Variable with correlation more than 0.6.
+We finally texclude one last variable that still has a VIF higher than our threshold (5)
 
-```{r plot_correl_3, out.width = '100%', echo=TRUE}
-cor_mtx <- cor(vars.quant)
+```{r check_correl_6, echo=FALSE, out.width = '100%'}
+loan_dataset_logistic <- dplyr::select(loan_dataset_logistic, -x_average_salary)
 
-ggcorrplot(cor_mtx, hc.order = TRUE, 
-           type = "lower", 
-           lab = TRUE, 
-           lab_size = 3, 
-           method="circle", 
-           colors = c("tomato2", "white", "springgreen3"), 
-           title="Correlation Matrix of Loan Dataset", 
-           ggtheme=theme_bw)
+vars.quant <- select_if(loan_dataset_logistic, is.numeric)
+
+VIF <- imcdiag(vars.quant, loan_dataset_logistic$y_loan_defaulter)
+
+VIF_Table_After <- tibble(variable = names(VIF$idiags[,1]),
+                          VIF = VIF$idiags[,1]) %>%
+  arrange(desc(VIF))
+
+ggplot(VIF_Table_After, aes(x = fct_reorder(variable, VIF), 
+                            y = log(VIF), label = round(VIF, 2))) + 
+  geom_point(stat='identity', fill="black", size=15)  +
+  geom_segment(aes(y = 0, 
+                   yend = log(VIF), 
+                   xend = variable), 
+               color = "black") +
+  geom_text(color="white", size=4) +
+  geom_hline(aes(yintercept = log(5)), color = 'red', size = 2) +
+  scale_y_continuous(labels = NULL, breaks = NULL) +
+  coord_flip() +
+  theme_economist() +
+  theme(legend.position = 'none', 
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank()) +
+  labs(x = 'Variable',
+       y = NULL,
+       title = 'Variance Inflation Factor',
+       subtitle="Checking for multicolinearity in X's variables.
+       Variables with VIF more than 5 will be droped from the model")
+```
+
+After variable selection step we end up with **28 variables** in the dataset.
+
+```{r variables_final, echo=TRUE}
+kable(tibble(variables = names(loan_dataset_logistic)))
 ```
 
 ## Sample split into Test and Training Data
@@ -287,18 +295,16 @@ The available data in Loan Dataset is split into Train and Testing data on the f
 - **Test Dataset ** (30% 204 obs).
 
 ```{r split_sample}
-
 set.seed(12345)
-index <- caret::createDataPartition(loan_reg_dataset$y_loan_defaulter, 
+index <- caret::createDataPartition(loan_dataset_logistic$y_loan_defaulter, 
                                     p= 0.7,list = FALSE)
 
-data.train <- loan_reg_dataset[index, ]
-data.test  <- loan_reg_dataset[-index,]
+data.train_logistic <- loan_dataset_logistic[index, ]
+data.test_logistic  <- loan_dataset_logistic[-index,]
 
-
-event_proportion <- bind_rows(prop.table(table(loan_reg_dataset$y_loan_defaulter)),
-                              prop.table(table(data.train$y_loan_defaulter)),
-                              prop.table(table(data.test$y_loan_defaulter)))
+event_proportion <- bind_rows(prop.table(table(loan_dataset_logistic$y_loan_defaulter)),
+                              prop.table(table(data.train_logistic$y_loan_defaulter)),
+                              prop.table(table(data.test_logistic$y_loan_defaulter)))
 
 event_proportion$scope = ''
 event_proportion$scope[1] = 'full dataset'
@@ -308,7 +314,6 @@ event_proportion$scope[3] = 'test dataset'
 event_proportion <- select(event_proportion, scope, everything())
 
 kable(event_proportion)
-
 ```
 
 Both datasets keep the same proportion for the explained variable around 11%.
@@ -317,84 +322,79 @@ Both datasets keep the same proportion for the explained variable around 11%.
 
 With the final cleaned dataset, we got from above steps we fit our Logistic Regression Y_loan_defaulter on all x variables.
 
-```{r fit_model_1}
-model_1 <- glm(data = data.train, formula = y_loan_defaulter ~ .,
-                 family= binomial(link='logit'))
+```{r fit_model_full, echo=TRUE}
+logistic.full <- glm(formula =y_loan_defaulter ~ .,
+                     data= data.train_logistic, 
+                     family= binomial(link='logit'))
 
-# jut truncating variable names to 30 char to fit nicely in the screen.
-names(model_1$coefficients) <- stringr::str_sub(names(model_1$coefficients), 1, 30)
-
-summary(model_1)
+names(logistic.full$coefficients) <- stringr::str_sub(names(logistic.full$coefficients), 1, 25)
+summary(logistic.full)
 ```
 
-Alternatively we fit a second model only with variables statistically significant p-value less than 10%.
+Alternatively we fit a second model only with variables statistically significant p-value less than 10% using the stepwise method.
 
-```{r fit_model_2}
-model_2 <- glm(data = data.train, formula = y_loan_defaulter ~ x_loan_amount +
-                 x_loan_duration + x_has_card + x_prop_interest_credited,
-                 family= binomial(link='logit'))
+```{r fit_model_step_0, include=FALSE}
+logistic.step <- step(logistic.full, direction = "both", test = "F")
 
-# jut truncating variable names to 30 char to fit nicely in the screen.
-names(model_2$coefficients) <- stringr::str_sub(names(model_2$coefficients), 1, 30)
-
-summary(model_2)
+names(logistic.step$coefficients) <- stringr::str_sub(names(logistic.step$coefficients), 1, 25)
+summary(logistic.step)
 ```
 
-In the next step we will compare how each model performed.
+```{r fit_model_step_1, eval=FALSE}
+logistic.step <- step(logistic.full, direction = "both", test = "F")
 
-*******************************************************************************
+names(logistic.step$coefficients) <- stringr::str_sub(names(logistic.step$coefficients), 1, 25)
+summary(logistic.step)
+```
+
+```{r fit_model_step_show, echo=FALSE}
+summary(logistic.step)
+```
 
 # Evaluating the model performance
 
 We started this step by making predictions using our model on the X's variables in our Train and Test datasets.
 
-```{r predict, warning=FALSE}
-glm.prob.train.1 <- predict(model_1, type = "response")
-glm.prob.test.1 <- predict(model_1, newdata = data.test, type= "response")
 
-glm.prob.train.2 <- predict(model_2, type = "response")
-glm.prob.test.2 <- predict(model_2, newdata = data.test, type= "response")
+```{r predict, warning=FALSE}
+logistic.prob.train <- predict(logistic.step, type = "response")
+logistic.prob.test <- predict(logistic.step,
+                              newdata = data.test_logistic, 
+                              type= "response")
 ```
 
 We then evaluate the metrics in the each model for Train and Test data:
 
 ```{r measure, warning=FALSE}
-glm.train.1 <- HMeasure(data.train$y_loan_defaulter, glm.prob.train.1, threshold = 0.5)
-glm.test.1  <- HMeasure(data.test$y_loan_defaulter, glm.prob.test.1, threshold = 0.5)
 
-glm.train.2 <- HMeasure(data.train$y_loan_defaulter, glm.prob.train.2, threshold = 0.5)
-glm.test.2 <- HMeasure(data.test$y_loan_defaulter, glm.prob.test.2, threshold = 0.5)
+measures.logistic.train <- HMeasure(data.train_logistic$y_loan_defaulter, 
+                                         logistic.prob.train, 
+                                         threshold = 0.5)
 
-measures <- t(bind_rows(glm.train.1$metrics,
-                      glm.test.1$metrics,
-                      glm.train.2$metrics,
-                      glm.test.2$metrics)) %>% as_tibble(., rownames = NA)
+measures.logistic.test <- HMeasure(data.test_logistic$y_loan_defaulter, 
+                                        logistic.prob.test, 
+                                        threshold = 0.5)
 
-colnames(measures) <- c('model 1 - train','model 1 - test',
-                        'model 2 - train','model 2 - test')
+measures <- t(bind_rows(measures.logistic.train$metrics,
+                        measures.logistic.test$metrics)) %>%
+  as_tibble(., rownames = NA)
+
+colnames(measures) <- c('logistic - train', 'logistic - test')
 
 measures$metric = rownames(measures)
 
-measures <- select(measures, metric, everything())
+measures <- dplyr::select(measures, metric, everything())
 
 kable(measures, row.names = FALSE)
+
 ```
 
 Then, we look a boxplot chart to see how well our model split the observation into our explained variable:
 
--**Model 1:**
-```{r boxplot_1, out.width = '100%', echo=FALSE}
-boxplot(glm.prob.test.1 ~ data.test$y_loan_defaulter,
-        col= c("red", "green"), 
-        horizontal= T,
-        xlab = 'Probability Prediction',
-        ylab = 'Loan Defaulter')
-```
-
--**Model 2:**
+- **Logistic Regression**
 ```{r boxplot_2, out.width = '100%', echo=FALSE}
-boxplot(glm.prob.test.2 ~ data.test$y_loan_defaulter,
-        col= c("red", "green"), 
+boxplot(logistic.prob.test ~ data.test_logistic$y_loan_defaulter,
+        col= c("green", "red"), 
         horizontal= T,
         xlab = 'Probability Prediction',
         ylab = 'Loan Defaulter')
@@ -403,98 +403,52 @@ boxplot(glm.prob.test.2 ~ data.test$y_loan_defaulter,
 Then we plot the ROC(Receiver Operator Characteristic Curve) of the model:
 
 ```{r roC, out.width = '100%', echo=TRUE, warning=FALSE, message=FALSE}
-roc_1 <- roc(data.test$y_loan_defaulter, glm.prob.test.1)
-roc_2 <- roc(data.test$y_loan_defaulter, glm.prob.test.2)
+roc_logistic <- roc(data.test_logistic$y_loan_defaulter,
+                    logistic.prob.test)
 
-y1 <- roc_1$sensitivities
-x1 <- 1-roc_1$specificities
-
-y2 <- roc_2$sensitivities
-x2 <- 1-roc_2$specificities
+y1 <- roc_logistic$sensitivities
+x1 <- 1 - roc_logistic$specificities
 
 plot(x1, y1,  type="n",
      xlab = "False Positive Rate (Specificities)", 
-     ylab= "True Positive Rate (Sensitivities)")
+     ylab = "True Positive Rate (Sensitivities)")
 
-lines(x1, y1,lwd=3,lty=1, col="red") 
-lines(x2, y2,lwd=3,lty=1, col="blue")
+lines(x1, y1, lwd = 3, lty = 1, col="red") 
 
-abline(0,1, lty=2)
+legend("bottomright", c('Logistic'), 
+       lty = 1, col = c('red'))
+
+abline(0, 1, lty = 2)
 ```
 
-By the ROC curve of each model we see that model 2 is a better model.
-It only consider the statistic significant variables.
-
-Finally we look more closely to the model 2 accuracy:
-
--**Model 2:**
+Finally we look more closely to the model accuracy **Logistic Regression**.
 
 To perform this task, we start by defining a threshold to assign the observation to each class, and them calculate the General Accuracy and the True Positive Rate.
-We start our analysis with a threshold of 0.5
 
-```{r accuracy_2_T_0.5, echo=TRUE}
-threshold <- 0.5
+- **Threshold = 0.1**
 
-fitted.results.2 <- ifelse(glm.prob.test.2 > threshold ,1 ,0)
+```{r accuracy, echo=TRUE}
+accuracy <- function(score, actual, threshold = 0.5) {
+  
+  fitted.results <- ifelse(score > threshold ,1 ,0)
+  
+  misClasificError <- mean(fitted.results != actual)
+  
+  misClassCount <- misclassCounts(fitted.results, actual)
 
-misClasificError <- mean(fitted.results.2 != data.test$y_loan_defaulter)
+  print(kable(misClassCount$conf.matrix))
 
-misClassCount <- misclassCounts(fitted.results.2, data.test$y_loan_defaulter)
+  print('--------------------------------------------------------------')
+  print(paste('Model General Accuracy of: ', 
+              round((1 - misClassCount$metrics['ER']) * 100, 2), '%', 
+              sep = ''))
+  print(paste('True Positive Rate of    : ', 
+              round(misClassCount$metrics['TPR'] * 100, 2), '%',
+              sep = ''))
+}
 
-paste('Model General Accuracy of: ', round((1 - misClassCount$metrics['ER']) * 100, 2), '%', sep = '')
-paste('True Positive Rate of    : ', round(misClassCount$metrics['TPR'] * 100, 2), '%', sep = '')
+accuracy(score = logistic.prob.test, 
+         actual = data.test_logistic$y_loan_defaulter, 
+         threshold = 0.1)
 
-kable(misClassCount$conf.matrix)
 ```
-
-At a first glance we may see this model as an excellent predictor of default as it can predict the correct class 88.24% of the cases.
-
-But looking more closely at the confusion matrix we can see that this model can predict only 16% of the true defaulters.
-
-One way to improve the performance of the model is to decrease the threshold to 0.2.
-
-See results below:
-
-```{r accuracy_2_T_0.2, echo=TRUE}
-threshold <- 0.2
-
-fitted.results.2 <- ifelse(glm.prob.test.2 > threshold ,1 ,0)
-
-misClasificError <- mean(fitted.results.2 != data.test$y_loan_defaulter)
-
-misClassCount <- misclassCounts(fitted.results.2, data.test$y_loan_defaulter)
-
-paste('Model General Accuracy of: ', round((1 - misClassCount$metrics['ER']) * 100, 2), '%', sep = '')
-paste('True Positive Rate of    : ', round(misClassCount$metrics['TPR'] * 100, 2), '%', sep = '')
-
-kable(misClassCount$conf.matrix)
-```
-
-Now we see that the True Positive accuracy increased to 52% and the general accuracy drop just a bit to 86.76%.
-
-We may be tempted to reduce even more our threshold.
-
-Let's see what happen if we use 0.1 as threshold.
-
-```{r accuracy_2_T_0.1, echo=FALSE}
-threshold <- 0.1
-
-fitted.results.2 <- ifelse(glm.prob.test.2 > threshold ,1 ,0)
-
-misClasificError <- mean(fitted.results.2 != data.test$y_loan_defaulter)
-
-misClassCount <- misclassCounts(fitted.results.2, data.test$y_loan_defaulter)
-
-paste('Model General Accuracy of: ', round((1 - misClassCount$metrics['ER']) * 100, 2), '%', sep = '')
-paste('True Positive Rate of    : ', round(misClassCount$metrics['TPR'] * 100, 2), '%', sep = '')
-
-kable(misClassCount$conf.matrix)
-```
-
-Now our TPR jumped to 72% and our general accuracy drop to 76.47%.
-
-The final threshold will depend on the real word use case, by how much we value each class.
-
-In this sample we see that we can improve our True Positive prediction rate at expense of classifying an increasing number as defaulter.
-
-This balance must be decided by the managers and the bank should keep seeking and experimenting with more variables to find a better model.
