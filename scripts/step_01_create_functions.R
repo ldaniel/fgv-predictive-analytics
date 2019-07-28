@@ -54,8 +54,9 @@ GetAgeFromBirthnumber <- function(var_birth_number) {
 # rename the variables and create the appropriate dummy variables to be used in the modeling process.
 
 DataPrep <- function() {
-
-  temp <- left_join(loan, disposition, by = c('account_id', 'type')) %>% 
+  
+  # joining datasets
+  dataset <- left_join(loan, disposition, by = c('account_id', 'type')) %>% 
     left_join(client, by = 'client_id') %>%
     left_join(district, by = 'district_id') %>% 
     left_join(creditcard, by = 'disp_id') %>% 
@@ -85,7 +86,8 @@ DataPrep <- function() {
                     "prop_statement", "prop_interest_credited", 
                     "prop_loan_payment", "prop_other"))
   
-  colnames(temp) <- c("x_loan_amount", "x_loan_duration", "x_loan_payments", 
+  # renaming variables
+  colnames(dataset) <- c("x_loan_amount", "x_loan_duration", "x_loan_payments", 
                       "x_loan_status", "y_loan_defaulter", "x_loan_contract_status",
                       "x_client_gender", "x_client_age", 
                       "x_district_name", "x_region", 
@@ -104,35 +106,40 @@ DataPrep <- function() {
                       "x_prop_old_age_pension", "x_prop_insurance_payment", 
                       "x_prop_sanction_interest","x_prop_household","x_prop_statement",
                       "x_prop_interest_credited", "x_prop_loan_payment", "x_prop_other")
-
-  temp <- dplyr::select(temp, -c("x_loan_status", "x_loan_contract_status", 
+  
+  # excluding redundant variables
+  dataset <- dplyr::select(dataset, -c("x_loan_status", "x_loan_contract_status", 
                                  'x_prop_sanction_interest'))
   
-  temp$x_card_type = ifelse(is.na(temp$x_card_type), 'no card', 
-                            as.character(temp$x_card_type))
+  # coercing variable domains and data types
+  dataset$x_card_type = ifelse(is.na(dataset$x_card_type), 'no card', 
+                            as.character(dataset$x_card_type))
   
-  temp$x_card_age_month = ifelse(is.na(temp$x_card_age_month), 0, 
-                                 temp$x_card_age_month)
+  dataset$x_card_age_month = ifelse(is.na(dataset$x_card_age_month), 0, 
+                                 dataset$x_card_age_month)
   
-  temp$y_loan_defaulter = as.integer(temp$y_loan_defaulter)
-
-  temp <- fastDummies::dummy_cols(temp,
+  dataset$y_loan_defaulter = as.integer(dataset$y_loan_defaulter)
+  
+  # creating dummies
+  dataset <- fastDummies::dummy_cols(dataset,
                                   remove_first_dummy = TRUE,
                                   select_columns = c("x_client_gender", "x_district_name", 
                                                      "x_region", "x_card_type"))
   
-  temp <- dplyr::select(temp, -c("x_client_gender", "x_district_name", "x_region", 
+  dataset <- dplyr::select(dataset, -c("x_client_gender", "x_district_name", "x_region", 
                           "x_card_type"))
   
-  temp <- temp[ , order(names(temp))]
+  # reordering variables
+  dataset <- dataset[ , order(names(dataset))]
   
-  temp <- dplyr::select(temp, y_loan_defaulter, everything())
+  dataset <- dplyr::select(dataset, y_loan_defaulter, everything())
   
-  colnames(temp) <- stringr::str_replace_all(names(temp), ' ', '_')
-  colnames(temp) <- stringr::str_replace_all(names(temp), '_-_', '_')
-  colnames(temp) <- trimws(names(temp))
-  colnames(temp) <- textclean::replace_non_ascii(names(temp))
+  # excluding non desirable characters in variable names
+  colnames(dataset) <- stringr::str_replace_all(names(dataset), ' ', '_')
+  colnames(dataset) <- stringr::str_replace_all(names(dataset), '_-_', '_')
+  colnames(dataset) <- trimws(names(dataset))
+  colnames(dataset) <- textclean::replace_non_ascii(names(dataset))
 
-  return(temp)
+  return(dataset)
 
 }
