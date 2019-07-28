@@ -6,29 +6,31 @@ navbar:
       icon: fa-home
       href: index.html
     - text: "Business Case"
-      icon: fa-info
+      icon: fa-hand-holding-usd
       menu: 
         - text: "About the Data"
           href: 01_about_the_data.html
-        - text: "Data preparation"
+        - text: "Data Preparation"
           href: 02_data_preparation.html
-    - text: "Model's reports"
-      icon: fa-file
+        - text: "Data Exploration"
+          href: 03_exploration_report.html
+    - text: "Model's Reports"
+      icon: fa-file-invoice
       menu: 
         - text: "Analytical Methods"
-        - text: "Logistic Regression"
-          href: 03_logistic_regression_report.html
-        - text: "Decision Tree"
-          href: 04_decision_tree_report.html
+        - text: "Logistic Regression Report"
+          href: 04_logistic_regression_report.html
+        - text: "Decision Tree Report"
+          href: 05_decision_tree_report.html
         - text: "---------"
         - text: "Ensembe Methods"
-        - text: "Boosting"
-          href: 05_boosting_report.html
-        - text: "Random Forest"
-          href: 06_random_forest_report.html
-    - text: "Conclusion"
-      icon: fa-gear
-      href: 07_conclusion.html
+        - text: "Boosting Report"
+          href: 06_boosting_report.html
+        - text: "Random Forest Report"
+          href: 07_random_forest_report.html
+    - text: "Final Report"
+      icon: fa-file-invoice-dollar
+      href: 08_conclusion.html
 output:
   html_document: 
     theme: cosmo
