@@ -143,3 +143,40 @@ DataPrep <- function() {
   return(dataset)
 
 }
+
+# metrics by cutoff value --------------------------------------------------------------------
+# The objective of this function is to calculate main metrics of model performance according to a cutoff value.
+calculateModelMetrics <- function(cutData, realData, predData){
+  cuttedData <- as.factor(ifelse(predData>=cutData, 1, 0))
+  
+  invisible(capture.output(out <- CrossTable(realData, cuttedData, prop.c = F, prop.t = F, prop.r = T, prop.chisq = F)))
+  
+  out <- as.data.frame(out) %>% 
+    mutate(merged=paste0(t.x, t.y)) %>% 
+    select(merged, val=t.Freq)
+  
+  TN <- filter(out, merged == "00")$val[1]
+  FP <- filter(out, merged == "01")$val[1]
+  FN <- filter(out, merged == "10")$val[1]
+  TP <- filter(out, merged == "11")$val[1]
+  
+  return(data.frame(Cut = cutData,
+                    TN = TN, 
+                    FP = FP,
+                    FN = FN, 
+                    TP = TP,
+                    TPR = TP/(TP+FN), TNR=TN/(TN+FP),
+                    Error = (FP+FN)/(TP+TN+FP+FN),
+                    Precision = TP/(TP+FP),
+                    F1 = 2*(TP/(TP+FN))*(TP/(TP+FP))/((TP/(TP+FP)) + (TP/(TP+FN)))))
+}
+
+
+# calculate metrics by each cutoff value given step --------------------------------------------------------------------
+# The objective of this function is to calculate main metrics of model performance for cutoffs from 0-1 based on given step.
+modelMetrics <- function(realData, predData, stepping = 0.01){
+  probCuts <- seq(from = 0, to = 1, by = stepping)
+  out <- bind_rows(lapply(probCuts, calculateModelMetrics, realData = realData, predData = predData))
+  out <- out[complete.cases(out),]
+  return(out)
+}
