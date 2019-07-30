@@ -22,6 +22,9 @@ library(adabag)
 library(VIM)
 library(reshape2)
 library(ggpubr)
+library(randomForest)
+library(gmodels)
+library(plotly)
 
 # loading other scripts do be used here ----------------------------------------------
 source("./scripts/step_00_config_environment.R")
