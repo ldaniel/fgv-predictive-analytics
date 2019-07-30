@@ -45,8 +45,7 @@ source("./scripts/step_05_data_enhancement.R")
 # data prep ---------------------------------------------------------------------------
 
 loan_dataset_rf <- DataPrep() %>% 
-  mutate(y_loan_defaulter = as.factor(y_loan_defaulter)) %>% 
-  select(-x_prop_old_age_pension)
+  mutate(y_loan_defaulter = as.factor(y_loan_defaulter))
 
 # sampling ----------------------------------------------------------------------------
 
@@ -114,10 +113,10 @@ plot(rf.full)
 
 # Best selected parameters: mtry = 100 and ntree = 5000 (time taken: ~2 hours)
 
-saveRDS(rf.full, "./models/rf.rds")
+saveRDS(rf.full, "./models/random_forest.rds")
 
 # to save time, only load fitted model ------------------------------------------------
-rf.full <- readRDS("./models/rf.rds")
+rf.full <- readRDS("./models/random_forest.rds")
 
 # generate predicted columns ----------------------------------------------------------
 
