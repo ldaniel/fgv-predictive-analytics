@@ -23,11 +23,9 @@ library(VIM)
 library(reshape2)
 library(ggpubr)
 library(randomForest)
-<<<<<<< HEAD
-=======
 library(gmodels)
 library(plotly)
->>>>>>> fd6eab9e307e5fc0c0ddf4f87557bb979ea5a55a
+
 
 # loading other scripts do be used here ----------------------------------------------
 source("./scripts/step_00_config_environment.R")
