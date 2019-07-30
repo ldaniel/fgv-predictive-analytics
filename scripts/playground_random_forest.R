@@ -32,6 +32,7 @@ library(reshape2)
 library(ggpubr)
 library(randomForest)
 library(gmodels)
+library(plotly)
 
 # loading other scripts do be used here ----------------------------------------------
 source("./scripts/step_00_config_environment.R")
@@ -125,20 +126,19 @@ rf.full <- readRDS("./models/random_forest.rds")
 
 # generate predicted columns ----------------------------------------------------------
 
-data.test_rf$y_loan_defaulter_predicted <- predict(rf.full, newdata = data.test_rf, type = "prob")
-data.train_rf$y_loan_defaulter_predicted <- predict(rf.full, newdata = data.train_rf, type = "prob")
-loan_dataset_rf$y_loan_defaulter_predicted <- predict(rf.full, newdata = loan_dataset_rf, type = "prob")
+data.test_rf$y_loan_defaulter_predicted <- predict(rf.full, newdata = data.test_rf, type = "prob")[,2]
+data.train_rf$y_loan_defaulter_predicted <- predict(rf.full, newdata = data.train_rf, type = "prob")[,2]
+loan_dataset_rf$y_loan_defaulter_predicted <- predict(rf.full, newdata = loan_dataset_rf, type = "prob")[,2]
 
 # calculate TNR and TPR for multi-cuts for RF -----------------------------------------
 
-metricsByCutoff <- modelMetrics(data.test_rf$y_loan_defaulter, data.test_rf$y_loan_defaulter_predicted)
+metricsByCutoff <- modelMetrics(loan_dataset_rf$y_loan_defaulter, loan_dataset_rf$y_loan_defaulter_predicted)
 p <- plot_ly(x = ~metricsByCutoff$Cut, y = ~metricsByCutoff$TNR, name = 'TNR', type = 'scatter', mode = 'lines')
 p <- p %>% add_trace(x = ~metricsByCutoff$Cut, y = ~metricsByCutoff$TPR, name = 'TPR', type = 'scatter', mode = 'lines')
 p %>% layout(xaxis = list(title = "Cutoff Value"),
              yaxis = list(title = "True Ratio (%)"))
 
-# TBD: cutoff
-# Optimized cut-off selected parameter: Z
+# Optimized cut-off selected parameter: 0.15
 
 # calculate metrics for selected parameters in train/test/full dataset ----------------
 
