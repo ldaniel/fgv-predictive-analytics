@@ -23,6 +23,11 @@ library(VIM)
 library(reshape2)
 library(ggpubr)
 library(randomForest)
+<<<<<<< HEAD
+=======
+library(gmodels)
+library(plotly)
+>>>>>>> fd6eab9e307e5fc0c0ddf4f87557bb979ea5a55a
 
 # loading other scripts do be used here ----------------------------------------------
 source("./scripts/step_00_config_environment.R")
@@ -45,46 +50,27 @@ source('scripts/playground_random_forest.R')
 ## making preditions -----------------------------------------------------------------
 
 logistic.prob.train <- predict(logistic.step, type = "response")
-logistic.prob.test <- predict(logistic.step,
-                              newdata = data.test_logistic, 
-                              type= "response")
+logistic.prob.test <- predict(logistic.step,newdata = data.test_logistic, type= "response")
 
 decision.tree.prob.train <- predict(tree.full, type = "prob")[, 2]
-decision.tree.prob.test  <- predict(tree.full,
-                                    newdata = data.test_DT, 
-                                    type = "prob")[, 2]
+decision.tree.prob.test  <- predict(tree.full,newdata = data.test_DT, type = "prob")[, 2]
 
-boosting.prob.train <- predict.boosting(boost, 
-                                        data.train_boost)$prob[, 2]
-
-boosting.prob.test  <- predict.boosting(boost, 
-                                        data.test_boost)$prob[, 2]
+boosting.prob.train <- predict.boosting(boost, data.train_boost)$prob[, 2]
+boosting.prob.test  <- predict.boosting(boost, data.test_boost)$prob[, 2]
 
 ## getting measures -----------------------------------------------------------------
 
-measures.logistic.train <- HMeasure(data.train_logistic$y_loan_defaulter, 
-                                         logistic.prob.train, 
-                                         threshold = 0.5)
+measures.logistic.train <- HMeasure(data.train_logistic$y_loan_defaulter, logistic.prob.train, threshold = 0.5)
 
-measures.logistic.test <- HMeasure(data.test_logistic$y_loan_defaulter, 
-                                        logistic.prob.test, 
-                                        threshold = 0.5)
+measures.logistic.test <- HMeasure(data.test_logistic$y_loan_defaulter, logistic.prob.test, threshold = 0.5)
 
-measures.decision.tree.train <- HMeasure(data.train_DT$y_loan_defaulter, 
-                                         decision.tree.prob.train, 
-                                         threshold = 0.5)
+measures.decision.tree.train <- HMeasure(data.train_DT$y_loan_defaulter, decision.tree.prob.train, threshold = 0.5)
 
-measures.decision.tree.test <- HMeasure(data.test_DT$y_loan_defaulter, 
-                                        decision.tree.prob.test, 
-                                        threshold = 0.5)
+measures.decision.tree.test <- HMeasure(data.test_DT$y_loan_defaulter, decision.tree.prob.test, threshold = 0.5)
 
-measures.boosting.train <- HMeasure(data.train_boost$y_loan_defaulter, 
-                                 boost.prob.train,
-                                 threshold = 0.5)
+measures.boosting.train <- HMeasure(data.train_boost$y_loan_defaulter, boost.prob.train,threshold = 0.5)
 
-measures.boosting.test  <- HMeasure(data.test_boost$y_loan_defaulter, 
-                                 boost.prob.test,
-                                 threshold = 0.5)
+measures.boosting.test  <- HMeasure(data.test_boost$y_loan_defaulter, boost.prob.test,threshold = 0.5)
 
 
 measures <- t(bind_rows(measures.logistic.train$metrics,
