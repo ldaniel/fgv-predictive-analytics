@@ -46,7 +46,7 @@ source("./scripts/step_05_data_enhancement.R")
 
 loan_dataset_rf <- DataPrep() %>% 
   mutate(y_loan_defaulter = as.factor(y_loan_defaulter)) %>% 
-  select(-x_district_name_Usti_nad_Labem, -x_prop_old_age_pension)
+  select(-x_district_name_Usti_nad_Labem, -x_prop_old_age_pension, -x_district_name_Prerov)
 
 # sampling ----------------------------------------------------------------------------
 
