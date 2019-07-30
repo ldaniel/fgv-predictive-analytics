@@ -1,8 +1,7 @@
 # data prep -------------------------------------------------------------------
 
-loan_dataset_DT <- DataPrep()
-loan_dataset_DT <- dplyr::select(loan_dataset_DT, 
-                      -x_prop_old_age_pension)
+loan_dataset_DT <-source_dataset
+loan_dataset_DT <- dplyr::select(loan_dataset_DT,-x_prop_old_age_pension)
 
 kable(tibble(variables = names(loan_dataset_DT)))
 

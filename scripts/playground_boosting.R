@@ -1,8 +1,7 @@
 
 # data prep -------------------------------------------------------------------
-loan_dataset_boost <- DataPrep()
-loan_dataset_boost <- dplyr::select(loan_dataset_boost,
-                      -x_prop_old_age_pension)
+loan_dataset_boost <- source_dataset
+loan_dataset_boost <- dplyr::select(loan_dataset_boost, -x_prop_old_age_pension)
 
 kable(tibble(variables = names(loan_dataset_boost)))
 

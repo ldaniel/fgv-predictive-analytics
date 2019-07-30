@@ -1,50 +1,11 @@
-#################### INI TEMP ####################
-
-# clear everything before starting rf playground --------------------------------------
-
 cat("\014")
-rm(list=ls())
-invisible(gc())
 
-# loading required libraries ----------------------------------------------------------
-library(caret)
-library(corrplot)
-library(fastDummies)
-library(feather)
-library(forcats)
-library(ggcorrplot)
-library(ggplot2)
-library(ggthemes)
-library(hmeasure)
-library(knitr)
-library(lubridate)
-library(MASS)
-library(mctest)
-library(pROC)
-library(readr)
-library(rms)
-library(rpart)
-library(rpart.plot)
-library(tidyverse)
-library(adabag)
-library(VIM)
-library(reshape2)
-library(ggpubr)
-library(randomForest)
 
-# loading other scripts do be used here ----------------------------------------------
-source("./scripts/step_00_config_environment.R")
-source("./scripts/step_01_create_functions.R")
-source("./scripts/step_02_data_ingestion.R")
-source("./scripts/step_03_data_cleaning.R")
-source("./scripts/step_04_label_translation.R")
-source("./scripts/step_05_data_enhancement.R")
 
-#################### END TEMP ####################
 
 # data prep ---------------------------------------------------------------------------
 
-loan_dataset_rf <- DataPrep()
+loan_dataset_rf <- source_dataset
 
 DistinctCounts <- loan_dataset_rf %>% summarise_all(n_distinct) %>% t %>% as.data.frame
 

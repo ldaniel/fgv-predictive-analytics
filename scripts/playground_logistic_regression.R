@@ -1,6 +1,6 @@
 # data prep -------------------------------------------------------------------
 
-loan_dataset_logistic <- DataPrep()
+loan_dataset_logistic <- source_dataset
 
 kable(tibble(variables = names(loan_dataset_logistic)))
 
