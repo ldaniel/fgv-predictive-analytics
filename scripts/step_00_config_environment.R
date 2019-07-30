@@ -1,3 +1,7 @@
+# clear everything before starting --------------------------------------------
+rm(list=ls())
+invisible(gc())
+
 # setting the environment -----------------------------------------------------
 options(encoding = "UTF-8")
 
