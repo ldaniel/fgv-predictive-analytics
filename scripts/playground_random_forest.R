@@ -88,8 +88,8 @@ customRF$levels <- function(x) x$classes
 # fit the random forest model using caret customized train function -------------------
 
 control <- trainControl(method="repeatedcv", number=5, repeats=3, verboseIter = TRUE, allowParallel = TRUE)
-tuneparam <- expand.grid(.mtry=c(5, 25, 50, 75, 100, 125, 150, 175, 200, 300, 400, 500), 
-                         .ntree=c(1000, 2000, 3000, 4000, 5000))
+tuneparam <- expand.grid(.mtry=c(5, 25, 50, 75, 85, 100, 115, 125, 150, 175, 200),
+                         .ntree=c(1000, 3000, 5000, 7000, 9000, 10000))
 evalmetric <- "Accuracy"
 
 set.seed(12345)
@@ -98,12 +98,12 @@ ini <- Sys.time()
 cat(paste0("\nStarted RF training at: ", ini, " ...\n\n"))
 
 rf.full <- train(y_loan_defaulter ~ .,
-                 data=data.train_rf, 
-                 method=customRF, 
+                 data=data.train_rf,
+                 method=customRF,
                  preProcess=c("center", "scale"),
                  metric=evalmetric,
-                 tuneGrid=tuneparam, 
-                 trControl=control, 
+                 tuneGrid=tuneparam,
+                 trControl=control,
                  importance=TRUE)
 
 elapsedTime <- difftime(Sys.time(), ini, units = "auto")
@@ -112,26 +112,31 @@ cat(paste0("\n\nFinished RF training. Total time taken: ", round(elapsedTime, 2)
 summary(rf.full)
 plot(rf.full)
 
-data.train_rf$y_loan_defaulter_predicted <- predict(rf.full, newdata = data.test_rf, type = "prob")
+# Best selected parameters: mtry = 100 and ntree = 5000 (time taken: ~2 hours)
 
-# TBD: mtry and ntree params
-# Best selected parameters: mtry = X and ntree = Y
+saveRDS(rf.full, "./models/rf.rds")
 
-# to save time, fit only with best selected parameters --------------------------------
+# to save time, only load fitted model ------------------------------------------------
+rf.full <- readRDS("./models/rf.rds")
 
+# generate predicted columns ----------------------------------------------------------
 
-# calculate TNR and TPR for multi-cuts for RF -----------------------------------------
+data.test_rf$y_loan_defaulter_predicted <- predict(rf.full, newdata = data.test_rf, type = "prob")
+data.train_rf$y_loan_defaulter_predicted <- predict(rf.full, newdata = data.train_rf, type = "prob")
+loan_dataset_rf$y_loan_defaulter_predicted <- predict(rf.full, newdata = loan_dataset_rf, type = "prob")
 
-metricsByCutoff <- modelMetrics(data.train_rf$y_loan_defaulter, data.train_rf$y_loan_defaulter_predicted)
-p <- plot_ly(x = ~metricsByCutoff$Cut, y = ~metricsByCutoff$TNR, name = 'TNR', type = 'scatter', mode = 'lines')
-p <- p %>% add_trace(x = ~metricsByCutoff$Cut, y = ~metricsByCutoff$TPR, name = 'TPR', type = 'scatter', mode = 'lines')
-p %>% layout(xaxis = list(title = "Cutoff Value"),
-             yaxis = list(title = "True Ratio (%)"))
-
-# TBD: cutoff
-# Optimized cut-off selected parameter: Z
-
-# calculate metrics for selected parameters in train/test/full dataset ----------------
-
-kable(event_proportion)
+# # calculate TNR and TPR for multi-cuts for RF -----------------------------------------
+# 
+# metricsByCutoff <- modelMetrics(data.train_rf$y_loan_defaulter, data.train_rf$y_loan_defaulter_predicted)
+# p <- plot_ly(x = ~metricsByCutoff$Cut, y = ~metricsByCutoff$TNR, name = 'TNR', type = 'scatter', mode = 'lines')
+# p <- p %>% add_trace(x = ~metricsByCutoff$Cut, y = ~metricsByCutoff$TPR, name = 'TPR', type = 'scatter', mode = 'lines')
+# p %>% layout(xaxis = list(title = "Cutoff Value"),
+#              yaxis = list(title = "True Ratio (%)"))
+# 
+# # TBD: cutoff
+# # Optimized cut-off selected parameter: Z
+# 
+# # calculate metrics for selected parameters in train/test/full dataset ----------------
+# 
+# kable(event_proportion)
 
