@@ -44,9 +44,13 @@ source("./scripts/step_05_data_enhancement.R")
 
 # data prep ---------------------------------------------------------------------------
 
-loan_dataset_rf <- DataPrep() %>% 
+loan_dataset_rf <- DataPrep()
+
+DistinctCounts <- loan_dataset_rf %>% summarise_all(n_distinct) %>% t %>% as.data.frame
+
+loan_dataset_rf %<>% 
   mutate(y_loan_defaulter = as.factor(y_loan_defaulter)) %>% 
-  select(-x_district_name_Usti_nad_Labem, -x_prop_old_age_pension, -x_district_name_Prerov)
+  select(-x_prop_old_age_pension)
 
 # sampling ----------------------------------------------------------------------------
 
@@ -100,7 +104,6 @@ cat(paste0("\nStarted RF training at: ", ini, " ...\n\n"))
 rf.full <- train(y_loan_defaulter ~ .,
                  data=data.train_rf,
                  method=customRF,
-                 preProcess=c("center", "scale"),
                  metric=evalmetric,
                  tuneGrid=tuneparam,
                  trControl=control,
