@@ -58,18 +58,17 @@ boosting.prob.test  <- predict.boosting(boost, data.test_boost)$prob[, 2]
 
 ## getting measures -----------------------------------------------------------------
 
+# logistic regression
 measures.logistic.train <- HMeasure(data.train_logistic$y_loan_defaulter, logistic.prob.train, threshold = 0.5)
-
 measures.logistic.test <- HMeasure(data.test_logistic$y_loan_defaulter, logistic.prob.test, threshold = 0.5)
 
+# decision tree
 measures.decision.tree.train <- HMeasure(data.train_DT$y_loan_defaulter, decision.tree.prob.train, threshold = 0.5)
-
 measures.decision.tree.test <- HMeasure(data.test_DT$y_loan_defaulter, decision.tree.prob.test, threshold = 0.5)
 
+# boosting
 measures.boosting.train <- HMeasure(data.train_boost$y_loan_defaulter, boost.prob.train,threshold = 0.5)
-
 measures.boosting.test  <- HMeasure(data.test_boost$y_loan_defaulter, boost.prob.test,threshold = 0.5)
-
 
 measures <- t(bind_rows(measures.logistic.train$metrics,
                         measures.logistic.test$metrics,
@@ -91,18 +90,21 @@ kable(measures, row.names = FALSE)
 
 ## boxplot -------------------------------------------------------------------------
 
+# logistic regression
 boxplot(logistic.prob.test ~ data.test_logistic$y_loan_defaulter,
         col= c("green", "red"), 
         horizontal= T,
         xlab = 'Probability Prediction',
         ylab = 'Loan Defaulter')
 
+# decision tree
 boxplot(decision.tree.prob.test ~ data.test_DT$y_loan_defaulter,
         col= c("green", "red"), 
         horizontal= T,
         xlab = 'Probability Prediction',
         ylab = 'Loan Defaulter')
 
+# boosting
 boxplot(boosting.prob.test ~ data.test_boost$y_loan_defaulter
         ,col= c("green", "red"),
         horizontal= T,
@@ -111,21 +113,27 @@ boxplot(boosting.prob.test ~ data.test_boost$y_loan_defaulter
 
 ## ROC Curve ----------------------------------------------------------------------
 
+# logistic regression
 roc_logistic <- roc(data.test_logistic$y_loan_defaulter,
                     logistic.prob.test)
 
+# decision tree
 roc_decision.tree <- roc(data.test_DT$y_loan_defaulter, 
                          decision.tree.prob.test)
 
+# boosting
 roc_boosting <- roc(data.test_boost$y_loan_defaulter,
                     boosting.prob.test)
 
+# logistic regression
 y1 <- roc_logistic$sensitivities
 x1 <- 1 - roc_logistic$specificities
 
+# decision tree
 y2 <- roc_decision.tree$sensitivities
 x2 <- 1 - roc_decision.tree$specificities
 
+# boosting
 y3 <- roc_boosting$sensitivities
 x3 <- 1 - roc_boosting$specificities
 
@@ -163,14 +171,17 @@ accuracy <- function(score, actual, threshold = 0.5) {
               sep = ''))
 }
 
+# logistic regression
 accuracy(score = logistic.prob.test, 
          actual = data.test_logistic$y_loan_defaulter, 
          threshold = 0.1)
 
+# decision tree
 accuracy(score = decision.tree.prob.test, 
          actual = data.test_DT$y_loan_defaulter, 
          threshold = 0.1)
 
+# boosting
 accuracy(score = boosting.prob.test, 
          actual = data.test_boost$y_loan_defaulter, 
          threshold = 0.4)
