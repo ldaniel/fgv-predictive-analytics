@@ -88,8 +88,8 @@ customRF$levels <- function(x) x$classes
 # fit the random forest model using caret customized train function -------------------
 
 control <- trainControl(method="repeatedcv", number=5, repeats=3, verboseIter = TRUE, allowParallel = TRUE)
-tuneparam <- expand.grid(.mtry=c(5, 25, 50, 75, 100), 
-                         .ntree=c(1000, 3000, 5000))
+tuneparam <- expand.grid(.mtry=c(5, 25, 50, 75, 100, 125, 150, 175, 200, 300, 400, 500), 
+                         .ntree=c(1000, 2000, 3000, 4000, 5000))
 evalmetric <- "Accuracy"
 
 set.seed(12345)
