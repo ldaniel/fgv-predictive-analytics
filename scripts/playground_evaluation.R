@@ -22,6 +22,7 @@ library(adabag)
 library(VIM)
 library(reshape2)
 library(ggpubr)
+library(randomForest)
 
 # loading other scripts do be used here ----------------------------------------------
 source("./scripts/step_00_config_environment.R")
@@ -30,12 +31,14 @@ source("./scripts/step_02_data_ingestion.R")
 source("./scripts/step_03_data_cleaning.R")
 source("./scripts/step_04_label_translation.R")
 source("./scripts/step_05_data_enhancement.R")
+source("./scripts/step_06_dataset_preparation.R")
 
 # modeling ---------------------------------------------------------------------------
 
 source('scripts/playground_logistic_regression.R')
 source('scripts/playground_decision_tree.R')
 source('scripts/playground_boosting.R')
+source('scripts/playground_random_forest.R')
 
 # model evaluation -------------------------------------------------------------------
 
