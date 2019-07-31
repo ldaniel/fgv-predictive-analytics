@@ -7,24 +7,11 @@ kable(tibble(variables = names(loan_dataset_DT)))
 
 # sampling ----------------------------------------------------------------------------
 
-set.seed(12345)
-index <- caret::createDataPartition(loan_dataset_DT$y_loan_defaulter, 
-                                    p= 0.7,list = FALSE)
-data.train_DT <- loan_dataset_DT[index, ]
-data.test_DT  <- loan_dataset_DT[-index,]
+SplitDataset <- SplitTestTrainDataset(loan_dataset_DT)
+data.train_DT <- SplitDataset$data.train
+data.test_DT <- SplitDataset$data.test
 
-event_proportion <- bind_rows(prop.table(table(loan_dataset_DT$y_loan_defaulter)),
-                              prop.table(table(data.train_DT$y_loan_defaulter)),
-                              prop.table(table(data.test_DT$y_loan_defaulter)))
-
-event_proportion$scope = ''
-event_proportion$scope[1] = 'full dataset'
-event_proportion$scope[2] = 'train dataset'
-event_proportion$scope[3] = 'test dataset'
-
-event_proportion <- select(event_proportion, scope, everything())
-
-kable(event_proportion)
+kable(SplitDataset$event.proportion)
 
 # fit the decision tree model -------------------------------------------------------------
 

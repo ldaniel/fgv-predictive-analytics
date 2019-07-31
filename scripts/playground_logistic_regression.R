@@ -92,11 +92,8 @@ reject_variables_vector <- tibble(var_1 = row.names(cor_mtx_high_VIF)) %>%
 
 reject_variables_vector <- reject_variables_vector$reject
 
-reject_variables_vector
-
 clean_dataset <- dplyr::select(loan_dataset_logistic, -reject_variables_vector)
 
-print('rejected variables')
 kable(reject_variables_vector)
 
 # comparing correlograms before and after --------------------------------------
@@ -159,29 +156,15 @@ loan_dataset_logistic <- dplyr::select(loan_dataset_logistic, -x_average_salary)
 
 # sampling ----------------------------------------------------------------------------
 
-set.seed(12345)
-index <- caret::createDataPartition(loan_dataset_logistic$y_loan_defaulter, 
-                                    p= 0.7,list = FALSE)
+SplitDataset <- SplitTestTrainDataset(loan_dataset_logistic)
+data.train_logistic <- SplitDataset$data.train
+data.test_logistic <- SplitDataset$data.test
 
-data.train_logistic <- loan_dataset_logistic[index, ]
-data.test_logistic  <- loan_dataset_logistic[-index,]
-
-event_proportion <- bind_rows(prop.table(table(loan_dataset_logistic$y_loan_defaulter)),
-                              prop.table(table(data.train_logistic$y_loan_defaulter)),
-                              prop.table(table(data.test_logistic$y_loan_defaulter)))
-
-event_proportion$scope = ''
-event_proportion$scope[1] = 'full dataset'
-event_proportion$scope[2] = 'train dataset'
-event_proportion$scope[3] = 'test dataset'
-
-event_proportion <- select(event_proportion, scope, everything())
-
-kable(event_proportion)
+kable(SplitDataset$event.proportion)
 
 # fit the logistic model -------------------------------------------------------------
 
-logistic.full <- glm(formula =y_loan_defaulter ~ .,
+logistic.full <- glm(formula = y_loan_defaulter ~ .,
                      data= data.train_logistic, 
                      family= binomial(link='logit'))
 
@@ -193,3 +176,4 @@ logistic.step <- step(logistic.full, direction = "both", test = "F")
 
 names(logistic.step$coefficients) <- stringr::str_sub(names(logistic.step$coefficients), 1, 25)
 summary(logistic.step)
+

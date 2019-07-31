@@ -10,25 +10,11 @@ loan_dataset_rf %<>%
 
 # sampling ----------------------------------------------------------------------------
 
-set.seed(12345)
-index <- caret::createDataPartition(loan_dataset_rf$y_loan_defaulter, 
-                                    p= 0.7,list = FALSE)
+SplitDataset <- SplitTestTrainDataset(loan_dataset_rf)
+data.train_rf <- SplitDataset$data.train
+data.test_rf <- SplitDataset$data.test
 
-data.train_rf <- loan_dataset_rf[index, ]
-data.test_rf  <- loan_dataset_rf[-index,]
-
-event_proportion <- bind_rows(prop.table(table(loan_dataset_rf$y_loan_defaulter)),
-                              prop.table(table(data.train_rf$y_loan_defaulter)),
-                              prop.table(table(data.test_rf$y_loan_defaulter)))
-
-event_proportion$scope = ''
-event_proportion$scope[1] = 'full dataset'
-event_proportion$scope[2] = 'train dataset'
-event_proportion$scope[3] = 'test dataset'
-
-event_proportion <- select(event_proportion, scope, everything())
-
-kable(event_proportion)
+kable(SplitDataset$event.proportion)
 
 # extent caret to allow ntree and mtry param at once ----------------------------------
 

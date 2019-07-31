@@ -14,24 +14,11 @@ boxplot(loan_dataset_boost$x_avg_account_balance ~ loan_dataset_boost$y_loan_def
 
 # sampling ----------------------------------------------------------------------------
 
-set.seed(12345)
-index <- caret::createDataPartition(loan_dataset_boost$y_loan_defaulter, 
-                                    p= 0.7,list = FALSE)
-data.train_boost <- loan_dataset_boost[index, ]
-data.test_boost  <- loan_dataset_boost[-index,]
+SplitDataset <- SplitTestTrainDataset(loan_dataset_boost)
+data.train_boost <- SplitDataset$data.train
+data.test_boost <- SplitDataset$data.test
 
-event_proportion <- bind_rows(prop.table(table(loan_dataset_boost$y_loan_defaulter)),
-                              prop.table(table(data.train_boost$y_loan_defaulter)),
-                              prop.table(table(data.test_boost$y_loan_defaulter)))
-
-event_proportion$scope = ''
-event_proportion$scope[1] = 'full dataset'
-event_proportion$scope[2] = 'train dataset'
-event_proportion$scope[3] = 'test dataset'
-
-event_proportion <- select(event_proportion, scope, everything())
-
-kable(event_proportion)
+kable(SplitDataset$event.proportion)
 
 # transforming the answer var on factor------------------------------------------------------
 
