@@ -82,5 +82,4 @@ p %>% layout(xaxis = list(title = "Cutoff Value"),
 
 # calculate metrics for selected parameters in train/test/full dataset ----------------
 
-kable(event_proportion)
-
+kable(SplitDataset$event.proportion)
