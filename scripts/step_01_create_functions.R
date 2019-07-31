@@ -81,6 +81,7 @@ calculateModelMetrics <- function(cutData, realData, predData){
 modelMetrics <- function(realData, predData, stepping = 0.01){
   probCuts <- seq(from = 0, to = 1, by = stepping)
   out <- bind_rows(lapply(probCuts, calculateModelMetrics, realData = realData, predData = predData))
-  out <- out[complete.cases(out),]
-  return(out)
+  out <- out[complete.cases(out),] %>% mutate(Difference = abs(TPR-TNR))
+  return(list(TableResults = out,
+              BestCut = out %>% arrange(Difference) %>% head(1) %>% select(-Difference)))
 }
