@@ -76,18 +76,7 @@ metricsByCutoff.full <- modelMetrics(loan_dataset_rf$y_loan_defaulter, loan_data
 metricsByCutoff.train <- modelMetrics(data.train_rf$y_loan_defaulter, data.train_rf$y_loan_defaulter_predicted)
 metricsByCutoff.test <- modelMetrics(data.test_rf$y_loan_defaulter, data.test_rf$y_loan_defaulter_predicted)
 
-plot_ly(x = ~metricsByCutoff.full$TableResults$Cut, 
-        y = ~metricsByCutoff.full$TableResults$Difference, 
-        name = 'Difference', type = 'bar', opacity = 0.3) %>% 
-  add_trace(x = ~metricsByCutoff.full$TableResults$Cut, 
-            y = ~metricsByCutoff.full$TableResults$TPR, 
-            name = 'TPR', type = 'scatter', mode = 'lines', opacity = 1) %>% 
-  add_trace(x = ~metricsByCutoff.full$TableResults$Cut, 
-            y = ~metricsByCutoff.full$TableResults$TNR, 
-            name = 'TNR', type = 'scatter', mode = 'lines', opacity = 1) %>% 
-  layout(xaxis = list(title = "Cutoff Value"),
-         yaxis = list(title = "True Ratio (%)"),
-         title = "TPR/TNR by cutoff over full dataset")
+metricsByCutoff.full$Plot
 
 # calculate metrics for selected parameters in train/test/full dataset ----------------
 
