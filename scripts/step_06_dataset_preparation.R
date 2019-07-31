@@ -88,3 +88,24 @@ source_dataset <- dplyr::select(source_dataset, y_loan_defaulter, everything())
 colnames(source_dataset) <- stringr::str_replace_all(names(source_dataset), ' ', '_')
 colnames(source_dataset) <- stringr::str_replace_all(names(source_dataset), '_-_', '_')
 colnames(source_dataset) <- trimws(names(source_dataset))
+
+# spliting dataset in train and test datasets
+set.seed(12345)
+index <- caret::createDataPartition(loan_dataset_logistic$y_loan_defaulter, 
+                                    p= 0.7,list = FALSE)
+data.train <- source_dataset[index, ]
+data.test  <- source_dataset[-index,]
+
+# checking event proportion in sample and test datasets against full dataset.
+event_proportion <- bind_rows(prop.table(table(source_dataset$y_loan_defaulter)),
+                              prop.table(table(data.train$y_loan_defaulter)),
+                              prop.table(table(data.test$y_loan_defaulter)))
+
+event_proportion$scope = ''
+event_proportion$scope[1] = 'full dataset'
+event_proportion$scope[2] = 'train dataset'
+event_proportion$scope[3] = 'test dataset'
+
+event_proportion <- select(event_proportion, scope, everything())
+
+kable(event_proportion)
