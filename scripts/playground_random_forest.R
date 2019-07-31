@@ -72,14 +72,31 @@ loan_dataset_rf$y_loan_defaulter_predicted <- predict(rf.full, newdata = loan_da
 
 # calculate TNR and TPR for multi-cuts for RF -----------------------------------------
 
-metricsByCutoff <- modelMetrics(loan_dataset_rf$y_loan_defaulter, loan_dataset_rf$y_loan_defaulter_predicted)
-p <- plot_ly(x = ~metricsByCutoff$Cut, y = ~metricsByCutoff$TNR, name = 'TNR', type = 'scatter', mode = 'lines')
-p <- p %>% add_trace(x = ~metricsByCutoff$Cut, y = ~metricsByCutoff$TPR, name = 'TPR', type = 'scatter', mode = 'lines')
-p %>% layout(xaxis = list(title = "Cutoff Value"),
-             yaxis = list(title = "True Ratio (%)"))
+metricsByCutoff.full <- modelMetrics(loan_dataset_rf$y_loan_defaulter, loan_dataset_rf$y_loan_defaulter_predicted)
+metricsByCutoff.train <- modelMetrics(data.train_rf$y_loan_defaulter, data.train_rf$y_loan_defaulter_predicted)
+metricsByCutoff.test <- modelMetrics(data.test_rf$y_loan_defaulter, data.test_rf$y_loan_defaulter_predicted)
 
-# Optimized cut-off selected parameter: 0.15
+plot_ly(x = ~metricsByCutoff.full$TableResults$Cut, 
+        y = ~metricsByCutoff.full$TableResults$Difference, 
+        name = 'Difference', type = 'bar', opacity = 0.3) %>% 
+  add_trace(x = ~metricsByCutoff.full$TableResults$Cut, 
+            y = ~metricsByCutoff.full$TableResults$TPR, 
+            name = 'TPR', type = 'scatter', mode = 'lines', opacity = 1) %>% 
+  add_trace(x = ~metricsByCutoff.full$TableResults$Cut, 
+            y = ~metricsByCutoff.full$TableResults$TNR, 
+            name = 'TNR', type = 'scatter', mode = 'lines', opacity = 1) %>% 
+  layout(xaxis = list(title = "Cutoff Value"),
+         yaxis = list(title = "True Ratio (%)"),
+         title = "TPR/TNR by cutoff over full dataset")
 
 # calculate metrics for selected parameters in train/test/full dataset ----------------
 
-kable(SplitDataset$event.proportion)
+FitResults <- bind_rows(metricsByCutoff.full$BestCut,
+                        metricsByCutoff.train$BestCut,
+                        metricsByCutoff.test$BestCut) %>% 
+  mutate(Scope = c("Full Dataset", "Train Dataset", "Test Dataset")) %>% 
+  select(Scope, everything())
+
+kable(FitResults)
+
+# Optimized cut-off selected parameter: 0.15
