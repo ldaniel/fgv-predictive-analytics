@@ -93,13 +93,13 @@ colnames(source_dataset) <- trimws(names(source_dataset))
 
 SplitTestTrainDataset <- function(dataset) {
   set.seed(12345)
-  index <- caret::createDataPartition(loan_dataset_logistic$y_loan_defaulter, 
+  index <- caret::createDataPartition(dataset$y_loan_defaulter, 
                                       p= 0.7, list = FALSE)
-  data.train <- source_dataset[index, ]
-  data.test  <- source_dataset[-index,]
+  data.train <- dataset[index, ]
+  data.test  <- dataset[-index,]
   
   # checking event proportion in sample and test datasets against full dataset.
-  event_proportion <- bind_rows(prop.table(table(source_dataset$y_loan_defaulter)),
+  event_proportion <- bind_rows(prop.table(table(dataset$y_loan_defaulter)),
                                 prop.table(table(data.train$y_loan_defaulter)),
                                 prop.table(table(data.test$y_loan_defaulter)))
   
