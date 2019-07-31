@@ -82,6 +82,17 @@ modelMetrics <- function(realData, predData, stepping = 0.01){
   probCuts <- seq(from = 0, to = 1, by = stepping)
   out <- bind_rows(lapply(probCuts, calculateModelMetrics, realData = realData, predData = predData))
   out <- out[complete.cases(out),] %>% mutate(Difference = abs(TPR-TNR))
+  
+  best <- out %>% arrange(Difference) %>% head(1) %>% select(-Difference)
+  
+  p <- plot_ly(x = ~out$Cut, y = ~out$Difference, name = 'Abs. Diff.', type = 'bar', opacity = 0.3) %>% 
+    add_trace(x = ~out$Cut, y = ~out$TPR, name = 'TPR', type = 'scatter', mode = 'lines', opacity = 1) %>% 
+    add_trace(x = ~out$Cut, y = ~out$TNR, name = 'TNR', type = 'scatter', mode = 'lines', opacity = 1) %>% 
+    layout(xaxis = list(title = "Cutoff Value"),
+           yaxis = list(title = "True Ratio (%)"),
+           title = "TPR/TNR by cutoff over full dataset")
+  
   return(list(TableResults = out,
-              BestCut = out %>% arrange(Difference) %>% head(1) %>% select(-Difference)))
+              BestCut = best,
+              Plot = p))
 }
