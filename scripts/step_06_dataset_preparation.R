@@ -93,6 +93,9 @@ colnames(source_dataset) <- trimws(names(source_dataset))
 
 SplitTestTrainDataset <- function(dataset) {
   set.seed(12345)
+  
+  dataset$y_loan_defaulter <- as.integer(dataset$y_loan_defaulter)
+  
   index <- caret::createDataPartition(dataset$y_loan_defaulter, 
                                       p= 0.7, list = FALSE)
   data.train <- dataset[index, ]
