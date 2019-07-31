@@ -20,12 +20,6 @@ data.test_boost <- SplitDataset$data.test
 
 kable(SplitDataset$event.proportion)
 
-# transforming the answer var on factor------------------------------------------------------
-
-data.train_boost$y_loan_defaulter <- as.factor(data.train_boost$y_loan_defaulter)
-data.test_boost$y_loan_defaulter  <- as.factor(data.test_boost$y_loan_defaulter)
-
-
 # MODELAGEM DOS DADOS - M?TODOS DE ENSEMBLE
 
 names  <- names(data.train_boost) # saving the name of all vars to put on formula
