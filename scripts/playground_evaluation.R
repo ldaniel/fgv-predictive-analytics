@@ -46,40 +46,56 @@ source('scripts/playground_random_forest.R')
 
 ## making preditions -----------------------------------------------------------------
 
-logistic.prob.train <- predict(logistic.step, type = "response")
-logistic.prob.test <- predict(logistic.step,newdata = data.test_logistic, type= "response")
+prob.full = list()
+prob.train = list()
+prob.test = tibble(.rows = 204)
 
-decision.tree.prob.train <- predict(tree.full, type = "prob")[, 2]
-decision.tree.prob.test  <- predict(tree.full,newdata = data.test_DT, type = "prob")[, 2]
+prob.full$logistic.actual         <- loan_dataset_logistic$y_loan_defaulter
+prob.full$logistic.predicted      <- predict(logistic.step, type = "response", newdata = loan_dataset_logistic)
+prob.full$decision.tree.actual    <- loan_dataset_DT$y_loan_defaulter
+prob.full$decision.tree.predicted <- predict(tree.full, type = "prob", newdata = loan_dataset_DT)[, 2]
+prob.full$boosting.actual         <- loan_dataset_boost$y_loan_defaulter
+prob.full$boosting.predicted      <- predict.boosting(boost, loan_dataset_boost)$prob[, 2]
+prob.full$random.forest.actual    <- loan_dataset_rf$y_loan_defaulter
+prob.full$random.forest.predicted <- predict(rf.full, type = "prob", newdata = loan_dataset_rf)[, 2]
 
-boosting.prob.train <- predict.boosting(boost, data.train_boost)$prob[, 2]
-boosting.prob.test  <- predict.boosting(boost, data.test_boost)$prob[, 2]
+prob.train$logistic.actual         <- data.train_logistic$y_loan_defaulter
+prob.train$logistic.predicted      <- predict(logistic.step, type = "response", newdata = data.train_logistic)
+prob.train$decision.tree.actual    <- data.train_DT$y_loan_defaulter
+prob.train$decision.tree.predicted <- predict(tree.full, type = "prob", newdata = data.train_DT)[, 2]
+prob.train$boosting.actual         <- data.train_boost$y_loan_defaulter
+prob.train$boosting.predicted      <- predict.boosting(boost, data.train_boost)$prob[, 2]
+prob.train$random.forest.actual    <- data.train_rf$y_loan_defaulter
+prob.train$random.forest.predicted <- predict(rf.full, type = "prob", newdata = data.train_rf)[, 2]
 
-random.forest.prob.train <- predict(rf.full, newdata = data.train_rf, type = "prob")[,2]
-random.forest.prob.test <- predict(rf.full, newdata = data.test_rf, type = "prob")[,2]
+prob.test$logistic.actual         <- data.test_logistic$y_loan_defaulter
+prob.test$logistic.predicted      <- predict(logistic.step, type = "response", newdata = data.test_logistic)
+prob.test$decision.tree.actual    <- data.test_DT$y_loan_defaulter
+prob.test$decision.tree.predicted <- predict(tree.full, type = "prob", newdata = data.test_DT)[, 2]
+prob.test$boosting.actual         <- data.test_boost$y_loan_defaulter
+prob.test$boosting.predicted      <- predict.boosting(boost, data.test_boost)$prob[, 2]
+prob.test$random.forest.actual    <- data.test_rf$y_loan_defaulter
+prob.test$random.forest.predicted <- predict(rf.full, type = "prob", newdata = data.test_rf)[, 2]
 
 ## getting measures -----------------------------------------------------------------
 
 # logistic regression
-
-measures.logistic.train <- HMeasure(data.train_logistic$y_loan_defaulter, logistic.prob.train, threshold = 0.1)
-measures.logistic.test <- HMeasure(data.test_logistic$y_loan_defaulter, logistic.prob.test, threshold = 0.1)
+measures.logistic.train <- HMeasure(prob.train$logistic.actual, prob.train$logistic.predicted, threshold = 0.1)
+measures.logistic.test <- HMeasure(prob.test$logistic.actual, prob.test$logistic.predicted, threshold = 0.1)
 
 # decision tree
-
-measures.decision.tree.train <- HMeasure(data.train_DT$y_loan_defaulter, decision.tree.prob.train, threshold = 0.1)
-measures.decision.tree.test <- HMeasure(data.test_DT$y_loan_defaulter, decision.tree.prob.test, threshold = 0.1)
+measures.decision.tree.train <- HMeasure(prob.train$decision.tree.actual, prob.train$decision.tree.predicted, threshold = 0.1)
+measures.decision.tree.test <- HMeasure(prob.test$decision.tree.actual, prob.test$decision.tree.predicted, threshold = 0.1)
 
 # boosting
-
-measures.boosting.train <- HMeasure(data.train_boost$y_loan_defaulter, boost.prob.train,threshold = 0.4)
-measures.boosting.test  <- HMeasure(data.test_boost$y_loan_defaulter, boost.prob.test,threshold = 0.4)
+measures.boosting.train <- HMeasure(prob.train$boosting.actual, prob.train$boosting.predicted, threshold = 0.4)
+measures.boosting.test  <- HMeasure(prob.test$boosting.actual, prob.test$boosting.predicted, threshold = 0.4)
 
 # random forest
+measures.random.forest.train <- HMeasure(prob.train$random.forest.actual, prob.train$random.forest.predicted, threshold = 0.1)
+measures.random.forest.test  <- HMeasure(prob.test$random.forest.actual, prob.test$random.forest.predicted, threshold = 0.1)
 
-measures.random.forest.train <- HMeasure(data.train_rf$y_loan_defaulter, random.forest.prob.train, threshold = 0.1)
-measures.random.forest.test  <- HMeasure(data.test_rf$y_loan_defaulter, random.forest.prob.test, threshold = 0.1)
-
+# join measures in a single data frame
 measures <- t(bind_rows(measures.logistic.train$metrics,
                         measures.logistic.test$metrics,
                         measures.decision.tree.train$metrics,
@@ -99,13 +115,20 @@ measures$metric = rownames(measures)
 
 measures <- dplyr::select(measures, metric, everything())
 
+rm(measures.boosting.test, measures.boosting.train, 
+   measures.decision.tree.test, measures.decision.tree.train,
+   measures.logistic.test, measures.logistic.train,
+   measures.random.forest.test, measures.random.forest.train)
+
+invisible(gc())
+
 kable(measures, row.names = FALSE)
 
 ## boxplot -------------------------------------------------------------------------
 
 # logistic regression
 
-boxplot(logistic.prob.test ~ data.test_logistic$y_loan_defaulter,
+boxplot(prob.test$logistic.predicted ~ prob.test$logistic.actual,
         col= c("green", "red"), 
         horizontal= T,
         xlab = 'Probability Prediction',
@@ -113,7 +136,7 @@ boxplot(logistic.prob.test ~ data.test_logistic$y_loan_defaulter,
 
 # decision tree
 
-boxplot(decision.tree.prob.test ~ data.test_DT$y_loan_defaulter,
+boxplot(prob.test$decision.tree.predicted ~ prob.test$decision.tree.actual,
         col= c("green", "red"), 
         horizontal= T,
         xlab = 'Probability Prediction',
@@ -121,7 +144,7 @@ boxplot(decision.tree.prob.test ~ data.test_DT$y_loan_defaulter,
 
 # boosting
 
-boxplot(boosting.prob.test ~ data.test_boost$y_loan_defaulter
+boxplot(prob.test$boosting.predicted ~ prob.test$boosting.actual
         ,col= c("green", "red"),
         horizontal= T,
         xlab = 'Probability Prediction',
@@ -129,11 +152,12 @@ boxplot(boosting.prob.test ~ data.test_boost$y_loan_defaulter
 
 # random forest
 
-boxplot(random.forest.prob.test ~ data.test_rf$y_loan_defaulter
+boxplot(prob.test$random.forest.predicted ~ prob.test$random.forest.actual
         ,col= c("green", "red"),
         horizontal= T,
         xlab = 'Probability Prediction',
         ylab = 'Loan Defaulter')
+
 
 ## ROC Curve ----------------------------------------------------------------------
 
