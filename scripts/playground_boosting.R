@@ -37,9 +37,12 @@ f_full <- as.formula(paste("y_loan_defaulter ~",
 
 library(adabag)
 
-boost <- boosting(f_full, data= data.train_boost, mfinal= 250, 
-                  coeflearn = "Freund", 
-                  control = rpart.control(minbucket= 50,maxdepth = 1))
+# boost <- boosting(f_full, data= data.train_boost, mfinal= 250, 
+#                   coeflearn = "Freund", 
+#                   control = rpart.control(minbucket= 50,maxdepth = 1))
+# saveRDS(boost, "./models/boosting.rds")
+
+boost <- readRDS("./models/boosting.rds")
 
 # analysing the error evolution by each interation
 plot(errorevol(boost, data.train_boost))
