@@ -15,6 +15,10 @@ data.test_rf <- SplitDataset$data.test
 
 kable(SplitDataset$event.proportion)
 
+loan_dataset_rf$y_loan_defaulter <- as.factor(loan_dataset_rf$y_loan_defaulter)
+data.train_rf$y_loan_defaulter   <- as.factor(data.train_rf$y_loan_defaulter)
+data.test_rf$y_loan_defaulter    <- as.factor(data.test_rf$y_loan_defaulter)
+
 # extent caret to allow ntree and mtry param at once ----------------------------------
 
 customRF <- list(type = "Classification", library = "randomForest", loop = NULL)

@@ -98,7 +98,7 @@ kable(reject_variables_vector)
 
 # comparing correlograms before and after --------------------------------------
 cor_mtx_full <- cor(loan_dataset_logistic)
-cor_mtx_clean <- cor(clean_dataset)
+cor_mtx_clean <- cor(clean_dataset,)
 
 full = ggcorrplot(cor_mtx_full, hc.order = TRUE,
            lab = FALSE, 
@@ -176,17 +176,4 @@ logistic.step <- step(logistic.full, direction = "both", test = "F")
 
 names(logistic.step$coefficients) <- stringr::str_sub(names(logistic.step$coefficients), 1, 25)
 summary(logistic.step)
-
-
-# generate predicted columns ----------------------------------------------------------
-
-loan_dataset_logistic$y_loan_defaulter_predicted <- predict(logistic.step, newdata = loan_dataset_logistic, type= "response")
-data.train_logistic$y_loan_defaulter_predicted <- predict(logistic.step, newdata = data.train_logistic, type= "response")
-data.test_logistic$y_loan_defaulter_predicted <- predict(logistic.step, newdata = data.test_logistic, type= "response")
-
-metricsByCutoff.full <- modelMetrics(loan_dataset_logistic$y_loan_defaulter, loan_dataset_logistic$y_loan_defaulter_predicted)
-metricsByCutoff.train <- modelMetrics(data.train_logistic$y_loan_defaulter, data.train_logistic$y_loan_defaulter_predicted)
-metricsByCutoff.test <- modelMetrics(data.test_logistic$y_loan_defaulter, data.test_logistic$y_loan_defaulter_predicted)
-
-metricsByCutoff.test$Plot
 

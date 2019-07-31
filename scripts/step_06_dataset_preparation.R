@@ -68,7 +68,7 @@ source_dataset$x_card_type = ifelse(is.na(source_dataset$x_card_type), 'no card'
 source_dataset$x_card_age_month = ifelse(is.na(source_dataset$x_card_age_month), 0, 
                                   source_dataset$x_card_age_month)
 
-source_dataset$y_loan_defaulter = as.factor(source_dataset$y_loan_defaulter)
+source_dataset$y_loan_defaulter = as.integer(source_dataset$y_loan_defaulter)
 
 # creating dummies
 source_dataset <- fastDummies::dummy_cols(source_dataset,
