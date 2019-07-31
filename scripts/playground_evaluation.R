@@ -35,6 +35,16 @@ source("./scripts/step_04_label_translation.R")
 source("./scripts/step_05_data_enhancement.R")
 source("./scripts/step_06_dataset_preparation.R")
 
+# clean global environment
+rm(account, account_balance, account_transaction_pattern,
+   client, creditcard, disposition, district, loan,
+   permanent_order, transaction, czech_regions_coords,
+   lat, long, region, transaction_empty_cols,
+   transaction_na_cols, wd, ConvertToDate, GetAgeFromBirthnumber,
+   GetBirthdateFromBirthnumber, GetGenderFromBirthnumber)
+
+invisible(gc)
+
 # modeling ---------------------------------------------------------------------------
 
 source('scripts/playground_logistic_regression.R')
