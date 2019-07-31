@@ -4,8 +4,7 @@ loan_dataset_rf <- source_dataset
 
 DistinctCounts <- loan_dataset_rf %>% summarise_all(n_distinct) %>% t %>% as.data.frame
 
-loan_dataset_rf %<>% 
-  mutate(y_loan_defaulter = as.factor(y_loan_defaulter)) %>% 
+loan_dataset_rf %<>%
   select(-x_prop_old_age_pension)
 
 # sampling ----------------------------------------------------------------------------
