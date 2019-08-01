@@ -204,7 +204,7 @@ One interest pattern shows up, males in prague region tend to have a bigger aver
 Regarding the Czech regions, we can notice in the exploration below which regions are more likely to have defaulters based on the finished loans operations so far.
 
 ```{r loan_district_map_exploration, echo=TRUE, out.width = '100%', message=FALSE, warning=FALSE}
-loan_amount_by_region <- select(loan, account_id, amount, defaulter, contract_status) %>% 
+loan_amount_by_region <- dplyr::select(loan, account_id, amount, defaulter, contract_status) %>% 
   filter(defaulter == TRUE) %>% 
   inner_join(account) %>% 
   inner_join(district) %>% 

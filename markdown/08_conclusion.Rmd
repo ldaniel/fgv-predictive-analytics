@@ -3,21 +3,370 @@ title: "Conclusion"
 date: "August, 2019"
 ---
 
-The final model can accurately segregate the loan contracts likely to default with test set accuracy of 76.47% using 0.1 as the threshold to assign the observation to defaulter class.
+```{r setup_evaluation, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.pos =  "h")
+knitr::opts_knit$set(root.dir = "../")
 
-Model was also able to predict 72% of real defaulters in our test dataset.
+# loading required libraries and scripts
+# libraries for data prep
+library(dplyr)
+library(readr)
+library(magrittr)
+library(forcats)
+library(lubridate)
+library(stringr)
+library(feather)
+library(fastDummies)
+library(reshape2)
+library(knitr)
 
-In practice, the probabilities returned by the logistic regression model can be used to decide on grant or not the loan and help on correctly price the interest rate based on the likelihood of default.
+#libraries for plots
+library(ggplot2)
+library(ggthemes)
+library(ggcorrplot)
+library(ggpubr)
+library(plotly)
 
-Model 2 shows that below variables are associated with the probability of default in a loan contract:
+# libraries for data clean
+library(VIM)
+library(rms)
+library(mctest)
 
-- **x_loan_amount**;
-- **x_loan_duration**; 
-- **x_has_card**;
-- **x_prop_interest_credited**.
+# libraries for modeling
+library(caret)
+library(gmodels)
+library(MASS)
+library(rpart)
+library(rpart.plot)
+library(adabag)
+library(randomForest)
 
-The threshold definition depends on the tradeoff we accept between correctly identifying the true defaulters and incorrectly set a non-defaulter as a defaulter.
+# libraries for measures
+library(hmeasure)
+library(pROC)
+```
 
-This balance must be decided by the managers and the bank should keep seeking and experimenting with more variables to find a better model.
+```{r scripts, include=FALSE}
+# loading required steps before performing the analysis
+source("./scripts/step_01_create_functions.R")
+source("./scripts/step_02_data_ingestion.R")
+source("./scripts/step_03_data_cleaning.R")
+source("./scripts/step_04_label_translation.R")
+source("./scripts/step_05_data_enhancement.R")
+source("./scripts/step_06_dataset_preparation.R")
+```
 
-This exercise was in no way a definitive answer to Berka Bank on how to perform their client credit analysis, but it served very well to exercise the new techniques learned in this class.
+```{r model_scripts, include=FALSE}
+# loading required steps before performing the analysis
+
+source('scripts/playground_logistic_regression.R')
+
+source('scripts/playground_decision_tree.R')
+
+source('scripts/playground_boosting.R')
+
+source('scripts/playground_random_forest.R')
+
+```
+
+# Objective
+
+The goal of this session is to compare the performance of all the models created during this paper.
+
+# Model Evaluation
+
+## Getting the predicted score
+
+Here we consolidate the predicted score and the actual value of each observation in the test datasets.
+
+```{r get_scores, echo=TRUE}
+## making preditions for each model and consilidating in a single data frame
+
+prob.full = list()
+prob.train = list()
+prob.test = list()
+
+prob.full$logistic.actual         <- loan_dataset_logistic$y_loan_defaulter
+prob.full$logistic.predicted      <- predict(logistic.step, type = "response", newdata = loan_dataset_logistic)
+prob.full$decision.tree.actual    <- loan_dataset_DT$y_loan_defaulter
+prob.full$decision.tree.predicted <- predict(tree.prune, type = "prob", newdata = loan_dataset_DT)[, 2]
+prob.full$boosting.actual         <- loan_dataset_boost$y_loan_defaulter
+prob.full$boosting.predicted      <- predict.boosting(boost, loan_dataset_boost)$prob[, 2]
+prob.full$random.forest.actual    <- loan_dataset_rf$y_loan_defaulter
+prob.full$random.forest.predicted <- predict(rf.full, type = "prob", newdata = loan_dataset_rf)[, 2]
+
+prob.train$logistic.actual         <- data.train_logistic$y_loan_defaulter
+prob.train$logistic.predicted      <- predict(logistic.step, type = "response", newdata = data.train_logistic)
+prob.train$decision.tree.actual    <- data.train_DT$y_loan_defaulter
+prob.train$decision.tree.predicted <- predict(tree.prune, type = "prob", newdata = data.train_DT)[, 2]
+prob.train$boosting.actual         <- data.train_boost$y_loan_defaulter
+prob.train$boosting.predicted      <- predict.boosting(boost, data.train_boost)$prob[, 2]
+prob.train$random.forest.actual    <- data.train_rf$y_loan_defaulter
+prob.train$random.forest.predicted <- predict(rf.full, type = "prob", newdata = data.train_rf)[, 2]
+
+prob.test$logistic.actual         <- data.test_logistic$y_loan_defaulter
+prob.test$logistic.predicted      <- predict(logistic.step, type = "response", newdata = data.test_logistic)
+prob.test$decision.tree.actual    <- data.test_DT$y_loan_defaulter
+prob.test$decision.tree.predicted <- predict(tree.prune, type = "prob", newdata = data.test_DT)[, 2]
+prob.test$boosting.actual         <- data.test_boost$y_loan_defaulter
+prob.test$boosting.predicted      <- predict.boosting(boost, data.test_boost)$prob[, 2]
+prob.test$random.forest.actual    <- data.test_rf$y_loan_defaulter
+prob.test$random.forest.predicted <- predict(rf.full, type = "prob", newdata = data.test_rf)[, 2]
+
+prob.full   <- prob.full %>% as_tibble()
+prob.train  <- prob.train %>% as_tibble()
+prob.test   <- prob.test %>% as_tibble()
+
+```
+
+## Getting Performance Measures for each model.
+
+To calculate the performance measures, derived from the confusion matrix, of each model we need to find the score cut off that best split our test dataset into Defaulters and Non Defaulters.
+
+In this excercise we decide to not prioritize the accuracy on predicting Defaulters and Non Defaultes, therefore we are looking for the score cut off that best predict each class equaly.
+
+We will use a custom function developed in this paper to calculate the best cut off for each model:
+
+```{r get_measures_functions, eval=FALSE}
+## making preditions for each model and consilidating in a single data frame
+# calculateModelMetrics -------------------------------------------------------
+# The objective of this function is to calculate main metrics of model performance according to a cutoff value.
+calculateModelMetrics <- function(cutData, realData, predData){
+  cuttedData <- as.factor(ifelse(predData>=cutData, 1, 0))
+  
+  invisible(capture.output(out <- CrossTable(realData, cuttedData, prop.c = F, prop.t = F, prop.r = T, prop.chisq = F)))
+  
+  out <- as.data.frame(out) %>% 
+    mutate(merged=paste0(t.x, t.y)) %>% 
+    dplyr::select(merged, val=t.Freq)
+  
+  TN <- filter(out, merged == "00")$val[1]
+  FP <- filter(out, merged == "01")$val[1]
+  FN <- filter(out, merged == "10")$val[1]
+  TP <- filter(out, merged == "11")$val[1]
+  
+  return(data.frame(Cut = cutData,
+                    TN = TN, 
+                    FP = FP,
+                    FN = FN, 
+                    TP = TP,
+                    TPR = TP/(TP+FN), TNR=TN/(TN+FP),
+                    Error = (FP+FN)/(TP+TN+FP+FN),
+                    Precision = TP/(TP+FP),
+                    F1 = 2*(TP/(TP+FN))*(TP/(TP+FP))/((TP/(TP+FP)) + (TP/(TP+FN)))))
+}
+
+# modelMetrics ----------------------------------------------------------------
+# The objective of this function is to calculate main metrics of model performance 
+# for cutoffs from 0-1 based on given step.
+modelMetrics <- function(realData, predData, stepping = 0.01, 
+                         plot_title = "TPR/TNR by cutoff over full dataset"){
+  probCuts <- seq(from = 0, to = 1, by = stepping)
+  out <- bind_rows(lapply(probCuts, calculateModelMetrics, realData = realData, predData = predData))
+  out <- out[complete.cases(out),] %>% mutate(Difference = abs(TPR-TNR))
+  
+  best <- out %>% arrange(Difference) %>% head(1) %>% dplyr::select(-Difference)
+  
+  p <- plot_ly(x = ~out$Cut, y = ~out$Difference, name = 'Abs. Diff.', type = 'bar', opacity = 0.3) %>% 
+    add_trace(x = ~out$Cut, y = ~out$TPR, name = 'TPR', type = 'scatter', mode = 'lines', opacity = 1) %>% 
+    add_trace(x = ~out$Cut, y = ~out$TNR, name = 'TNR', type = 'scatter', mode = 'lines', opacity = 1) %>% 
+    add_text(x = best$Cut, y = best$TPR, text = best$Cut, opacity = 1) %>% 
+    layout(xaxis = list(title = "Cutoff Value"),
+           yaxis = list(title = "True Ratio (%)"),
+           title = plot_title)
+  
+  return(list(TableResults = out,
+              BestCut = best,
+              Plot = p))
+}
+
+```
+
+With the returned object from these function we can plot the comparason between TPR (True Positive Rate) and TNR (True Negative Rate) to find the best cut off.
+
+```{r get_measures, echo=TRUE, out.width= '100%'}
+## getting measures -----------------------------------------------------------------
+
+metricsByCutoff.test_log    <- modelMetrics(prob.test$logistic.actual, 
+                                            prob.test$logistic.predicted, 
+                                            plot_title = 'Logistic Regression')
+metricsByCutoff.test_DT     <- modelMetrics(prob.test$decision.tree.actual, 
+                                            prob.test$decision.tree.predicted, 
+                                            plot_title = 'Decision Tree')
+metricsByCutoff.test_boost  <- modelMetrics(prob.test$boosting.actual, 
+                                            prob.test$boosting.predicted, 
+                                            plot_title = 'Boosting')
+metricsByCutoff.test_rf     <- modelMetrics(prob.test$random.forest.actual, 
+                                            prob.test$random.forest.predicted, 
+                                            plot_title = 'Random Forest')
+
+cutoffs <- plotly::subplot(metricsByCutoff.test_log$Plot,
+                   metricsByCutoff.test_DT$Plot,
+                   metricsByCutoff.test_boost$Plot,
+                   metricsByCutoff.test_rf$Plot,
+                   nrows = 2) %>% hide_legend()
+
+cutoffs
+
+```
+
+With the optimized cut off for each model we calculate the full set of model metrics.
+
+```{r get_measures_full, echo=TRUE, out.width= '100%'}
+# logistic regression
+measures.logistic.train <- HMeasure(prob.train$logistic.actual, 
+                                    prob.train$logistic.predicted, 
+                                    threshold = metricsByCutoff.test_log$BestCut['Cut'])
+measures.logistic.test <- HMeasure(prob.test$logistic.actual, 
+                                   prob.test$logistic.predicted, 
+                                   threshold = metricsByCutoff.test_log$BestCut['Cut'])
+
+# decision tree
+measures.decision.tree.train <- HMeasure(prob.train$decision.tree.actual, 
+                                         prob.train$decision.tree.predicted, 
+                                         threshold = metricsByCutoff.test_DT$BestCut['Cut'])
+measures.decision.tree.test <- HMeasure(prob.test$decision.tree.actual, 
+                                        prob.test$decision.tree.predicted, 
+                                        threshold = metricsByCutoff.test_DT$BestCut['Cut'])
+
+# boosting
+measures.boosting.train <- HMeasure(prob.train$boosting.actual, 
+                                    prob.train$boosting.predicted, 
+                                    threshold = metricsByCutoff.test_boost$BestCut['Cut'])
+measures.boosting.test  <- HMeasure(prob.test$boosting.actual, 
+                                    prob.test$boosting.predicted, 
+                                    threshold = metricsByCutoff.test_boost$BestCut['Cut'])
+
+# random forest
+measures.random.forest.train <- HMeasure(prob.train$random.forest.actual, 
+                                         prob.train$random.forest.predicted, 
+                                         threshold = metricsByCutoff.test_rf$BestCut['Cut'])
+measures.random.forest.test  <- HMeasure(prob.test$random.forest.actual, 
+                                         prob.test$random.forest.predicted, 
+                                         threshold = metricsByCutoff.test_rf$BestCut['Cut'])
+
+# join measures in a single data frame
+measures <- t(bind_rows(measures.logistic.train$metrics,
+                        measures.logistic.test$metrics,
+                        measures.decision.tree.train$metrics,
+                        measures.decision.tree.test$metrics,
+                        measures.boosting.train$metrics,
+                        measures.boosting.test$metrics,
+                        measures.random.forest.train$metrics,
+                        measures.random.forest.test$metrics
+                        )) %>% as_tibble(., rownames = NA)
+
+colnames(measures) <- c('logistic - train', 'logistic - test',
+                        'decision.tree - train', 'decision.tree - test',
+                        'boosting - train', 'boosting - test',
+                        'random forest - train', 'random forest - test')
+
+measures$metric = rownames(measures)
+
+measures <- dplyr::select(measures, metric, everything())
+
+```
+
+Below are the metrics on the train dataset:
+```{r see_train_measures, echo=TRUE, out.width= '100%'}
+kable(dplyr::select(measures, contains('train')), row.names = TRUE)
+```
+
+Below are the metrics on the test dataset:
+```{r see_score_measures, echo=TRUE, out.width= '100%'}
+kable(dplyr::select(measures, contains('test')), row.names = TRUE)
+```
+
+## Evaluating performance of each model
+
+In this session we look ate some metrics of each model on the test dataset.
+
+### Score Boxplots
+
+First we look at the score box plots to see how well the models are able to split Defaulters and Non Defaultes.
+
+```{r boxplots_plots, echo=TRUE, out.width= '100%'}
+boxplots <- ggarrange(Score_Boxplot(prob.test, 
+                        prob.test$logistic.predicted, 
+                        prob.test$logistic.actual,
+                        'Logistic Regression'),
+          Score_Boxplot(prob.test, 
+                        prob.test$decision.tree.predicted, 
+                        prob.test$decision.tree.actual,
+                        'Decision Tree'),
+          Score_Boxplot(prob.test, 
+                        prob.test$boosting.predicted, 
+                        prob.test$boosting.actual,
+                        'Boosting'),
+          Score_Boxplot(prob.test, 
+                        prob.test$random.forest.predicted, 
+                        prob.test$random.forest.actual,
+                        'Random Forest'))
+
+boxplots <- annotate_figure(boxplots, 
+                            top = text_grob("Score Boxplots of All Models", 
+                                            color = "black", face = "bold", 
+                                            size = 14))
+
+boxplots
+```
+
+### Density Plots
+
+Another way to look at the score distribution of each model is ploting its density histograms.
+
+```{r density_plots, echo=TRUE, out.width= '100%'}
+density_plots <- ggarrange(Score_Histograms(prob.test, 
+                        prob.test$logistic.predicted,
+                        prob.test$logistic.actual,
+                        'Logistic Regression'),
+          Score_Histograms(prob.test, 
+                        prob.test$decision.tree.predicted,
+                        prob.test$decision.tree.actual,
+                        'Decision Tree'),
+          Score_Histograms(prob.test, 
+                        prob.test$boosting.predicted,
+                        prob.test$boosting.actual,
+                        'Boosting'),
+          Score_Histograms(prob.test, 
+                        prob.test$random.forest.predicted,
+                        prob.test$random.forest.actual,
+                        'Random Forest'))
+
+density_plots <- annotate_figure(density_plots, 
+                            top = text_grob("Density of All Models", 
+                                            color = "black", face = "bold", 
+                                            size = 14))
+
+density_plots
+```
+
+### KS Plots
+
+Here we look at the acumulated probability distribution curves delivered by each model.
+From this plot we can derivate a key measure KS (Kolmogorov–Smirnov).
+
+```{r KS_plots, echo=TRUE, out.width= '100%'}
+KS_plots <- ggarrange(
+  KS_Plot(prob.test$logistic.predicted[prob.test$logistic.actual == 0],
+          prob.test$logistic.predicted[prob.test$logistic.actual == 1],
+          'Logistic Regression'),
+  KS_Plot(prob.test$decision.tree.predicted[prob.test$decision.tree.actual == 0],
+          prob.test$decision.tree.predicted[prob.test$decision.tree.actual == 1],
+          'Decision Tree'),
+  KS_Plot(prob.test$boosting.predicted[prob.test$boosting.actual == 0],
+          prob.test$boosting.predicted[prob.test$boosting.actual == 1],
+          'Boosting'),
+  KS_Plot(prob.test$random.forest.predicted[prob.test$random.forest.actual == 0],
+          prob.test$random.forest.predicted[prob.test$random.forest.actual == 1],
+          'Random Forest'))
+
+KS_plots <- annotate_figure(KS_plots,
+                            top = text_grob("KS Plots of All Models",
+                                            color = "black", face = "bold",
+                                            size = 14))
+
+KS_plots
+```
+

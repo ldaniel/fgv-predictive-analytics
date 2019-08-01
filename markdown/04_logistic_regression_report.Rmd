@@ -311,7 +311,7 @@ event_proportion$scope[1] = 'full dataset'
 event_proportion$scope[2] = 'train dataset'
 event_proportion$scope[3] = 'test dataset'
 
-event_proportion <- select(event_proportion, scope, everything())
+event_proportion <- dplyr::select(event_proportion, scope, everything())
 
 kable(event_proportion)
 ```
