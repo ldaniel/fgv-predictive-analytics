@@ -280,7 +280,7 @@ kable(dplyr::select(measures, contains('test')), row.names = TRUE)
 
 ## Evaluating performance of each model
 
-In this session we look ate some metrics of each model on the test dataset.
+In this session we look at some metrics of each model on the test dataset.
 
 ### Score Boxplots
 
