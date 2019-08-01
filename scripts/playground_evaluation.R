@@ -40,7 +40,7 @@ rm(account, account_balance, account_transaction_pattern,
    client, creditcard, disposition, district, loan,
    permanent_order, transaction, czech_regions_coords,
    lat, long, region, transaction_empty_cols,
-   transaction_na_cols, wd, ConvertToDate, GetAgeFromBirthnumber,
+   transaction_na_cols, ConvertToDate, GetAgeFromBirthnumber,
    GetBirthdateFromBirthnumber, GetGenderFromBirthnumber)
 invisible(gc)
 
@@ -113,6 +113,20 @@ rm(loan_dataset_boost, loan_dataset_DT, loan_dataset_logistic, loan_dataset_rf,
 invisible(gc())
 
 ## getting measures -----------------------------------------------------------------
+
+metricsByCutoff.test_log    <- modelMetrics(prob.test$logistic.actual, prob.test$logistic.predicted)
+metricsByCutoff.test_DT     <- modelMetrics(prob.test$decision.tree.actual, prob.test$decision.tree.predicted)
+metricsByCutoff.test_boost  <- modelMetrics(prob.test$boosting.actual, prob.test$boosting.predicted)
+metricsByCutoff.test_rf     <- modelMetrics(prob.test$random.forest.actual, prob.test$random.forest.predicted)
+
+subplot(metricsByCutoff.test_log$Plot,
+        metricsByCutoff.test_DT$Plot,
+        metricsByCutoff.test_boost$Plot,
+        metricsByCutoff.test_rf$Plot,
+        nrows = 2) %>% hide_legend()
+
+
+
 
 # logistic regression
 measures.logistic.train <- HMeasure(prob.train$logistic.actual, prob.train$logistic.predicted, threshold = 0.1)
