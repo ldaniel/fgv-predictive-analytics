@@ -14,7 +14,6 @@ library(knitr)
 #libraries for plots
 library(ggplot2)
 library(ggthemes)
-
 library(ggcorrplot)
 library(ggpubr)
 library(plotly)
@@ -138,7 +137,7 @@ metricsByCutoff.test_rf     <- modelMetrics(prob.test$random.forest.actual,
                                             prob.test$random.forest.predicted, 
                                             plot_title = 'Random Forest')
 
-cutoffs <- subplot(metricsByCutoff.test_log$Plot,
+cutoffs <- plotly::subplot(metricsByCutoff.test_log$Plot,
                    metricsByCutoff.test_DT$Plot,
                    metricsByCutoff.test_boost$Plot,
                    metricsByCutoff.test_rf$Plot,
@@ -363,4 +362,3 @@ accuracy(score = prob.test$boosting.predicted,
 accuracy(score = prob.test$random.forest.predicted, 
          actual = prob.test$boosting.actual, 
          threshold = 0.12)
-
