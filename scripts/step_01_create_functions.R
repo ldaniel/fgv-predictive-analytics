@@ -132,3 +132,90 @@ SplitTestTrainDataset <- function(dataset) {
   return(SplitDataset)
   
 }
+
+# plot functions --------------------------------------------------------------
+# functions used in the evaluation step to compare the models.
+
+Score_Boxplot <- function(dataset, predicted, actual, title) {
+  ggplot(data = dataset) +
+    geom_boxplot(aes(y = predicted,
+                     fill = as.factor(actual))) +
+    coord_flip() +
+    scale_fill_manual(values = c("0" = "#16a085", "1" = "#e74c3c")) +
+    scale_y_continuous(limits = c(0, 1)) +
+    theme_economist() +
+    labs(title = title,
+         y = 'Score',
+         fill = 'Defaulter |1 = True|') +
+    theme(panel.grid = element_blank(),
+          axis.ticks.y = element_blank(),
+          axis.text.y = element_blank(),
+          legend.position = 0,
+          plot.title = element_text(hjust = 0.5))
+}
+
+Score_Histograms <- function(dataset, predicted, actual, title) {
+  ggplot(data = dataset) +
+    geom_density(aes(x = predicted, fill = as.factor(actual)),
+                 alpha = 0.5) +
+    scale_fill_manual(values = c("0" = "#16a085", "1" = "#e74c3c")) +
+    scale_x_continuous(limits = c(0, 1)) +
+    theme_economist() +
+    labs(title = title,
+         y = 'Score',
+         fill = 'Defaulter |1 = True|') +
+    theme(panel.grid = element_blank(),
+          axis.ticks.y = element_blank(),
+          axis.text.y = element_blank(),
+          legend.position = 0,
+          plot.title = element_text(hjust = 0.5))
+}
+
+KS_Plot <- function(zeros, ones, title) {
+  group <- c(rep("Non Defaulters", length(zeros)), rep("Defauters", length(ones)))
+  dat <- data.frame(KSD = c(zeros, ones), group = group)
+  cdf1 <- ecdf(zeros) 
+  cdf2 <- ecdf(ones) 
+  minMax <- seq(min(zeros, ones), max(zeros, ones), length.out=length(zeros)) 
+  x0 <- minMax[which( abs(cdf1(minMax) - cdf2(minMax)) == max(abs(cdf1(minMax) - cdf2(minMax))) )][1] 
+  y0 <- cdf1(x0)[1]
+  y1 <- cdf2(x0)[1]
+  ks <- round(y0 - y1, 2)
+  
+  ggplot(dat, aes(x = KSD, group = group, color = group))+
+    stat_ecdf(size=1) +
+    geom_segment(aes(x = x0[1], y = y0[1], xend = x0[1], yend = y1[1]),
+                 linetype = "dashed", color = "blue") +
+    geom_point(aes(x = x0[1] , y = y0[1]), color="blue", size=4) +
+    geom_point(aes(x = x0[1] , y = y1[1]), color="blue", size=4) +
+    geom_label(aes(x = x0[1], y = y1[1] + (y0[1] - y1[1]) / 2, label = ks),
+               color = 'black') +
+    scale_x_continuous(limits = c(0, 1)) +
+    labs(title = title,
+         y = 'Acumulated Probability Distribution',
+         x = 'Score') +
+    theme_economist() +
+    theme(legend.title = element_blank(),
+          panel.grid = element_blank(),
+          legend.position = 0,
+          plot.title = element_text(hjust = 0.5))
+}
+
+accuracy <- function(score, actual, threshold = 0.5) {
+  
+  fitted.results <- ifelse(score > threshold ,1 ,0)
+  
+  misClasificError <- mean(fitted.results != actual)
+  
+  misClassCount <- misclassCounts(fitted.results, actual)
+  
+  print(kable(misClassCount$conf.matrix))
+  
+  print('--------------------------------------------------------------')
+  print(paste('Model General Accuracy of: ', 
+              round((1 - misClassCount$metrics['ER']) * 100, 2), '%', 
+              sep = ''))
+  print(paste('True Positive Rate of    : ', 
+              round(misClassCount$metrics['TPR'] * 100, 2), '%',
+              sep = ''))
+}
