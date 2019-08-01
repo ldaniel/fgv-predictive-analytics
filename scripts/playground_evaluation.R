@@ -114,35 +114,58 @@ invisible(gc())
 
 ## getting measures -----------------------------------------------------------------
 
-metricsByCutoff.test_log    <- modelMetrics(prob.test$logistic.actual, prob.test$logistic.predicted)
-metricsByCutoff.test_DT     <- modelMetrics(prob.test$decision.tree.actual, prob.test$decision.tree.predicted)
-metricsByCutoff.test_boost  <- modelMetrics(prob.test$boosting.actual, prob.test$boosting.predicted)
-metricsByCutoff.test_rf     <- modelMetrics(prob.test$random.forest.actual, prob.test$random.forest.predicted)
+metricsByCutoff.test_log    <- modelMetrics(prob.test$logistic.actual, 
+                                            prob.test$logistic.predicted, 
+                                            plot_title = 'Logistic Regression')
+metricsByCutoff.test_DT     <- modelMetrics(prob.test$decision.tree.actual, 
+                                            prob.test$decision.tree.predicted, 
+                                            plot_title = 'Decision Tree')
+metricsByCutoff.test_boost  <- modelMetrics(prob.test$boosting.actual, 
+                                            prob.test$boosting.predicted, 
+                                            plot_title = 'Boosting')
+metricsByCutoff.test_rf     <- modelMetrics(prob.test$random.forest.actual, 
+                                            prob.test$random.forest.predicted, 
+                                            plot_title = 'Random Forest')
 
-subplot(metricsByCutoff.test_log$Plot,
-        metricsByCutoff.test_DT$Plot,
-        metricsByCutoff.test_boost$Plot,
-        metricsByCutoff.test_rf$Plot,
-        nrows = 2) %>% hide_legend()
+cutoffs <- subplot(metricsByCutoff.test_log$Plot,
+                   metricsByCutoff.test_DT$Plot,
+                   metricsByCutoff.test_boost$Plot,
+                   metricsByCutoff.test_rf$Plot,
+                   nrows = 2) %>% hide_legend()
 
-
-
+cutoffs
 
 # logistic regression
-measures.logistic.train <- HMeasure(prob.train$logistic.actual, prob.train$logistic.predicted, threshold = 0.1)
-measures.logistic.test <- HMeasure(prob.test$logistic.actual, prob.test$logistic.predicted, threshold = 0.1)
+measures.logistic.train <- HMeasure(prob.train$logistic.actual, 
+                                    prob.train$logistic.predicted, 
+                                    threshold = metricsByCutoff.test_log$BestCut['Cut'])
+measures.logistic.test <- HMeasure(prob.test$logistic.actual, 
+                                   prob.test$logistic.predicted, 
+                                   threshold = metricsByCutoff.test_log$BestCut['Cut'])
 
 # decision tree
-measures.decision.tree.train <- HMeasure(prob.train$decision.tree.actual, prob.train$decision.tree.predicted, threshold = 0.1)
-measures.decision.tree.test <- HMeasure(prob.test$decision.tree.actual, prob.test$decision.tree.predicted, threshold = 0.1)
+measures.decision.tree.train <- HMeasure(prob.train$decision.tree.actual, 
+                                         prob.train$decision.tree.predicted, 
+                                         threshold = metricsByCutoff.test_DT$BestCut['Cut'])
+measures.decision.tree.test <- HMeasure(prob.test$decision.tree.actual, 
+                                        prob.test$decision.tree.predicted, 
+                                        threshold = metricsByCutoff.test_DT$BestCut['Cut'])
 
 # boosting
-measures.boosting.train <- HMeasure(prob.train$boosting.actual, prob.train$boosting.predicted, threshold = 0.4)
-measures.boosting.test  <- HMeasure(prob.test$boosting.actual, prob.test$boosting.predicted, threshold = 0.4)
+measures.boosting.train <- HMeasure(prob.train$boosting.actual, 
+                                    prob.train$boosting.predicted, 
+                                    threshold = metricsByCutoff.test_boost$BestCut['Cut'])
+measures.boosting.test  <- HMeasure(prob.test$boosting.actual, 
+                                    prob.test$boosting.predicted, 
+                                    threshold = metricsByCutoff.test_boost$BestCut['Cut'])
 
 # random forest
-measures.random.forest.train <- HMeasure(prob.train$random.forest.actual, prob.train$random.forest.predicted, threshold = 0.1)
-measures.random.forest.test  <- HMeasure(prob.test$random.forest.actual, prob.test$random.forest.predicted, threshold = 0.1)
+measures.random.forest.train <- HMeasure(prob.train$random.forest.actual, 
+                                         prob.train$random.forest.predicted, 
+                                         threshold = metricsByCutoff.test_rf$BestCut['Cut'])
+measures.random.forest.test  <- HMeasure(prob.test$random.forest.actual, 
+                                         prob.test$random.forest.predicted, 
+                                         threshold = metricsByCutoff.test_rf$BestCut['Cut'])
 
 # join measures in a single data frame
 measures <- t(bind_rows(measures.logistic.train$metrics,
