@@ -24,6 +24,9 @@ loan_dataset_boost$y_loan_defaulter <- as.factor(loan_dataset_boost$y_loan_defau
 data.train_boost$y_loan_defaulter   <- as.factor(data.train_boost$y_loan_defaulter)
 data.test_boost$y_loan_defaulter    <- as.factor(data.test_boost$y_loan_defaulter)
 
+data.train_boost <- dplyr::select(data.train_boost, names(loan_dataset_boost))
+data.test_boost <- dplyr::select(data.test_boost, names(loan_dataset_boost))
+
 # MODELAGEM DOS DADOS - M?TODOS DE ENSEMBLE
 
 names  <- names(data.train_boost) # saving the name of all vars to put on formula

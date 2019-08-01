@@ -160,6 +160,9 @@ SplitDataset <- source_train_test_dataset
 data.train_logistic <- SplitDataset$data.train
 data.test_logistic <- SplitDataset$data.test
 
+data.train_logistic <- dplyr::select(data.train_logistic, names(loan_dataset_logistic))
+data.test_logistic <- dplyr::select(data.test_logistic, names(loan_dataset_logistic))
+
 kable(SplitDataset$event.proportion)
 
 # fit the logistic model -------------------------------------------------------------

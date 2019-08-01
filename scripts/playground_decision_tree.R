@@ -11,6 +11,9 @@ SplitDataset <- source_train_test_dataset
 data.train_DT <- SplitDataset$data.train
 data.test_DT <- SplitDataset$data.test
 
+data.train_DT <- dplyr::select(data.train_DT, names(loan_dataset_DT))
+data.test_DT <- dplyr::select(data.test_DT, names(loan_dataset_DT))
+
 kable(SplitDataset$event.proportion)
 
 # fit the decision tree model -------------------------------------------------------------

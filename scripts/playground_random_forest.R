@@ -19,6 +19,9 @@ loan_dataset_rf$y_loan_defaulter <- as.factor(loan_dataset_rf$y_loan_defaulter)
 data.train_rf$y_loan_defaulter   <- as.factor(data.train_rf$y_loan_defaulter)
 data.test_rf$y_loan_defaulter    <- as.factor(data.test_rf$y_loan_defaulter)
 
+data.train_rf <- dplyr::select(data.train_rf, names(loan_dataset_rf))
+data.test_rf <- dplyr::select(data.test_rf, names(loan_dataset_rf))
+
 # extent caret to allow ntree and mtry param at once ----------------------------------
 
 customRF <- list(type = "Classification", library = "randomForest", loop = NULL)
