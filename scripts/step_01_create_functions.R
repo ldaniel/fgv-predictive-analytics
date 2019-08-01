@@ -57,7 +57,7 @@ calculateModelMetrics <- function(cutData, realData, predData){
   
   out <- as.data.frame(out) %>% 
     mutate(merged=paste0(t.x, t.y)) %>% 
-    select(merged, val=t.Freq)
+    dplyr::select(merged, val=t.Freq)
   
   TN <- filter(out, merged == "00")$val[1]
   FP <- filter(out, merged == "01")$val[1]
@@ -84,7 +84,7 @@ modelMetrics <- function(realData, predData, stepping = 0.01,
   out <- bind_rows(lapply(probCuts, calculateModelMetrics, realData = realData, predData = predData))
   out <- out[complete.cases(out),] %>% mutate(Difference = abs(TPR-TNR))
   
-  best <- out %>% arrange(Difference) %>% head(1) %>% select(-Difference)
+  best <- out %>% arrange(Difference) %>% head(1) %>% dplyr::select(-Difference)
   
   p <- plot_ly(x = ~out$Cut, y = ~out$Difference, name = 'Abs. Diff.', type = 'bar', opacity = 0.3) %>% 
     add_trace(x = ~out$Cut, y = ~out$TPR, name = 'TPR', type = 'scatter', mode = 'lines', opacity = 1) %>% 

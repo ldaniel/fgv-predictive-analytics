@@ -5,7 +5,7 @@ loan_dataset_rf <- source_dataset
 DistinctCounts <- loan_dataset_rf %>% summarise_all(n_distinct) %>% t %>% as.data.frame
 
 loan_dataset_rf %<>%
-  select(-x_prop_old_age_pension)
+  dplyr::select(-x_prop_old_age_pension)
 
 # sampling ----------------------------------------------------------------------------
 
@@ -90,7 +90,7 @@ FitResults <- bind_rows(metricsByCutoff.full$BestCut,
                         metricsByCutoff.train$BestCut,
                         metricsByCutoff.test$BestCut) %>% 
   mutate(Scope = c("Full Dataset", "Train Dataset", "Test Dataset")) %>% 
-  select(Scope, everything())
+  dplyr::select(Scope, everything())
 
 kable(FitResults)
 

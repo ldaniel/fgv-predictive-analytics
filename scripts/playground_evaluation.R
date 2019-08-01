@@ -1,30 +1,41 @@
 # loading required libraries ----------------------------------------------------------
-library(caret)
-library(corrplot)
-library(fastDummies)
-library(feather)
+# libraries for data prep
+library(dplyr)
+library(readr)
+library(magrittr)
 library(forcats)
-library(ggcorrplot)
+library(lubridate)
+library(stringr)
+library(feather)
+library(fastDummies)
+library(reshape2)
+library(knitr)
+
+#libraries for plots
 library(ggplot2)
 library(ggthemes)
-library(hmeasure)
-library(knitr)
-library(lubridate)
-library(MASS)
-library(mctest)
-library(pROC)
-library(readr)
+
+library(ggcorrplot)
+library(ggpubr)
+library(plotly)
+
+# libraries for data clean
+library(VIM)
 library(rms)
+library(mctest)
+
+# libraries for modeling
+library(caret)
+library(gmodels)
+library(MASS)
 library(rpart)
 library(rpart.plot)
-library(tidyverse)
 library(adabag)
-library(VIM)
-library(reshape2)
-library(ggpubr)
 library(randomForest)
-library(gmodels)
-library(plotly)
+
+# libraries for measures
+library(hmeasure)
+library(pROC)
 
 # loading other scripts do be used here ----------------------------------------------
 source("./scripts/step_00_config_environment.R")
@@ -59,7 +70,7 @@ rm(SplitDataset, tree.full)
 invisible(gc)
 
 source('scripts/playground_boosting.R')
-rm(SplitDataset, boost.prob.test, boost.prob.train, f_full, names, var_importance)
+rm(SplitDataset, f_full, names, var_importance)
 invisible(gc())
 
 source('scripts/playground_random_forest.R')
