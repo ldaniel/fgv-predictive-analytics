@@ -78,7 +78,8 @@ calculateModelMetrics <- function(cutData, realData, predData){
 # modelMetrics ----------------------------------------------------------------
 # The objective of this function is to calculate main metrics of model performance 
 # for cutoffs from 0-1 based on given step.
-modelMetrics <- function(realData, predData, stepping = 0.01){
+modelMetrics <- function(realData, predData, stepping = 0.01, 
+                         plot_title = "TPR/TNR by cutoff over full dataset"){
   probCuts <- seq(from = 0, to = 1, by = stepping)
   out <- bind_rows(lapply(probCuts, calculateModelMetrics, realData = realData, predData = predData))
   out <- out[complete.cases(out),] %>% mutate(Difference = abs(TPR-TNR))
@@ -88,10 +89,10 @@ modelMetrics <- function(realData, predData, stepping = 0.01){
   p <- plot_ly(x = ~out$Cut, y = ~out$Difference, name = 'Abs. Diff.', type = 'bar', opacity = 0.3) %>% 
     add_trace(x = ~out$Cut, y = ~out$TPR, name = 'TPR', type = 'scatter', mode = 'lines', opacity = 1) %>% 
     add_trace(x = ~out$Cut, y = ~out$TNR, name = 'TNR', type = 'scatter', mode = 'lines', opacity = 1) %>% 
-    add_text(x = best$Cut, y = best$TPR, text = best$Cut, opacity = 2) %>% 
+    add_text(x = best$Cut, y = best$TPR, text = best$Cut, opacity = 1) %>% 
     layout(xaxis = list(title = "Cutoff Value"),
            yaxis = list(title = "True Ratio (%)"),
-           title = "TPR/TNR by cutoff over full dataset")
+           title = plot_title)
   
   return(list(TableResults = out,
               BestCut = best,
