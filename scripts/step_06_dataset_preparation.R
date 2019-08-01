@@ -90,4 +90,11 @@ colnames(source_dataset) <- stringr::str_replace_all(names(source_dataset), '_-_
 colnames(source_dataset) <- trimws(names(source_dataset))
 
 # calling function to split and create train and test databases
-source_train_test_dataset <- SplitTestTrainDataset(source_dataset)
+# this function will split the dataset into train and test data and save the sampling in disk
+# to resample just delete './models/source_train_test_dataset.rds' file and rerun this script
+if (file.exists('./models/source_train_test_dataset.rds')) {
+  source_train_test_dataset <- readRDS('./models/source_train_test_dataset.rds')
+} else {
+  source_train_test_dataset <- SplitTestTrainDataset(source_dataset)
+  saveRDS(source_train_test_dataset, './models/source_train_test_dataset.rds')  
+}
