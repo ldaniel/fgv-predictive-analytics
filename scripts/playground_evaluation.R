@@ -42,28 +42,43 @@ rm(account, account_balance, account_transaction_pattern,
    lat, long, region, transaction_empty_cols,
    transaction_na_cols, wd, ConvertToDate, GetAgeFromBirthnumber,
    GetBirthdateFromBirthnumber, GetGenderFromBirthnumber)
-
 invisible(gc)
 
 # modeling ---------------------------------------------------------------------------
 
 source('scripts/playground_logistic_regression.R')
+rm(clean, clean_dataset, cor_mtx_clean, cor_mtx_full, cor_mtx_high_VIF,
+   dummy_variables, high_VIF_dataset, high_VIF_correlogram_before, 
+   logistic.full, SplitDataset, vars.quant, VIF, VIF_Table_After, 
+   VIF_Table_Before, full, correl_threshold, dummy_variables_high,
+   dummy_variables_low, high_VIF, low_VIF, prop_variables, reject_variables_vector)
+invisible(gc)
+
 source('scripts/playground_decision_tree.R')
+rm(SplitDataset, tree.full)
+invisible(gc)
+
 source('scripts/playground_boosting.R')
+rm(SplitDataset, boost.prob.test, boost.prob.train, f_full, names, var_importance)
+invisible(gc())
+
 source('scripts/playground_random_forest.R')
+rm(customRF, DistinctCounts, FitResults, metricsByCutoff.full, metricsByCutoff.test,
+   metricsByCutoff.train, SplitDataset)
+invisible(gc())
 
 # model evaluation -------------------------------------------------------------------
 
-## making preditions -----------------------------------------------------------------
+## making preditions for each model and consilidating in a single data frame
 
 prob.full = list()
 prob.train = list()
-prob.test = tibble(.rows = 204)
+prob.test = list()
 
 prob.full$logistic.actual         <- loan_dataset_logistic$y_loan_defaulter
 prob.full$logistic.predicted      <- predict(logistic.step, type = "response", newdata = loan_dataset_logistic)
 prob.full$decision.tree.actual    <- loan_dataset_DT$y_loan_defaulter
-prob.full$decision.tree.predicted <- predict(tree.full, type = "prob", newdata = loan_dataset_DT)[, 2]
+prob.full$decision.tree.predicted <- predict(tree.prune, type = "prob", newdata = loan_dataset_DT)[, 2]
 prob.full$boosting.actual         <- loan_dataset_boost$y_loan_defaulter
 prob.full$boosting.predicted      <- predict.boosting(boost, loan_dataset_boost)$prob[, 2]
 prob.full$random.forest.actual    <- loan_dataset_rf$y_loan_defaulter
@@ -72,7 +87,7 @@ prob.full$random.forest.predicted <- predict(rf.full, type = "prob", newdata = l
 prob.train$logistic.actual         <- data.train_logistic$y_loan_defaulter
 prob.train$logistic.predicted      <- predict(logistic.step, type = "response", newdata = data.train_logistic)
 prob.train$decision.tree.actual    <- data.train_DT$y_loan_defaulter
-prob.train$decision.tree.predicted <- predict(tree.full, type = "prob", newdata = data.train_DT)[, 2]
+prob.train$decision.tree.predicted <- predict(tree.prune, type = "prob", newdata = data.train_DT)[, 2]
 prob.train$boosting.actual         <- data.train_boost$y_loan_defaulter
 prob.train$boosting.predicted      <- predict.boosting(boost, data.train_boost)$prob[, 2]
 prob.train$random.forest.actual    <- data.train_rf$y_loan_defaulter
@@ -81,11 +96,21 @@ prob.train$random.forest.predicted <- predict(rf.full, type = "prob", newdata = 
 prob.test$logistic.actual         <- data.test_logistic$y_loan_defaulter
 prob.test$logistic.predicted      <- predict(logistic.step, type = "response", newdata = data.test_logistic)
 prob.test$decision.tree.actual    <- data.test_DT$y_loan_defaulter
-prob.test$decision.tree.predicted <- predict(tree.full, type = "prob", newdata = data.test_DT)[, 2]
+prob.test$decision.tree.predicted <- predict(tree.prune, type = "prob", newdata = data.test_DT)[, 2]
 prob.test$boosting.actual         <- data.test_boost$y_loan_defaulter
 prob.test$boosting.predicted      <- predict.boosting(boost, data.test_boost)$prob[, 2]
 prob.test$random.forest.actual    <- data.test_rf$y_loan_defaulter
 prob.test$random.forest.predicted <- predict(rf.full, type = "prob", newdata = data.test_rf)[, 2]
+
+prob.full   <- prob.full %>% as_tibble()
+prob.train  <- prob.train %>% as_tibble()
+prob.test   <- prob.test %>% as_tibble()
+
+#clean global environment
+rm(loan_dataset_boost, loan_dataset_DT, loan_dataset_logistic, loan_dataset_rf,
+   data.test_boost, data.test_DT, data.test_logistic, data.test_rf,
+   data.train_boost, data.train_DT, data.train_logistic, data.train_rf)
+invisible(gc())
 
 ## getting measures -----------------------------------------------------------------
 
@@ -132,64 +157,173 @@ rm(measures.boosting.test, measures.boosting.train,
 
 invisible(gc())
 
-kable(measures, row.names = FALSE)
+kable(dplyr::select(measures, contains('train')), row.names = TRUE)
+kable(dplyr::select(measures, contains('test')), row.names = TRUE)
 
 ## boxplot -------------------------------------------------------------------------
 
-# logistic regression
+Score_Boxplot <- function(dataset, predicted, actual, title) {
+  ggplot(data = dataset) +
+    geom_boxplot(aes(y = predicted,
+                     fill = as.factor(actual))) +
+    coord_flip() +
+    scale_fill_manual(values = c("0" = "#16a085", "1" = "#e74c3c")) +
+    scale_y_continuous(limits = c(0, 1)) +
+    theme_economist() +
+    labs(title = title,
+         y = 'Score',
+         fill = 'Defaulter |1 = True|') +
+    theme(panel.grid = element_blank(),
+          axis.ticks.y = element_blank(),
+          axis.text.y = element_blank(),
+          legend.position = 0,
+          plot.title = element_text(hjust = 0.5))
+}
 
-boxplot(prob.test$logistic.predicted ~ prob.test$logistic.actual,
-        col= c("green", "red"), 
-        horizontal= T,
-        xlab = 'Probability Prediction',
-        ylab = 'Loan Defaulter')
+boxplots <- ggarrange(Score_Boxplot(prob.test, 
+                        prob.test$logistic.predicted, 
+                        prob.test$logistic.actual,
+                        'Logistic Regression'),
+          Score_Boxplot(prob.test, 
+                        prob.test$decision.tree.predicted, 
+                        prob.test$decision.tree.actual,
+                        'Decision Tree'),
+          Score_Boxplot(prob.test, 
+                        prob.test$boosting.predicted, 
+                        prob.test$boosting.actual,
+                        'Boosting'),
+          Score_Boxplot(prob.test, 
+                        prob.test$random.forest.predicted, 
+                        prob.test$random.forest.actual,
+                        'Random Forest'))
 
-# decision tree
+boxplots <- annotate_figure(boxplots, 
+                            top = text_grob("Score Boxplots of All Models", 
+                                            color = "black", face = "bold", 
+                                            size = 14))
 
-boxplot(prob.test$decision.tree.predicted ~ prob.test$decision.tree.actual,
-        col= c("green", "red"), 
-        horizontal= T,
-        xlab = 'Probability Prediction',
-        ylab = 'Loan Defaulter')
+boxplots
 
-# boosting
+Score_Histograms <- function(dataset, predicted, actual, title) {
+  ggplot(data = dataset) +
+    geom_density(aes(x = predicted, fill = as.factor(actual)),
+                 alpha = 0.5) +
+    scale_fill_manual(values = c("0" = "#16a085", "1" = "#e74c3c")) +
+    scale_x_continuous(limits = c(0, 1)) +
+    theme_economist() +
+    labs(title = title,
+         y = 'Score',
+         fill = 'Defaulter |1 = True|') +
+    theme(panel.grid = element_blank(),
+          axis.ticks.y = element_blank(),
+          axis.text.y = element_blank(),
+          legend.position = 0,
+          plot.title = element_text(hjust = 0.5))
+}
 
-boxplot(prob.test$boosting.predicted ~ prob.test$boosting.actual
-        ,col= c("green", "red"),
-        horizontal= T,
-        xlab = 'Probability Prediction',
-        ylab = 'Loan Defaulter')
+density_plots <- ggarrange(Score_Histograms(prob.test, 
+                        prob.test$logistic.predicted,
+                        prob.test$logistic.actual,
+                        'Logistic Regression'),
+          Score_Histograms(prob.test, 
+                        prob.test$decision.tree.predicted,
+                        prob.test$decision.tree.actual,
+                        'Decision Tree'),
+          Score_Histograms(prob.test, 
+                        prob.test$boosting.predicted,
+                        prob.test$boosting.actual,
+                        'Boosting'),
+          Score_Histograms(prob.test, 
+                        prob.test$random.forest.predicted,
+                        prob.test$random.forest.actual,
+                        'Random Forest'))
 
-# random forest
+density_plots <- annotate_figure(density_plots, 
+                            top = text_grob("Density of All Models", 
+                                            color = "black", face = "bold", 
+                                            size = 14))
 
-boxplot(prob.test$random.forest.predicted ~ prob.test$random.forest.actual
-        ,col= c("green", "red"),
-        horizontal= T,
-        xlab = 'Probability Prediction',
-        ylab = 'Loan Defaulter')
+density_plots
 
+# KS plots ------------------------------------------------------------------------
+
+
+KS_Plot <- function(zeros, ones, title) {
+  group <- c(rep("Non Defaulters", length(zeros)), rep("Defauters", length(ones)))
+  dat <- data.frame(KSD = c(zeros, ones), group = group)
+  # create ECDF of data
+  cdf1 <- ecdf(zeros) 
+  cdf2 <- ecdf(ones) 
+  # find min and max statistics to draw line between points of greatest distance
+  minMax <- seq(min(zeros, ones), max(zeros, ones), length.out=length(zeros)) 
+  x0 <- minMax[which( abs(cdf1(minMax) - cdf2(minMax)) == max(abs(cdf1(minMax) - cdf2(minMax))) )][1] 
+  y0 <- cdf1(x0)[1]
+  y1 <- cdf2(x0)[1]
+  ks <- round(y0 - y1, 2)
+  
+  ggplot(dat, aes(x = KSD, group = group, color = group))+
+    stat_ecdf(size=1) +
+    geom_segment(aes(x = x0[1], y = y0[1], xend = x0[1], yend = y1[1]),
+                 linetype = "dashed", color = "blue") +
+    geom_point(aes(x = x0[1] , y = y0[1]), color="blue", size=4) +
+    geom_point(aes(x = x0[1] , y = y1[1]), color="blue", size=4) +
+    geom_label(aes(x = x0[1], y = y1[1] + (y0[1] - y1[1]) / 2, label = ks),
+               color = 'black') +
+    scale_x_continuous(limits = c(0, 1)) +
+    labs(title = title,
+         y = 'Acumulated Probability Distribution',
+         x = 'Score') +
+    theme_economist() +
+    theme(legend.title = element_blank(),
+          panel.grid = element_blank(),
+          legend.position = 0,
+          plot.title = element_text(hjust = 0.5))
+}
+
+
+KS_plots <- ggarrange(
+  KS_Plot(prob.test$logistic.predicted[prob.test$logistic.actual == 0],
+          prob.test$logistic.predicted[prob.test$logistic.actual == 1],
+          'Logistic Regression'),
+  KS_Plot(prob.test$decision.tree.predicted[prob.test$decision.tree.actual == 0],
+          prob.test$decision.tree.predicted[prob.test$decision.tree.actual == 1],
+          'Decision Tree'),
+  KS_Plot(prob.test$boosting.predicted[prob.test$boosting.actual == 0],
+          prob.test$boosting.predicted[prob.test$boosting.actual == 1],
+          'Boosting'),
+  KS_Plot(prob.test$random.forest.predicted[prob.test$random.forest.actual == 0],
+          prob.test$random.forest.predicted[prob.test$random.forest.actual == 1],
+          'Random Forest'))
+
+KS_plots <- annotate_figure(KS_plots,
+                            top = text_grob("KS Plots of All Models",
+                                            color = "black", face = "bold",
+                                            size = 14))
+
+KS_plots
 
 ## ROC Curve ----------------------------------------------------------------------
 
 # logistic regression
 
-roc_logistic <- roc(data.test_logistic$y_loan_defaulter,
-                    logistic.prob.test)
+roc_logistic      <- roc(prob.test$logistic.actual,
+                         prob.test$logistic.predicted)
 
 # decision tree
 
-roc_decision.tree <- roc(data.test_DT$y_loan_defaulter, 
-                         decision.tree.prob.test)
+roc_decision.tree <- roc(prob.test$decision.tree.actual, 
+                         prob.test$decision.tree.predicted)
 
 # boosting
 
-roc_boosting <- roc(data.test_boost$y_loan_defaulter,
-                    boosting.prob.test)
+roc_boosting      <- roc(prob.test$boosting.actual,
+                         prob.test$boosting.predicted)
 
 # random forest
 
-roc_random.forest <- roc(data.test_rf$y_loan_defaulter,
-                    random.forest.prob.test)
+roc_random.forest <- roc(prob.test$random.forest.actual,
+                         prob.test$random.forest.predicted)
+
 
 # logistic regression
 
@@ -248,25 +382,25 @@ accuracy <- function(score, actual, threshold = 0.5) {
 
 # logistic regression
 
-accuracy(score = logistic.prob.test, 
-         actual = data.test_logistic$y_loan_defaulter, 
+accuracy(score = prob.test$logistic.predicted, 
+         actual = prob.test$logistic.actual, 
          threshold = 0.08)
 
 # decision tree
 
-accuracy(score = decision.tree.prob.test, 
-         actual = data.test_DT$y_loan_defaulter, 
+accuracy(score = prob.test$decision.tree.predicted, 
+         actual = prob.test$boosting.actual, 
          threshold = 0.1)
 
 # boosting
 
-accuracy(score = boosting.prob.test, 
-         actual = data.test_boost$y_loan_defaulter, 
+accuracy(score = prob.test$boosting.predicted, 
+         actual = prob.test$boosting.actual, 
          threshold = 0.41)
 
 # random forest
 
-accuracy(score = random.forest.prob.test, 
-         actual = data.test_rf$y_loan_defaulter, 
+accuracy(score = prob.test$random.forest.predicted, 
+         actual = prob.test$boosting.actual, 
          threshold = 0.12)
 
