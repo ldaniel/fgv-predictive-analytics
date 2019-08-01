@@ -48,7 +48,7 @@ GetAgeFromBirthnumber <- function(var_birth_number) {
   return(result)
 }
 
-# metrics by cutoff value --------------------------------------------------------------------
+# calculateModelMetrics -------------------------------------------------------
 # The objective of this function is to calculate main metrics of model performance according to a cutoff value.
 calculateModelMetrics <- function(cutData, realData, predData){
   cuttedData <- as.factor(ifelse(predData>=cutData, 1, 0))
@@ -75,9 +75,9 @@ calculateModelMetrics <- function(cutData, realData, predData){
                     F1 = 2*(TP/(TP+FN))*(TP/(TP+FP))/((TP/(TP+FP)) + (TP/(TP+FN)))))
 }
 
-
-# calculate metrics by each cutoff value given step --------------------------------------------------------------------
-# The objective of this function is to calculate main metrics of model performance for cutoffs from 0-1 based on given step.
+# modelMetrics ----------------------------------------------------------------
+# The objective of this function is to calculate main metrics of model performance 
+# for cutoffs from 0-1 based on given step.
 modelMetrics <- function(realData, predData, stepping = 0.01){
   probCuts <- seq(from = 0, to = 1, by = stepping)
   out <- bind_rows(lapply(probCuts, calculateModelMetrics, realData = realData, predData = predData))
@@ -95,4 +95,38 @@ modelMetrics <- function(realData, predData, stepping = 0.01){
   return(list(TableResults = out,
               BestCut = best,
               Plot = p))
+}
+
+# SplitTestTrainDataset -------------------------------------------------------
+# The objective of this function is to split a given dataset 
+# in train and test datasets
+SplitTestTrainDataset <- function(dataset) {
+  set.seed(12345)
+  
+  dataset$y_loan_defaulter <- as.integer(dataset$y_loan_defaulter)
+  
+  index <- caret::createDataPartition(dataset$y_loan_defaulter, 
+                                      p= 0.7, list = FALSE)
+  data.train <- dataset[index, ]
+  data.test  <- dataset[-index,]
+  
+  # checking event proportion in sample and test datasets against full dataset.
+  event_proportion <- bind_rows(prop.table(table(dataset$y_loan_defaulter)),
+                                prop.table(table(data.train$y_loan_defaulter)),
+                                prop.table(table(data.test$y_loan_defaulter)))
+  
+  event_proportion$scope = ''
+  event_proportion$scope[1] = 'full dataset'
+  event_proportion$scope[2] = 'train dataset'
+  event_proportion$scope[3] = 'test dataset'
+  
+  event_proportion <- select(event_proportion, scope, everything())
+  
+  SplitDataset <-  list()
+  SplitDataset$data.train <- data.train
+  SplitDataset$data.test  <- data.test
+  SplitDataset$event.proportion <- event_proportion
+  
+  return(SplitDataset)
+  
 }

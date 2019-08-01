@@ -156,7 +156,7 @@ loan_dataset_logistic <- dplyr::select(loan_dataset_logistic, -x_average_salary)
 
 # sampling ----------------------------------------------------------------------------
 
-SplitDataset <- SplitTestTrainDataset(loan_dataset_logistic)
+SplitDataset <- source_train_test_dataset
 data.train_logistic <- SplitDataset$data.train
 data.test_logistic <- SplitDataset$data.test
 

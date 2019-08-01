@@ -7,7 +7,7 @@ kable(tibble(variables = names(loan_dataset_DT)))
 
 # sampling ----------------------------------------------------------------------------
 
-SplitDataset <- SplitTestTrainDataset(loan_dataset_DT)
+SplitDataset <- source_train_test_dataset
 data.train_DT <- SplitDataset$data.train
 data.test_DT <- SplitDataset$data.test
 

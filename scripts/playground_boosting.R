@@ -14,7 +14,7 @@ boxplot(loan_dataset_boost$x_avg_account_balance ~ loan_dataset_boost$y_loan_def
 
 # sampling ----------------------------------------------------------------------------
 
-SplitDataset <- SplitTestTrainDataset(loan_dataset_boost)
+SplitDataset <- source_train_test_dataset
 data.train_boost <- SplitDataset$data.train
 data.test_boost <- SplitDataset$data.test
 
@@ -33,8 +33,6 @@ f_full <- as.formula(paste("y_loan_defaulter ~",
 
 # fit the decision tree model with boosting--------------------------------------------------
 
-library(adabag)
-
 # boost <- boosting(f_full, data= data.train_boost, mfinal= 250, 
 #                   coeflearn = "Freund", 
 #                   control = rpart.control(minbucket= 50,maxdepth = 1))
@@ -45,21 +43,17 @@ boost <- readRDS("./models/boosting.rds")
 # analysing the error evolution by each interation
 plot(errorevol(boost, data.train_boost))
 
-
 # Analysing var importance on model
 var_importance <- boost$importance[order(boost$importance,decreasing = T)]
 var_importance
 importanceplot(boost)
 
-
 # Applying the boosted model on data test to test
 boost.prob.train <- predict.boosting(boost, data.train_boost)$prob[,2]
 boost.prob.test  <- predict.boosting(boost, data.test_boost)$prob[,2]
 
-
 # Comportamento da saida do modelo
 hist(boost.prob.test, breaks = 25, col = "lightblue",xlab= "Probability",
      ylab= "Frequency",main= "Boosting")
-
 
 boxplot(boost.prob.test ~ data.test_boost$y_loan_defaulter,col= c("green", "red"), horizontal= T)

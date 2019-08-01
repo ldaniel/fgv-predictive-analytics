@@ -9,7 +9,7 @@ loan_dataset_rf %<>%
 
 # sampling ----------------------------------------------------------------------------
 
-SplitDataset <- SplitTestTrainDataset(loan_dataset_rf)
+SplitDataset <- source_train_test_dataset
 data.train_rf <- SplitDataset$data.train
 data.test_rf <- SplitDataset$data.test
 

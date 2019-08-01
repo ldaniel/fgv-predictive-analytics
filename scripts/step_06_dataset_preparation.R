@@ -89,35 +89,5 @@ colnames(source_dataset) <- stringr::str_replace_all(names(source_dataset), ' ',
 colnames(source_dataset) <- stringr::str_replace_all(names(source_dataset), '_-_', '_')
 colnames(source_dataset) <- trimws(names(source_dataset))
 
-# spliting dataset in train and test datasets
-
-SplitTestTrainDataset <- function(dataset) {
-  set.seed(12345)
-  
-  dataset$y_loan_defaulter <- as.integer(dataset$y_loan_defaulter)
-  
-  index <- caret::createDataPartition(dataset$y_loan_defaulter, 
-                                      p= 0.7, list = FALSE)
-  data.train <- dataset[index, ]
-  data.test  <- dataset[-index,]
-  
-  # checking event proportion in sample and test datasets against full dataset.
-  event_proportion <- bind_rows(prop.table(table(dataset$y_loan_defaulter)),
-                                prop.table(table(data.train$y_loan_defaulter)),
-                                prop.table(table(data.test$y_loan_defaulter)))
-  
-  event_proportion$scope = ''
-  event_proportion$scope[1] = 'full dataset'
-  event_proportion$scope[2] = 'train dataset'
-  event_proportion$scope[3] = 'test dataset'
-  
-  event_proportion <- select(event_proportion, scope, everything())
-  
-  SplitDataset <-  list()
-  SplitDataset$data.train <- data.train
-  SplitDataset$data.test  <- data.test
-  SplitDataset$event.proportion <- event_proportion
-  
-  return(SplitDataset)
-  
-}
+# calling function to split and create train and test databases
+source_train_test_dataset <- SplitTestTrainDataset(source_dataset)
