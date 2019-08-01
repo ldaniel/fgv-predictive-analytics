@@ -179,4 +179,3 @@ logistic.step <- step(logistic.full, direction = "both", test = "F")
 
 names(logistic.step$coefficients) <- stringr::str_sub(names(logistic.step$coefficients), 1, 25)
 summary(logistic.step)
-

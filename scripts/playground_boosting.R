@@ -50,13 +50,3 @@ plot(errorevol(boost, data.train_boost))
 var_importance <- boost$importance[order(boost$importance,decreasing = T)]
 var_importance
 importanceplot(boost)
-
-# Applying the boosted model on data test to test
-boost.prob.train <- predict.boosting(boost, data.train_boost)$prob[,2]
-boost.prob.test  <- predict.boosting(boost, data.test_boost)$prob[,2]
-
-# Comportamento da saida do modelo
-hist(boost.prob.test, breaks = 25, col = "lightblue",xlab= "Probability",
-     ylab= "Frequency",main= "Boosting")
-
-boxplot(boost.prob.test ~ data.test_boost$y_loan_defaulter,col= c("green", "red"), horizontal= T)
