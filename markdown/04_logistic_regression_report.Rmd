@@ -38,6 +38,7 @@ source("./scripts/step_02_data_ingestion.R")
 source("./scripts/step_03_data_cleaning.R")
 source("./scripts/step_04_label_translation.R")
 source("./scripts/step_05_data_enhancement.R")
+source("./scripts/step_06_dataset_preparation.R")
 ```
 
 # Objective
@@ -58,7 +59,8 @@ We ended up having a data set with **118 variables**.
 
 
 ```{r variables, echo=TRUE}
-loan_dataset_logistic <- DataPrep()
+loan_dataset_logistic <- source_dataset
+
 kable(tibble(variables = names(loan_dataset_logistic)))
 ```
 
@@ -104,7 +106,9 @@ After we investigated the low variability in the dummies we look at the calculat
 ```{r prop, echo=TRUE}
 prop_variables <- dplyr::select(loan_dataset_logistic, 
                                 starts_with('x_prop'))
+
 prop_variables <- summary(prop_variables)
+
 kable(t(prop_variables))
 
 loan_dataset_logistic <- dplyr::select(loan_dataset_logistic, -x_prop_old_age_pension)
@@ -147,9 +151,9 @@ high_VIF_correlogram_before <- ggcorrplot(cor_mtx_high_VIF,
                                 hc.order = TRUE,
                                 lab = FALSE,
                                 lab_size = 3, 
-                                method ="square",
+                                method="square",
                                 colors = c("tomato2", "white", "springgreen3"),
-                                title = "Correlation Matrix of Loan Dataset Variables with high VIF") +
+                                title="Correlation Matrix of Loan Dataset Variables with high VIF") +
   theme(axis.text = element_blank(),
         legend.position = 0)
 
@@ -188,7 +192,7 @@ We finally look on the complete dataset correlogram with the clean data set.
 
 ```{r check_correl_4, out.width = '100%'}
 cor_mtx_full <- cor(loan_dataset_logistic)
-cor_mtx_clean <- cor(clean_dataset)
+cor_mtx_clean <- cor(clean_dataset,)
 
 full = ggcorrplot(cor_mtx_full, hc.order = TRUE,
            lab = FALSE, 
@@ -208,9 +212,9 @@ clean = ggcorrplot(cor_mtx_clean, hc.order = TRUE,
   theme(axis.text = element_blank(),
         legend.position = 0)
 
-loan_dataset_logistic <- clean_dataset
-
 print(ggarrange(full, clean))
+
+loan_dataset_logistic <- clean_dataset
 ```
 
 We also look again at the VIF estimates for the clena dataset.
@@ -244,13 +248,13 @@ ggplot(VIF_Table_After, aes(x = fct_reorder(variable, VIF),
        title = 'Variance Inflation Factor',
        subtitle="Checking for multicolinearity in X's variables.
        Variables with VIF more than 5 will be droped from the model")
+
+loan_dataset_logistic <- dplyr::select(loan_dataset_logistic, -x_average_salary)
 ```
 
 We finally texclude one last variable that still has a VIF higher than our threshold (5)
 
 ```{r check_correl_6, echo=FALSE, out.width = '100%'}
-loan_dataset_logistic <- dplyr::select(loan_dataset_logistic, -x_average_salary)
-
 vars.quant <- select_if(loan_dataset_logistic, is.numeric)
 
 VIF <- imcdiag(vars.quant, loan_dataset_logistic$y_loan_defaulter)
@@ -295,25 +299,14 @@ The available data in Loan Dataset is split into Train and Testing data on the f
 - **Test Dataset ** (30% 204 obs).
 
 ```{r split_sample}
-set.seed(12345)
-index <- caret::createDataPartition(loan_dataset_logistic$y_loan_defaulter, 
-                                    p= 0.7,list = FALSE)
+SplitDataset <- source_train_test_dataset
+data.train_logistic <- SplitDataset$data.train
+data.test_logistic <- SplitDataset$data.test
 
-data.train_logistic <- loan_dataset_logistic[index, ]
-data.test_logistic  <- loan_dataset_logistic[-index,]
+data.train_logistic <- dplyr::select(data.train_logistic, names(loan_dataset_logistic))
+data.test_logistic <- dplyr::select(data.test_logistic, names(loan_dataset_logistic))
 
-event_proportion <- bind_rows(prop.table(table(loan_dataset_logistic$y_loan_defaulter)),
-                              prop.table(table(data.train_logistic$y_loan_defaulter)),
-                              prop.table(table(data.test_logistic$y_loan_defaulter)))
-
-event_proportion$scope = ''
-event_proportion$scope[1] = 'full dataset'
-event_proportion$scope[2] = 'train dataset'
-event_proportion$scope[3] = 'test dataset'
-
-event_proportion <- dplyr::select(event_proportion, scope, everything())
-
-kable(event_proportion)
+kable(SplitDataset$event.proportion)
 ```
 
 Both datasets keep the same proportion for the explained variable around 11%.
@@ -323,7 +316,7 @@ Both datasets keep the same proportion for the explained variable around 11%.
 With the final cleaned dataset, we got from above steps we fit our Logistic Regression Y_loan_defaulter on all x variables.
 
 ```{r fit_model_full, echo=TRUE}
-logistic.full <- glm(formula =y_loan_defaulter ~ .,
+logistic.full <- glm(formula = y_loan_defaulter ~ .,
                      data= data.train_logistic, 
                      family= binomial(link='logit'))
 
@@ -344,7 +337,6 @@ summary(logistic.step)
 logistic.step <- step(logistic.full, direction = "both", test = "F")
 
 names(logistic.step$coefficients) <- stringr::str_sub(names(logistic.step$coefficients), 1, 25)
-summary(logistic.step)
 ```
 
 ```{r fit_model_step_show, echo=FALSE}
@@ -354,101 +346,3 @@ summary(logistic.step)
 # Evaluating the model performance
 
 We started this step by making predictions using our model on the X's variables in our Train and Test datasets.
-
-
-```{r predict, warning=FALSE}
-logistic.prob.train <- predict(logistic.step, type = "response")
-logistic.prob.test <- predict(logistic.step,
-                              newdata = data.test_logistic, 
-                              type= "response")
-```
-
-We then evaluate the metrics in the each model for Train and Test data:
-
-```{r measure, warning=FALSE}
-
-measures.logistic.train <- HMeasure(data.train_logistic$y_loan_defaulter, 
-                                         logistic.prob.train, 
-                                         threshold = 0.5)
-
-measures.logistic.test <- HMeasure(data.test_logistic$y_loan_defaulter, 
-                                        logistic.prob.test, 
-                                        threshold = 0.5)
-
-measures <- t(bind_rows(measures.logistic.train$metrics,
-                        measures.logistic.test$metrics)) %>%
-  as_tibble(., rownames = NA)
-
-colnames(measures) <- c('logistic - train', 'logistic - test')
-
-measures$metric = rownames(measures)
-
-measures <- dplyr::select(measures, metric, everything())
-
-kable(measures, row.names = FALSE)
-
-```
-
-Then, we look a boxplot chart to see how well our model split the observation into our explained variable:
-
-- **Logistic Regression**
-```{r boxplot_2, out.width = '100%', echo=FALSE}
-boxplot(logistic.prob.test ~ data.test_logistic$y_loan_defaulter,
-        col= c("green", "red"), 
-        horizontal= T,
-        xlab = 'Probability Prediction',
-        ylab = 'Loan Defaulter')
-```
-
-Then we plot the ROC(Receiver Operator Characteristic Curve) of the model:
-
-```{r roC, out.width = '100%', echo=TRUE, warning=FALSE, message=FALSE}
-roc_logistic <- roc(data.test_logistic$y_loan_defaulter,
-                    logistic.prob.test)
-
-y1 <- roc_logistic$sensitivities
-x1 <- 1 - roc_logistic$specificities
-
-plot(x1, y1,  type="n",
-     xlab = "False Positive Rate (Specificities)", 
-     ylab = "True Positive Rate (Sensitivities)")
-
-lines(x1, y1, lwd = 3, lty = 1, col="red") 
-
-legend("bottomright", c('Logistic'), 
-       lty = 1, col = c('red'))
-
-abline(0, 1, lty = 2)
-```
-
-Finally we look more closely to the model accuracy **Logistic Regression**.
-
-To perform this task, we start by defining a threshold to assign the observation to each class, and them calculate the General Accuracy and the True Positive Rate.
-
-- **Threshold = 0.1**
-
-```{r accuracy, echo=TRUE}
-accuracy <- function(score, actual, threshold = 0.5) {
-  
-  fitted.results <- ifelse(score > threshold ,1 ,0)
-  
-  misClasificError <- mean(fitted.results != actual)
-  
-  misClassCount <- misclassCounts(fitted.results, actual)
-
-  print(kable(misClassCount$conf.matrix))
-
-  print('--------------------------------------------------------------')
-  print(paste('Model General Accuracy of: ', 
-              round((1 - misClassCount$metrics['ER']) * 100, 2), '%', 
-              sep = ''))
-  print(paste('True Positive Rate of    : ', 
-              round(misClassCount$metrics['TPR'] * 100, 2), '%',
-              sep = ''))
-}
-
-accuracy(score = logistic.prob.test, 
-         actual = data.test_logistic$y_loan_defaulter, 
-         threshold = 0.1)
-
-```
