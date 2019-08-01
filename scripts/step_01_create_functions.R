@@ -88,6 +88,7 @@ modelMetrics <- function(realData, predData, stepping = 0.01){
   p <- plot_ly(x = ~out$Cut, y = ~out$Difference, name = 'Abs. Diff.', type = 'bar', opacity = 0.3) %>% 
     add_trace(x = ~out$Cut, y = ~out$TPR, name = 'TPR', type = 'scatter', mode = 'lines', opacity = 1) %>% 
     add_trace(x = ~out$Cut, y = ~out$TNR, name = 'TNR', type = 'scatter', mode = 'lines', opacity = 1) %>% 
+    add_text(x = best$Cut, y = best$TPR, text = best$Cut, opacity = 2) %>% 
     layout(xaxis = list(title = "Cutoff Value"),
            yaxis = list(title = "True Ratio (%)"),
            title = "TPR/TNR by cutoff over full dataset")
