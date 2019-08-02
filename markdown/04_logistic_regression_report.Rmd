@@ -85,6 +85,8 @@ kable(tibble(variables = names(loan_dataset_logistic)))
 
 Starting from this dataset we investigate the presence of redundant or variables not useful for the model such as the ones with not enough variability.
 
+### Dummy variables
+
 Starting with the dummy variables.
 
 We will keep only dummies that has the event in at least 5% in the dataset:
@@ -118,6 +120,8 @@ dummy_variables_low <- names(dplyr::select(dummy_variables, -dummy_variables_hig
 loan_dataset_logistic <- dplyr::select(loan_dataset_logistic, -dummy_variables_low)
 ```
 
+### Transaction type proportion variables
+
 After we investigated the low variability in the dummies we look at the calculated variables on the transaction type proportion we calculated dutring the data enhancement process.
 
 ```{r prop, echo=TRUE}
@@ -139,7 +143,7 @@ We ended up having a data set with **40 variables**.
 kable(tibble(variables = names(loan_dataset_logistic)))
 ```
 
-## Investigating Multicollinearity
+### Multicollinearity on feature variables
 
 With the remaining variables we ran a multicollinearity test to identify additional variables to drop from the model specification.
 
@@ -330,7 +334,7 @@ Both datasets keep the same proportion for the explained variable around 11%.
 
 ## Fit the logistic model 
 
-With the final cleaned dataset, we got from above steps we fit our Logistic Regression Y_loan_defaulter on all x variables.
+With the final cleaned dataset, we got from above steps we fit our Logistic Regression model for y_loan_defaulter on all x variables.
 
 ```{r fit_model_full, echo=TRUE}
 logistic.full <- glm(formula = y_loan_defaulter ~ .,
@@ -541,6 +545,5 @@ p3 <- KS_Plot(prob.test$logistic.predicted[prob.test$logistic.actual == 0],
         prob.test$logistic.predicted[prob.test$logistic.actual == 1],
         'KS Plot') + theme(axis.title.y = element_blank(),
                            axis.text.y = element_blank())
-
 ggarrange(p1, p2, p3, nrow = 3)
 ```

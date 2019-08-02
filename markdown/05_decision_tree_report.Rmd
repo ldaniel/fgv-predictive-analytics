@@ -8,24 +8,33 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(fig.pos =  "h")
 knitr::opts_knit$set(root.dir = "../")
 
-# loading required libraries
-library(rmarkdown)
+# loading required libraries ----------------------------------------------------------
+# libraries for data prep
 library(dplyr)
-library(tidyr)
+library(readr)
+library(magrittr)
 library(forcats)
 library(lubridate)
-library(tinytex)
+library(stringr)
 library(feather)
-library(corrplot)
-library(mctest)
+library(fastDummies)
+library(reshape2)
+library(knitr)
+
+#libraries for plots
+library(ggplot2)
+library(ggthemes)
+library(ggpubr)
+library(plotly)
+
+# libraries for modeling
 library(caret)
+library(rpart)
+library(rpart.plot)
+
+# libraries for measures
 library(hmeasure)
 library(pROC)
-library(rms)
-library(knitr)
-library(ggplot2)
-library(ggcorrplot)
-library(ggthemes)
 
 ```
 
@@ -36,8 +45,193 @@ source("./scripts/step_02_data_ingestion.R")
 source("./scripts/step_03_data_cleaning.R")
 source("./scripts/step_04_label_translation.R")
 source("./scripts/step_05_data_enhancement.R")
+source("./scripts/step_06_dataset_preparation.R")
 ```
 
 # Objective
 
-To-do.
+The goal of this report is trying to fit a simple decision Tree model on Loan data aiming to predict the probability of delinquency for each contract.
+
+# Task description
+
+## Dataset preparation
+
+Using the vanilla transaction dataset, we calculated several derived variables for each account as described in the Data Preparation session.
+
+This dataset is joined with Loan, Client, Credit Card, District, Account and Account Balance tables.
+
+We ended up having a data set with **118 variables**.
+
+```{r variables, echo=TRUE}
+loan_dataset_logistic <- source_dataset
+
+kable(tibble(variables = names(loan_dataset_logistic)))
+```
+
+## Variable selection
+
+One advantage of Decision Tree models is that it does no require heavy feature enginiring.
+We will only remove **x_prop_old_age_pension** that we found ou to have no variance in the dataset.
+
+This model is also not sensible to outliers, missing values and multicollinearity.
+
+```{r variable_selecion, echo=TRUE}
+loan_dataset_DT <-source_dataset
+loan_dataset_DT <- dplyr::select(loan_dataset_DT, -x_prop_old_age_pension)
+```
+
+## Sample split into Test and Training Data
+
+The available data in Loan Dataset is split into Train and Testing data on the following proportion:
+
+- **Train Dataset** (70% 478 obs);
+- **Test Dataset ** (30% 204 obs).
+
+We are selecting exact the same samples we used for the Logistic Model to allow comparison across models.
+
+```{r sampling, echo=TRUE}
+SplitDataset <- source_train_test_dataset
+data.train_DT <- SplitDataset$data.train
+data.test_DT <- SplitDataset$data.test
+
+data.train_DT <- dplyr::select(data.train_DT, names(loan_dataset_DT))
+data.test_DT <- dplyr::select(data.test_DT, names(loan_dataset_DT))
+
+kable(SplitDataset$event.proportion)
+```
+
+Both datasets keep the same proportion for the explained variable around 11%.
+
+## Fit the Decision Tree model 
+
+With the final cleaned dataset, we got from above steps we fit our Decision Tree Model for y_loan_defaulter on all x variables.
+
+We choose to change the default **minbucket** parameter to **5** to deliberate create a fully grown tree as the database is not big enouth for this model.
+
+```{r fit_DT_full, echo=TRUE}
+tree.full <- rpart(data= data.train_DT, y_loan_defaulter ~ .,
+                   control = rpart.control(minbucket = 5),
+                   method = "class")
+
+tree.full
+summary(tree.full)
+rpart.plot(tree.full)
+
+printcp(tree.full)
+plotcp(tree.full)
+```
+
+### Evaluating necessity of prunning
+
+```{r fit_DT_prune, echo=TRUE}
+tree.prune <- prune(tree.full, cp= tree.full$cptable[which.min(tree.full$cptable[,"xerror"]),"CP"])
+tree.prune <- tree.full
+
+plotcp(tree.prune)
+rpart.plot(tree.prune)
+
+tree.prune <- tree.full
+```
+
+# Evaluating the model performance
+
+We started this step by making predictions using our model on the X's variables in our Train and Test datasets.
+
+```{r get_scores, echo=TRUE}
+## making preditions for each model and consilidating in a single data frame
+
+prob.full = list()
+prob.train = list()
+prob.test = list()
+
+prob.full$decision.tree.actual     <- loan_dataset_DT$y_loan_defaulter
+prob.full$decision.tree.predicted  <- predict(tree.prune, type = "prob", newdata = loan_dataset_DT)[, 2]
+
+prob.train$decision.tree.actual    <- data.train_DT$y_loan_defaulter
+prob.train$decision.tree.predicted <- predict(tree.prune, type = "prob", newdata = data.train_DT)[, 2]
+
+prob.test$decision.tree.actual     <- data.test_DT$y_loan_defaulter
+prob.test$decision.tree.predicted  <- predict(tree.prune, type = "prob", newdata = data.test_DT)[, 2]
+
+prob.full   <- prob.full %>% as_tibble()
+prob.train  <- prob.train %>% as_tibble()
+prob.test   <- prob.test %>% as_tibble()
+```
+
+## Getting Performance Measures:
+
+To calculate the performance measures, derived from the confusion matrix, we need to find the score cut off that best split our test dataset into Defaulters and Non-Defaulters.
+
+In this exercise we decide to not prioritize the accuracy on predicting Defaulters and Non-Defaulters, therefore we are looking for the score cut off that best predict each class equally.
+
+With the returned object from this function we can plot the comparison between TPR (True Positive Rate) and TNR (True Negative Rate) to find the best cut off.
+
+```{r get_measures, echo=TRUE, out.width= '100%'}
+## getting measures -----------------------------------------------------------------
+metricsByCutoff.test_DT     <- modelMetrics(prob.test$decision.tree.actual, 
+                                            prob.test$decision.tree.predicted, 
+                                            plot_title = 'Decision Tree')
+metricsByCutoff.test_DT$Plot
+```
+
+With the optimized cut off we calculate the full set of model metrics.
+
+```{r get_measures_full, echo=TRUE, out.width= '100%', warning=FALSE}
+# decision tree
+measures.decision.tree.train <- HMeasure(prob.train$decision.tree.actual, 
+                                         prob.train$decision.tree.predicted, 
+                                         threshold = metricsByCutoff.test_DT$BestCut['Cut'])
+measures.decision.tree.test <- HMeasure(prob.test$decision.tree.actual, 
+                                        prob.test$decision.tree.predicted, 
+                                        threshold = metricsByCutoff.test_DT$BestCut['Cut'])
+
+# join measures in a single data frame
+measures <- t(bind_rows(measures.decision.tree.train$metrics,
+                        measures.decision.tree.test$metrics
+                        )) %>% as_tibble(., rownames = NA)
+
+colnames(measures) <- c('decision.tree - train', 'decision.tree - test')
+
+measures$metric = rownames(measures)
+
+measures <- dplyr::select(measures, metric, everything())
+```
+
+Below are the metrics on the train and test dataset:
+```{r see_train_measures, echo=TRUE, out.width= '100%'}
+kable(measures, row.names = FALSE)
+```
+
+In general, this model has not delivered a good accuracy, we will compare how it performed against other classes of models in the Final Report section.
+
+Below the confusion matrix and general performance of the model that we get from our custom function:
+```{r see_accuracy_1, echo=TRUE, out.width= '100%'}
+# accuracy metrics ---------------------------------------------------------------
+# logistic regression
+accuracy(score = prob.test$decision.tree.predicted, 
+         actual = prob.test$decision.tree.actual, 
+         threshold = metricsByCutoff.test_DT[["BestCut"]][["Cut"]])
+```
+
+We can finally look at the score distribution charts how well the model is able to split Defaulters and Non-Defaulters
+
+```{r model_plots, echo=TRUE, out.width= '100%'}
+p1 <- Score_Histograms(prob.test, 
+                 prob.test$decision.tree.predicted,
+                 prob.test$decision.tree.actual,
+                 'Density Plot') + theme(axis.title.y = element_blank())
+
+p2 <- Score_Boxplot(prob.test, 
+              prob.test$decision.tree.predicted, 
+              prob.test$decision.tree.actual,
+              'Score Boxplot')
+
+p3 <- KS_Plot(prob.test$decision.tree.predicted[prob.test$decision.tree.actual == 0],
+        prob.test$decision.tree.predicted[prob.test$decision.tree.actual == 1],
+        'KS Plot') + theme(axis.title.y = element_blank(),
+                           axis.text.y = element_blank())
+
+p1
+p2
+p3
+```

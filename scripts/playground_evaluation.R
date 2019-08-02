@@ -343,22 +343,22 @@ abline(0, 1, lty = 2)
 
 accuracy(score = prob.test$logistic.predicted, 
          actual = prob.test$logistic.actual, 
-         threshold = 0.08)
+         threshold = metricsByCutoff.test_log[["BestCut"]][["Cut"]])
 
 # decision tree
 
 accuracy(score = prob.test$decision.tree.predicted, 
-         actual = prob.test$boosting.actual, 
-         threshold = 0.1)
+         actual = prob.test$decision.tree.actual, 
+         threshold = metricsByCutoff.test_DT[["BestCut"]][["Cut"]])
 
 # boosting
 
 accuracy(score = prob.test$boosting.predicted, 
          actual = prob.test$boosting.actual, 
-         threshold = 0.41)
+         threshold = metricsByCutoff.test_boost[["BestCut"]][["Cut"]])
 
 # random forest
 
 accuracy(score = prob.test$random.forest.predicted, 
-         actual = prob.test$boosting.actual, 
-         threshold = 0.12)
+         actual = prob.test$random.forest.actual, 
+         threshold = metricsByCutoff.test_rf[["BestCut"]][["Cut"]])
