@@ -21,6 +21,13 @@
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/htmlwidgets-1.3/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.9.0/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="site_libs/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.0.0/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-1.46.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-1.46.1/plotly-latest.min.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
@@ -436,7 +443,9 @@ $(document).ready(function () {
 <li><a href="#sample-split-into-test-and-training-data"><span class="toc-section-number">2.4</span> Sample split into Test and Training Data</a></li>
 <li><a href="#fit-the-logistic-model"><span class="toc-section-number">2.5</span> Fit the logistic model</a></li>
 </ul></li>
-<li><a href="#evaluating-the-model-performance"><span class="toc-section-number">3</span> Evaluating the model performance</a></li>
+<li><a href="#evaluating-the-model-performance"><span class="toc-section-number">3</span> Evaluating the model performance</a><ul>
+<li><a href="#getting-performance-measures"><span class="toc-section-number">3.1</span> Getting Performance Measures:</a></li>
+</ul></li>
 </ul>
 </div>
 
@@ -1681,6 +1690,288 @@ $(document).ready(function () {
 <div id="evaluating-the-model-performance" class="section level1">
 <h1><span class="header-section-number">3</span> Evaluating the model performance</h1>
 <p>We started this step by making predictions using our model on the X’s variables in our Train and Test datasets.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1"><span class="co">## making preditions for each model and consilidating in a single data frame</span></a>
+<a class="sourceLine" id="cb18-2" title="2"></a>
+<a class="sourceLine" id="cb18-3" title="3">prob.full =<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb18-4" title="4">prob.train =<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb18-5" title="5">prob.test =<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb18-6" title="6"></a>
+<a class="sourceLine" id="cb18-7" title="7">prob.full<span class="op">$</span>logistic.actual     &lt;-<span class="st"> </span>loan_dataset_logistic<span class="op">$</span>y_loan_defaulter</a>
+<a class="sourceLine" id="cb18-8" title="8">prob.full<span class="op">$</span>logistic.predicted  &lt;-<span class="st"> </span><span class="kw">predict</span>(logistic.step, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>, </a>
+<a class="sourceLine" id="cb18-9" title="9">                                         <span class="dt">newdata =</span> loan_dataset_logistic)</a>
+<a class="sourceLine" id="cb18-10" title="10"></a>
+<a class="sourceLine" id="cb18-11" title="11">prob.train<span class="op">$</span>logistic.actual    &lt;-<span class="st"> </span>data.train_logistic<span class="op">$</span>y_loan_defaulter</a>
+<a class="sourceLine" id="cb18-12" title="12">prob.train<span class="op">$</span>logistic.predicted &lt;-<span class="st"> </span><span class="kw">predict</span>(logistic.step, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>, </a>
+<a class="sourceLine" id="cb18-13" title="13">                                         <span class="dt">newdata =</span> data.train_logistic)</a>
+<a class="sourceLine" id="cb18-14" title="14"></a>
+<a class="sourceLine" id="cb18-15" title="15">prob.test<span class="op">$</span>logistic.actual     &lt;-<span class="st"> </span>data.test_logistic<span class="op">$</span>y_loan_defaulter</a>
+<a class="sourceLine" id="cb18-16" title="16">prob.test<span class="op">$</span>logistic.predicted  &lt;-<span class="st"> </span><span class="kw">predict</span>(logistic.step, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>, </a>
+<a class="sourceLine" id="cb18-17" title="17">                                         <span class="dt">newdata =</span> data.test_logistic)</a>
+<a class="sourceLine" id="cb18-18" title="18"></a>
+<a class="sourceLine" id="cb18-19" title="19">prob.full   &lt;-<span class="st"> </span>prob.full <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a>
+<a class="sourceLine" id="cb18-20" title="20">prob.train  &lt;-<span class="st"> </span>prob.train <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a>
+<a class="sourceLine" id="cb18-21" title="21">prob.test   &lt;-<span class="st"> </span>prob.test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a></code></pre></div>
+<div id="getting-performance-measures" class="section level2">
+<h2><span class="header-section-number">3.1</span> Getting Performance Measures:</h2>
+<p>To calculate the performance measures, derived from the confusion matrix, we need to find the score cut off that best split our test dataset into Defaulters and Non-Defaulters.</p>
+<p>In this exercise we decide to not prioritize the accuracy on predicting Defaulters and Non-Defaulters, therefore we are looking for the score cut off that best predict each class equally.</p>
+<p>We will use a custom function developed in this paper to calculate the best cut off for each model:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" title="1"><span class="co">## making preditions for each model and consilidating in a single data frame</span></a>
+<a class="sourceLine" id="cb19-2" title="2"><span class="co"># calculateModelMetrics -------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb19-3" title="3"><span class="co"># The objective of this function is to calculate main metrics of model performance according to a cutoff value.</span></a>
+<a class="sourceLine" id="cb19-4" title="4">calculateModelMetrics &lt;-<span class="st"> </span><span class="cf">function</span>(cutData, realData, predData){</a>
+<a class="sourceLine" id="cb19-5" title="5">  cuttedData &lt;-<span class="st"> </span><span class="kw">as.factor</span>(<span class="kw">ifelse</span>(predData<span class="op">&gt;=</span>cutData, <span class="dv">1</span>, <span class="dv">0</span>))</a>
+<a class="sourceLine" id="cb19-6" title="6">  </a>
+<a class="sourceLine" id="cb19-7" title="7">  <span class="kw">invisible</span>(<span class="kw">capture.output</span>(out &lt;-<span class="st"> </span><span class="kw">CrossTable</span>(realData, cuttedData, </a>
+<a class="sourceLine" id="cb19-8" title="8">                                             <span class="dt">prop.c =</span> F, <span class="dt">prop.t =</span> F, <span class="dt">prop.r =</span> T, <span class="dt">prop.chisq =</span> F)))</a>
+<a class="sourceLine" id="cb19-9" title="9">  </a>
+<a class="sourceLine" id="cb19-10" title="10">  out &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(out) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-11" title="11"><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">merged=</span><span class="kw">paste0</span>(t.x, t.y)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-12" title="12"><span class="st">    </span>dplyr<span class="op">::</span><span class="kw">select</span>(merged, <span class="dt">val=</span>t.Freq)</a>
+<a class="sourceLine" id="cb19-13" title="13">  </a>
+<a class="sourceLine" id="cb19-14" title="14">  TN &lt;-<span class="st"> </span><span class="kw">filter</span>(out, merged <span class="op">==</span><span class="st"> &quot;00&quot;</span>)<span class="op">$</span>val[<span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb19-15" title="15">  FP &lt;-<span class="st"> </span><span class="kw">filter</span>(out, merged <span class="op">==</span><span class="st"> &quot;01&quot;</span>)<span class="op">$</span>val[<span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb19-16" title="16">  FN &lt;-<span class="st"> </span><span class="kw">filter</span>(out, merged <span class="op">==</span><span class="st"> &quot;10&quot;</span>)<span class="op">$</span>val[<span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb19-17" title="17">  TP &lt;-<span class="st"> </span><span class="kw">filter</span>(out, merged <span class="op">==</span><span class="st"> &quot;11&quot;</span>)<span class="op">$</span>val[<span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb19-18" title="18">  </a>
+<a class="sourceLine" id="cb19-19" title="19">  <span class="kw">return</span>(<span class="kw">data.frame</span>(<span class="dt">Cut =</span> cutData,</a>
+<a class="sourceLine" id="cb19-20" title="20">                    <span class="dt">TN =</span> TN, </a>
+<a class="sourceLine" id="cb19-21" title="21">                    <span class="dt">FP =</span> FP,</a>
+<a class="sourceLine" id="cb19-22" title="22">                    <span class="dt">FN =</span> FN, </a>
+<a class="sourceLine" id="cb19-23" title="23">                    <span class="dt">TP =</span> TP,</a>
+<a class="sourceLine" id="cb19-24" title="24">                    <span class="dt">TPR =</span> TP<span class="op">/</span>(TP<span class="op">+</span>FN), <span class="dt">TNR=</span>TN<span class="op">/</span>(TN<span class="op">+</span>FP),</a>
+<a class="sourceLine" id="cb19-25" title="25">                    <span class="dt">Error =</span> (FP<span class="op">+</span>FN)<span class="op">/</span>(TP<span class="op">+</span>TN<span class="op">+</span>FP<span class="op">+</span>FN),</a>
+<a class="sourceLine" id="cb19-26" title="26">                    <span class="dt">Precision =</span> TP<span class="op">/</span>(TP<span class="op">+</span>FP),</a>
+<a class="sourceLine" id="cb19-27" title="27">                    <span class="dt">F1 =</span> <span class="dv">2</span><span class="op">*</span>(TP<span class="op">/</span>(TP<span class="op">+</span>FN))<span class="op">*</span>(TP<span class="op">/</span>(TP<span class="op">+</span>FP))<span class="op">/</span>((TP<span class="op">/</span>(TP<span class="op">+</span>FP)) <span class="op">+</span><span class="st"> </span>(TP<span class="op">/</span>(TP<span class="op">+</span>FN)))))</a>
+<a class="sourceLine" id="cb19-28" title="28">}</a>
+<a class="sourceLine" id="cb19-29" title="29"></a>
+<a class="sourceLine" id="cb19-30" title="30"><span class="co"># modelMetrics ----------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb19-31" title="31"><span class="co"># The objective of this function is to calculate main metrics of model performance </span></a>
+<a class="sourceLine" id="cb19-32" title="32"><span class="co"># for cutoffs from 0-1 based on given step.</span></a>
+<a class="sourceLine" id="cb19-33" title="33">modelMetrics &lt;-<span class="st"> </span><span class="cf">function</span>(realData, predData, <span class="dt">stepping =</span> <span class="fl">0.01</span>, </a>
+<a class="sourceLine" id="cb19-34" title="34">                         <span class="dt">plot_title =</span> <span class="st">&quot;TPR/TNR by cutoff over full dataset&quot;</span>){</a>
+<a class="sourceLine" id="cb19-35" title="35">  probCuts &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dt">from =</span> <span class="dv">0</span>, <span class="dt">to =</span> <span class="dv">1</span>, <span class="dt">by =</span> stepping)</a>
+<a class="sourceLine" id="cb19-36" title="36">  out &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(<span class="kw">lapply</span>(probCuts, calculateModelMetrics, <span class="dt">realData =</span> realData, <span class="dt">predData =</span> predData))</a>
+<a class="sourceLine" id="cb19-37" title="37">  out &lt;-<span class="st"> </span>out[<span class="kw">complete.cases</span>(out),] <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">Difference =</span> <span class="kw">abs</span>(TPR<span class="op">-</span>TNR))</a>
+<a class="sourceLine" id="cb19-38" title="38">  </a>
+<a class="sourceLine" id="cb19-39" title="39">  best &lt;-<span class="st"> </span>out <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">arrange</span>(Difference) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">head</span>(<span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(<span class="op">-</span>Difference)</a>
+<a class="sourceLine" id="cb19-40" title="40">  </a>
+<a class="sourceLine" id="cb19-41" title="41">  p &lt;-<span class="st"> </span><span class="kw">plot_ly</span>(<span class="dt">x =</span> <span class="op">~</span>out<span class="op">$</span>Cut, <span class="dt">y =</span> <span class="op">~</span>out<span class="op">$</span>Difference, <span class="dt">name =</span> <span class="st">&#39;Abs. Diff.&#39;</span>, <span class="dt">type =</span> <span class="st">&#39;bar&#39;</span>, <span class="dt">opacity =</span> <span class="fl">0.3</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-42" title="42"><span class="st">    </span><span class="kw">add_trace</span>(<span class="dt">x =</span> <span class="op">~</span>out<span class="op">$</span>Cut, <span class="dt">y =</span> <span class="op">~</span>out<span class="op">$</span>TPR, <span class="dt">name =</span> <span class="st">&#39;TPR&#39;</span>, <span class="dt">type =</span> <span class="st">&#39;scatter&#39;</span>, <span class="dt">mode =</span> <span class="st">&#39;lines&#39;</span>, <span class="dt">opacity =</span> <span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-43" title="43"><span class="st">    </span><span class="kw">add_trace</span>(<span class="dt">x =</span> <span class="op">~</span>out<span class="op">$</span>Cut, <span class="dt">y =</span> <span class="op">~</span>out<span class="op">$</span>TNR, <span class="dt">name =</span> <span class="st">&#39;TNR&#39;</span>, <span class="dt">type =</span> <span class="st">&#39;scatter&#39;</span>, <span class="dt">mode =</span> <span class="st">&#39;lines&#39;</span>, <span class="dt">opacity =</span> <span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-44" title="44"><span class="st">    </span><span class="kw">add_text</span>(<span class="dt">x =</span> best<span class="op">$</span>Cut, <span class="dt">y =</span> best<span class="op">$</span>TPR, <span class="dt">text =</span> best<span class="op">$</span>Cut, <span class="dt">opacity =</span> <span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-45" title="45"><span class="st">    </span><span class="kw">layout</span>(<span class="dt">xaxis =</span> <span class="kw">list</span>(<span class="dt">title =</span> <span class="st">&quot;Cutoff Value&quot;</span>),</a>
+<a class="sourceLine" id="cb19-46" title="46">           <span class="dt">yaxis =</span> <span class="kw">list</span>(<span class="dt">title =</span> <span class="st">&quot;True Ratio (%)&quot;</span>),</a>
+<a class="sourceLine" id="cb19-47" title="47">           <span class="dt">title =</span> plot_title)</a>
+<a class="sourceLine" id="cb19-48" title="48">  </a>
+<a class="sourceLine" id="cb19-49" title="49">  <span class="kw">return</span>(<span class="kw">list</span>(<span class="dt">TableResults =</span> out,</a>
+<a class="sourceLine" id="cb19-50" title="50">              <span class="dt">BestCut =</span> best,</a>
+<a class="sourceLine" id="cb19-51" title="51">              <span class="dt">Plot =</span> p))</a>
+<a class="sourceLine" id="cb19-52" title="52">}</a></code></pre></div>
+<p>With the returned object from this function we can plot the comparison between TPR (True Positive Rate) and TNR (True Negative Rate) to find the best cut off.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1"><span class="co">## getting measures -----------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb20-2" title="2"></a>
+<a class="sourceLine" id="cb20-3" title="3">metricsByCutoff.test_log    &lt;-<span class="st"> </span><span class="kw">modelMetrics</span>(prob.test<span class="op">$</span>logistic.actual, </a>
+<a class="sourceLine" id="cb20-4" title="4">                                            prob.test<span class="op">$</span>logistic.predicted, </a>
+<a class="sourceLine" id="cb20-5" title="5">                                            <span class="dt">plot_title =</span> <span class="st">&#39;Logistic Regression&#39;</span>)</a>
+<a class="sourceLine" id="cb20-6" title="6">metricsByCutoff.test_log<span class="op">$</span>Plot</a></code></pre></div>
+<div id="htmlwidget-2e14c3dcec6805c975e3" style="width:100%;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2e14c3dcec6805c975e3">{"x":{"visdat":{"a947a926228":["function () ","plotlyVisDat"]},"cur_data":"a947a926228","attrs":{"a947a926228":{"x":{},"y":{},"opacity":0.3,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"bar"},"a947a926228.1":{"x":{},"y":{},"opacity":1,"name":"TPR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"a947a926228.2":{"x":{},"y":{},"opacity":1,"name":"TNR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"a947a926228.3":{"x":0.08,"y":0.64,"opacity":1,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","text":0.08,"mode":"text","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"title":"Cutoff Value"},"yaxis":{"domain":[0,1],"automargin":true,"title":"True Ratio (%)"},"title":"Logistic Regression","hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77],"y":[0.820335195530726,0.686256983240223,0.516871508379888,0.415418994413408,0.26927374301676,0.167821229050279,0.0319553072625699,0.0303910614525139,0.0918435754189943,0.130949720670391,0.147709497206704,0.215642458100559,0.277988826815642,0.311508379888268,0.357094972067039,0.36268156424581,0.413854748603352,0.419441340782123,0.465027932960894,0.521787709497207,0.527374301675978,0.567374301675978,0.57854748603352,0.61854748603352,0.629720670391061,0.635307262569832,0.640893854748603,0.640893854748603,0.640893854748603,0.646480446927374,0.646480446927374,0.646480446927374,0.692067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.783240223463687,0.823240223463687,0.863240223463687,0.903240223463687,0.903240223463687,0.903240223463687,0.903240223463687,0.908826815642458,0.908826815642458,0.908826815642458,0.908826815642458,0.914413407821229,0.914413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.96],"opacity":0.3,"name":"Abs. Diff.","type":"bar","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77],"y":[0.96,0.96,0.88,0.84,0.8,0.76,0.68,0.64,0.64,0.64,0.64,0.6,0.56,0.56,0.52,0.52,0.48,0.48,0.44,0.4,0.4,0.36,0.36,0.32,0.32,0.32,0.32,0.32,0.32,0.32,0.32,0.32,0.28,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.16,0.12,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04],"opacity":1,"name":"TPR","type":"scatter","mode":"lines","marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"line":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77],"y":[0.139664804469274,0.273743016759777,0.363128491620112,0.424581005586592,0.53072625698324,0.592178770949721,0.64804469273743,0.670391061452514,0.731843575418994,0.770949720670391,0.787709497206704,0.815642458100559,0.837988826815642,0.871508379888268,0.877094972067039,0.88268156424581,0.893854748603352,0.899441340782123,0.905027932960894,0.921787709497207,0.927374301675978,0.927374301675978,0.93854748603352,0.93854748603352,0.949720670391061,0.955307262569832,0.960893854748603,0.960893854748603,0.960893854748603,0.966480446927374,0.966480446927374,0.966480446927374,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.988826815642458,0.988826815642458,0.988826815642458,0.988826815642458,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,1],"opacity":1,"name":"TNR","type":"scatter","mode":"lines","marker":{"color":"rgba(44,160,44,1)","line":{"color":"rgba(44,160,44,1)"}},"error_y":{"color":"rgba(44,160,44,1)"},"error_x":{"color":"rgba(44,160,44,1)"},"line":{"color":"rgba(44,160,44,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.08],"y":[0.64],"opacity":1,"name":"Abs. Diff.","type":"scatter","text":0.08,"mode":"text","marker":{"color":"rgba(214,39,40,1)","line":{"color":"rgba(214,39,40,1)"}},"error_y":{"color":"rgba(214,39,40,1)"},"error_x":{"color":"rgba(214,39,40,1)"},"line":{"color":"rgba(214,39,40,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<p>With the optimized cut off we calculate the full set of model metrics.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1"><span class="co"># logistic regression</span></a>
+<a class="sourceLine" id="cb21-2" title="2">measures.logistic.train &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.train<span class="op">$</span>logistic.actual, </a>
+<a class="sourceLine" id="cb21-3" title="3">                                    prob.train<span class="op">$</span>logistic.predicted, </a>
+<a class="sourceLine" id="cb21-4" title="4">                                    <span class="dt">threshold =</span> metricsByCutoff.test_log<span class="op">$</span>BestCut[<span class="st">&#39;Cut&#39;</span>])</a>
+<a class="sourceLine" id="cb21-5" title="5">measures.logistic.test &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.test<span class="op">$</span>logistic.actual, </a>
+<a class="sourceLine" id="cb21-6" title="6">                                   prob.test<span class="op">$</span>logistic.predicted, </a>
+<a class="sourceLine" id="cb21-7" title="7">                                   <span class="dt">threshold =</span> metricsByCutoff.test_log<span class="op">$</span>BestCut[<span class="st">&#39;Cut&#39;</span>])</a>
+<a class="sourceLine" id="cb21-8" title="8"></a>
+<a class="sourceLine" id="cb21-9" title="9"><span class="co"># join measures in a single data frame</span></a>
+<a class="sourceLine" id="cb21-10" title="10">measures &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">bind_rows</span>(measures.logistic.train<span class="op">$</span>metrics,</a>
+<a class="sourceLine" id="cb21-11" title="11">                        measures.logistic.test<span class="op">$</span>metrics)</a>
+<a class="sourceLine" id="cb21-12" title="12">              ) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>(., <span class="dt">rownames =</span> <span class="ot">NA</span>)</a>
+<a class="sourceLine" id="cb21-13" title="13"></a>
+<a class="sourceLine" id="cb21-14" title="14"><span class="kw">colnames</span>(measures) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;logistic - train&#39;</span>, <span class="st">&#39;logistic - test&#39;</span>)</a>
+<a class="sourceLine" id="cb21-15" title="15"></a>
+<a class="sourceLine" id="cb21-16" title="16">measures<span class="op">$</span>metric =<span class="st"> </span><span class="kw">rownames</span>(measures)</a>
+<a class="sourceLine" id="cb21-17" title="17"></a>
+<a class="sourceLine" id="cb21-18" title="18">measures &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(measures, metric, <span class="kw">everything</span>())</a></code></pre></div>
+<p>Below are the metrics on the train and test dataset:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1"><span class="kw">kable</span>(measures, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">metric</th>
+<th align="right">logistic - train</th>
+<th align="right">logistic - test</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">H</td>
+<td align="right">0.3612900</td>
+<td align="right">0.3070793</td>
+</tr>
+<tr class="even">
+<td align="left">Gini</td>
+<td align="right">0.6641411</td>
+<td align="right">0.5195531</td>
+</tr>
+<tr class="odd">
+<td align="left">AUC</td>
+<td align="right">0.8320705</td>
+<td align="right">0.7597765</td>
+</tr>
+<tr class="even">
+<td align="left">AUCH</td>
+<td align="right">0.8475456</td>
+<td align="right">0.7915084</td>
+</tr>
+<tr class="odd">
+<td align="left">KS</td>
+<td align="right">0.5492033</td>
+<td align="right">0.4370950</td>
+</tr>
+<tr class="even">
+<td align="left">MER</td>
+<td align="right">0.0920502</td>
+<td align="right">0.1078431</td>
+</tr>
+<tr class="odd">
+<td align="left">MWL</td>
+<td align="right">0.0859316</td>
+<td align="right">0.1210592</td>
+</tr>
+<tr class="even">
+<td align="left">Spec.Sens95</td>
+<td align="right">0.5339578</td>
+<td align="right">0.3072626</td>
+</tr>
+<tr class="odd">
+<td align="left">Sens.Spec95</td>
+<td align="right">0.3725490</td>
+<td align="right">0.3200000</td>
+</tr>
+<tr class="even">
+<td align="left">ER</td>
+<td align="right">0.3347280</td>
+<td align="right">0.3333333</td>
+</tr>
+<tr class="odd">
+<td align="left">Sens</td>
+<td align="right">0.8431373</td>
+<td align="right">0.6400000</td>
+</tr>
+<tr class="even">
+<td align="left">Spec</td>
+<td align="right">0.6440281</td>
+<td align="right">0.6703911</td>
+</tr>
+<tr class="odd">
+<td align="left">Precision</td>
+<td align="right">0.2205128</td>
+<td align="right">0.2133333</td>
+</tr>
+<tr class="even">
+<td align="left">Recall</td>
+<td align="right">0.8431373</td>
+<td align="right">0.6400000</td>
+</tr>
+<tr class="odd">
+<td align="left">TPR</td>
+<td align="right">0.8431373</td>
+<td align="right">0.6400000</td>
+</tr>
+<tr class="even">
+<td align="left">FPR</td>
+<td align="right">0.3559719</td>
+<td align="right">0.3296089</td>
+</tr>
+<tr class="odd">
+<td align="left">F</td>
+<td align="right">0.3495935</td>
+<td align="right">0.3200000</td>
+</tr>
+<tr class="even">
+<td align="left">Youden</td>
+<td align="right">0.4871654</td>
+<td align="right">0.3103911</td>
+</tr>
+<tr class="odd">
+<td align="left">TP</td>
+<td align="right">43.0000000</td>
+<td align="right">16.0000000</td>
+</tr>
+<tr class="even">
+<td align="left">FP</td>
+<td align="right">152.0000000</td>
+<td align="right">59.0000000</td>
+</tr>
+<tr class="odd">
+<td align="left">TN</td>
+<td align="right">275.0000000</td>
+<td align="right">120.0000000</td>
+</tr>
+<tr class="even">
+<td align="left">FN</td>
+<td align="right">8.0000000</td>
+<td align="right">9.0000000</td>
+</tr>
+</tbody>
+</table>
+<p>In general, this model has not delivered a good accuracy, we will compare how it performed against other classes of models in the Final Report section.</p>
+<p>Below the confusion matrix and general performance of the model that we get from our custom function:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1">accuracy &lt;-<span class="st"> </span><span class="cf">function</span>(score, actual, <span class="dt">threshold =</span> <span class="fl">0.5</span>) {</a>
+<a class="sourceLine" id="cb23-2" title="2">  </a>
+<a class="sourceLine" id="cb23-3" title="3">  fitted.results &lt;-<span class="st"> </span><span class="kw">ifelse</span>(score <span class="op">&gt;</span><span class="st"> </span>threshold ,<span class="dv">1</span> ,<span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb23-4" title="4">  </a>
+<a class="sourceLine" id="cb23-5" title="5">  misClasificError &lt;-<span class="st"> </span><span class="kw">mean</span>(fitted.results <span class="op">!=</span><span class="st"> </span>actual)</a>
+<a class="sourceLine" id="cb23-6" title="6">  </a>
+<a class="sourceLine" id="cb23-7" title="7">  misClassCount &lt;-<span class="st"> </span><span class="kw">misclassCounts</span>(fitted.results, actual)</a>
+<a class="sourceLine" id="cb23-8" title="8">  </a>
+<a class="sourceLine" id="cb23-9" title="9">  <span class="kw">print</span>(<span class="kw">kable</span>(misClassCount<span class="op">$</span>conf.matrix))</a>
+<a class="sourceLine" id="cb23-10" title="10">  </a>
+<a class="sourceLine" id="cb23-11" title="11">  <span class="kw">print</span>(<span class="st">&#39;--------------------------------------------------------------&#39;</span>)</a>
+<a class="sourceLine" id="cb23-12" title="12">  <span class="kw">print</span>(<span class="kw">paste</span>(<span class="st">&#39;Model General Accuracy of: &#39;</span>, </a>
+<a class="sourceLine" id="cb23-13" title="13">              <span class="kw">round</span>((<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>misClassCount<span class="op">$</span>metrics[<span class="st">&#39;ER&#39;</span>]) <span class="op">*</span><span class="st"> </span><span class="dv">100</span>, <span class="dv">2</span>), <span class="st">&#39;%&#39;</span>, </a>
+<a class="sourceLine" id="cb23-14" title="14">              <span class="dt">sep =</span> <span class="st">&#39;&#39;</span>))</a>
+<a class="sourceLine" id="cb23-15" title="15">  <span class="kw">print</span>(<span class="kw">paste</span>(<span class="st">&#39;True Positive Rate of    : &#39;</span>, </a>
+<a class="sourceLine" id="cb23-16" title="16">              <span class="kw">round</span>(misClassCount<span class="op">$</span>metrics[<span class="st">&#39;TPR&#39;</span>] <span class="op">*</span><span class="st"> </span><span class="dv">100</span>, <span class="dv">2</span>), <span class="st">&#39;%&#39;</span>,</a>
+<a class="sourceLine" id="cb23-17" title="17">              <span class="dt">sep =</span> <span class="st">&#39;&#39;</span>))</a>
+<a class="sourceLine" id="cb23-18" title="18">}</a></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" title="1"><span class="co"># accuracy metrics ---------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb24-2" title="2"><span class="co"># logistic regression</span></a>
+<a class="sourceLine" id="cb24-3" title="3"><span class="kw">accuracy</span>(<span class="dt">score =</span> prob.test<span class="op">$</span>logistic.predicted, </a>
+<a class="sourceLine" id="cb24-4" title="4">         <span class="dt">actual =</span> prob.test<span class="op">$</span>logistic.actual, </a>
+<a class="sourceLine" id="cb24-5" title="5">         <span class="dt">threshold =</span> metricsByCutoff.test_log[[<span class="st">&quot;BestCut&quot;</span>]][[<span class="st">&quot;Cut&quot;</span>]])</a></code></pre></div>
+<pre><code>## 
+## 
+##             pred.1   pred.0
+## ---------  -------  -------
+## actual.1        16        9
+## actual.0        59      120
+## [1] &quot;--------------------------------------------------------------&quot;
+## [1] &quot;Model General Accuracy of: 66.67%&quot;
+## [1] &quot;True Positive Rate of    : 64%&quot;</code></pre>
+<p>We can finally look at the score distribution charts how well the model is able to split Defaulters and Non-Defaulters</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1">p1 &lt;-<span class="st"> </span><span class="kw">Score_Histograms</span>(prob.test, </a>
+<a class="sourceLine" id="cb26-2" title="2">                 prob.test<span class="op">$</span>logistic.predicted,</a>
+<a class="sourceLine" id="cb26-3" title="3">                 prob.test<span class="op">$</span>logistic.actual,</a>
+<a class="sourceLine" id="cb26-4" title="4">                 <span class="st">&#39;Density Plot&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.title.y =</span> <span class="kw">element_blank</span>())</a>
+<a class="sourceLine" id="cb26-5" title="5"></a>
+<a class="sourceLine" id="cb26-6" title="6">p2 &lt;-<span class="st"> </span><span class="kw">Score_Boxplot</span>(prob.test, </a>
+<a class="sourceLine" id="cb26-7" title="7">              prob.test<span class="op">$</span>logistic.predicted, </a>
+<a class="sourceLine" id="cb26-8" title="8">              prob.test<span class="op">$</span>logistic.actual,</a>
+<a class="sourceLine" id="cb26-9" title="9">              <span class="st">&#39;Score Boxplot&#39;</span>)</a>
+<a class="sourceLine" id="cb26-10" title="10"></a>
+<a class="sourceLine" id="cb26-11" title="11">p3 &lt;-<span class="st"> </span><span class="kw">KS_Plot</span>(prob.test<span class="op">$</span>logistic.predicted[prob.test<span class="op">$</span>logistic.actual <span class="op">==</span><span class="st"> </span><span class="dv">0</span>],</a>
+<a class="sourceLine" id="cb26-12" title="12">        prob.test<span class="op">$</span>logistic.predicted[prob.test<span class="op">$</span>logistic.actual <span class="op">==</span><span class="st"> </span><span class="dv">1</span>],</a>
+<a class="sourceLine" id="cb26-13" title="13">        <span class="st">&#39;KS Plot&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.title.y =</span> <span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb26-14" title="14">                           <span class="dt">axis.text.y =</span> <span class="kw">element_blank</span>())</a>
+<a class="sourceLine" id="cb26-15" title="15"></a>
+<a class="sourceLine" id="cb26-16" title="16"><span class="kw">ggarrange</span>(p1, p2, p3, <span class="dt">nrow =</span> <span class="dv">3</span>)</a></code></pre></div>
+<p><img src="04_logistic_regression_report_files/figure-html/model_plots-1.png" width="100%" /></p>
+</div>
 </div>
 
 

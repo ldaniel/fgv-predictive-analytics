@@ -439,7 +439,8 @@ $(document).ready(function () {
 <li><a href="#data-cleaning"><span class="toc-section-number">1.3</span> Data Cleaning</a></li>
 <li><a href="#label-translation"><span class="toc-section-number">1.4</span> Label Translation</a></li>
 <li><a href="#data-enhancement"><span class="toc-section-number">1.5</span> Data Enhancement</a></li>
-<li><a href="#data-preparation-dor-predictive-modeling"><span class="toc-section-number">1.6</span> Data Preparation dor Predictive Modeling</a></li>
+<li><a href="#data-preparation-for-predictive-modeling"><span class="toc-section-number">1.6</span> Data Preparation for Predictive Modeling</a></li>
+<li><a href="#spliting-dataset-into-train-and-test-data"><span class="toc-section-number">1.7</span> Spliting dataset into Train and Test data</a></li>
 </ul></li>
 </ul>
 </div>
@@ -453,6 +454,7 @@ $(document).ready(function () {
 <li><strong>Step 03</strong>: Data Cleaning;</li>
 <li><strong>Step 04</strong>: Label Translation;</li>
 <li><strong>Step 05</strong>: Data Enhancement.</li>
+<li><strong>Step 06</strong>: Dataset Preparation</li>
 </ul>
 <div id="create-functions" class="section level2">
 <h2><span class="header-section-number">1.1</span> Create Functions</h2>
@@ -711,99 +713,145 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb13-16" title="16">              <span class="dt">prop_sanction_interest =</span> <span class="kw">sum</span>(<span class="st">`</span><span class="dt">sanction interest</span><span class="st">`</span>) <span class="op">/</span><span class="st"> </span>amount,</a>
 <a class="sourceLine" id="cb13-17" title="17">              <span class="dt">prop_statement =</span> <span class="kw">sum</span>(<span class="st">`</span><span class="dt">statement</span><span class="st">`</span>) <span class="op">/</span><span class="st"> </span>amount)</a></code></pre></div>
 </div>
-<div id="data-preparation-dor-predictive-modeling" class="section level2">
-<h2><span class="header-section-number">1.6</span> Data Preparation dor Predictive Modeling</h2>
+<div id="data-preparation-for-predictive-modeling" class="section level2">
+<h2><span class="header-section-number">1.6</span> Data Preparation for Predictive Modeling</h2>
 <p>The below function was created to be used in the modeling exercises to be performed, the idea is to have a standard way to get the prepared data set already prepared with correct data types and dummies.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1">DataPrep &lt;-<span class="st"> </span><span class="cf">function</span>() {</a>
-<a class="sourceLine" id="cb14-2" title="2">  </a>
-<a class="sourceLine" id="cb14-3" title="3">  <span class="co"># joining datasets</span></a>
-<a class="sourceLine" id="cb14-4" title="4">  dataset &lt;-<span class="st"> </span><span class="kw">left_join</span>(loan, disposition, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&#39;account_id&#39;</span>, <span class="st">&#39;type&#39;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb14-5" title="5"><span class="st">    </span><span class="kw">left_join</span>(client, <span class="dt">by =</span> <span class="st">&#39;client_id&#39;</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb14-6" title="6"><span class="st">    </span><span class="kw">left_join</span>(district, <span class="dt">by =</span> <span class="st">&#39;district_id&#39;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb14-7" title="7"><span class="st">    </span><span class="kw">left_join</span>(creditcard, <span class="dt">by =</span> <span class="st">&#39;disp_id&#39;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb14-8" title="8"><span class="st">    </span><span class="kw">left_join</span>(account_balance, <span class="dt">by =</span> <span class="st">&#39;account_id&#39;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb14-9" title="9"><span class="st">    </span><span class="kw">left_join</span>(account_transaction_pattern, <span class="dt">by =</span> <span class="st">&#39;account_id&#39;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb14-10" title="10"><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">card_age_month =</span> (issued <span class="op">%--%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb14-11" title="11"><span class="st">                               </span><span class="kw">make_date</span>(<span class="dv">1998</span>, <span class="dv">12</span>, <span class="dv">31</span>)) <span class="op">/</span><span class="st"> </span><span class="kw">months</span>(<span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb14-12" title="12">           <span class="dt">last_transaction_age_days =</span> ((last_transaction_date.y <span class="op">%--%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb14-13" title="13"><span class="st">                                           </span><span class="kw">make_date</span>(<span class="dv">1998</span>, <span class="dv">12</span>, <span class="dv">31</span>)) <span class="op">/</span><span class="st"> </span><span class="kw">days</span>(<span class="dv">1</span>))) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb14-14" title="14"><span class="st">    </span>dplyr<span class="op">::</span><span class="kw">select</span>(<span class="kw">c</span>(<span class="st">&quot;amount.x&quot;</span>, <span class="st">&quot;duration&quot;</span>, <span class="st">&quot;payments&quot;</span>, <span class="st">&quot;status&quot;</span>, <span class="st">&quot;defaulter&quot;</span>, </a>
-<a class="sourceLine" id="cb14-15" title="15">                    <span class="st">&quot;contract_status&quot;</span>, <span class="st">&quot;gender&quot;</span>, <span class="st">&quot;age&quot;</span>, <span class="st">&quot;district_name&quot;</span>, </a>
-<a class="sourceLine" id="cb14-16" title="16">                    <span class="st">&quot;region&quot;</span>, <span class="st">&quot;no_of_inhabitants&quot;</span>, </a>
-<a class="sourceLine" id="cb14-17" title="17">                    <span class="st">&quot;no_of_municip_inhabitants_less_499&quot;</span>, </a>
-<a class="sourceLine" id="cb14-18" title="18">                    <span class="st">&quot;no_of_municip_500_to_1999&quot;</span>, <span class="st">&quot;no_of_municip_2000_to_9999&quot;</span>, </a>
-<a class="sourceLine" id="cb14-19" title="19">                    <span class="st">&quot;no_of_municip_greater_10000&quot;</span>, <span class="st">&quot;no_of_cities&quot;</span>, </a>
-<a class="sourceLine" id="cb14-20" title="20">                    <span class="st">&quot;ratio_of_urban_inhabitants&quot;</span>, </a>
-<a class="sourceLine" id="cb14-21" title="21">                    <span class="st">&quot;average_salary&quot;</span>, <span class="st">&quot;unemploymant_rate_1995&quot;</span>, </a>
-<a class="sourceLine" id="cb14-22" title="22">                    <span class="st">&quot;unemploymant_rate_1996&quot;</span>, </a>
-<a class="sourceLine" id="cb14-23" title="23">                    <span class="st">&quot;no_of_enterpreneurs_per_1000_inhabitants&quot;</span>, </a>
-<a class="sourceLine" id="cb14-24" title="24">                    <span class="st">&quot;no_of_commited_crimes_1995&quot;</span>, </a>
-<a class="sourceLine" id="cb14-25" title="25">                    <span class="st">&quot;no_of_commited_crimes_1996&quot;</span>, <span class="st">&quot;type.y&quot;</span>, </a>
-<a class="sourceLine" id="cb14-26" title="26">                    <span class="st">&quot;card_age_month&quot;</span>,<span class="st">&quot;account_balance&quot;</span>, </a>
-<a class="sourceLine" id="cb14-27" title="27">                    <span class="st">&quot;avg_balance&quot;</span>,<span class="st">&quot;transaction_count&quot;</span>, <span class="st">&quot;amount.y&quot;</span>, </a>
-<a class="sourceLine" id="cb14-28" title="28">                    <span class="st">&quot;last_transaction_age_days&quot;</span>, <span class="st">&quot;prop_old_age_pension&quot;</span>, </a>
-<a class="sourceLine" id="cb14-29" title="29">                    <span class="st">&quot;prop_insurance_payment&quot;</span>, </a>
-<a class="sourceLine" id="cb14-30" title="30">                    <span class="st">&quot;prop_sanction_interest&quot;</span>,<span class="st">&quot;prop_household&quot;</span>, </a>
-<a class="sourceLine" id="cb14-31" title="31">                    <span class="st">&quot;prop_statement&quot;</span>, <span class="st">&quot;prop_interest_credited&quot;</span>, </a>
-<a class="sourceLine" id="cb14-32" title="32">                    <span class="st">&quot;prop_loan_payment&quot;</span>, <span class="st">&quot;prop_other&quot;</span>))</a>
-<a class="sourceLine" id="cb14-33" title="33">  </a>
-<a class="sourceLine" id="cb14-34" title="34">  <span class="co"># renaming variables</span></a>
-<a class="sourceLine" id="cb14-35" title="35">  <span class="kw">colnames</span>(dataset) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;x_loan_amount&quot;</span>, <span class="st">&quot;x_loan_duration&quot;</span>, <span class="st">&quot;x_loan_payments&quot;</span>, </a>
-<a class="sourceLine" id="cb14-36" title="36">                      <span class="st">&quot;x_loan_status&quot;</span>, <span class="st">&quot;y_loan_defaulter&quot;</span>, <span class="st">&quot;x_loan_contract_status&quot;</span>,</a>
-<a class="sourceLine" id="cb14-37" title="37">                      <span class="st">&quot;x_client_gender&quot;</span>, <span class="st">&quot;x_client_age&quot;</span>, </a>
-<a class="sourceLine" id="cb14-38" title="38">                      <span class="st">&quot;x_district_name&quot;</span>, <span class="st">&quot;x_region&quot;</span>, </a>
-<a class="sourceLine" id="cb14-39" title="39">                      <span class="st">&quot;x_no_of_inhabitants&quot;</span>, <span class="st">&quot;x_no_of_municip_inhabitants_less_499&quot;</span>, </a>
-<a class="sourceLine" id="cb14-40" title="40">                      <span class="st">&quot;x_no_of_municip_500_to_1999&quot;</span>, <span class="st">&quot;x_no_of_municip_2000_to_9999&quot;</span>, </a>
-<a class="sourceLine" id="cb14-41" title="41">                      <span class="st">&quot;x_no_of_municip_greater_10000&quot;</span>, <span class="st">&quot;x_no_of_cities&quot;</span>, </a>
-<a class="sourceLine" id="cb14-42" title="42">                      <span class="st">&quot;x_ratio_of_urban_inhabitants&quot;</span>, </a>
-<a class="sourceLine" id="cb14-43" title="43">                      <span class="st">&quot;x_average_salary&quot;</span>, <span class="st">&quot;x_unemploymant_rate_1995&quot;</span>, </a>
-<a class="sourceLine" id="cb14-44" title="44">                      <span class="st">&quot;x_unemploymant_rate_1996&quot;</span>, </a>
-<a class="sourceLine" id="cb14-45" title="45">                      <span class="st">&quot;x_no_of_enterpreneurs_per_1000_inhabitants&quot;</span>, </a>
-<a class="sourceLine" id="cb14-46" title="46">                      <span class="st">&quot;x_no_of_commited_crimes_1995&quot;</span>, </a>
-<a class="sourceLine" id="cb14-47" title="47">                      <span class="st">&quot;x_no_of_commited_crimes_1996&quot;</span>, <span class="st">&quot;x_card_type&quot;</span>, </a>
-<a class="sourceLine" id="cb14-48" title="48">                      <span class="st">&quot;x_card_age_month&quot;</span>,<span class="st">&quot;x_account_balance&quot;</span>, </a>
-<a class="sourceLine" id="cb14-49" title="49">                      <span class="st">&quot;x_avg_account_balance&quot;</span>,<span class="st">&quot;x_transaction_count&quot;</span>, </a>
-<a class="sourceLine" id="cb14-50" title="50">                      <span class="st">&quot;x_transaction_amount&quot;</span>, <span class="st">&quot;x_last_transaction_age_days&quot;</span>, </a>
-<a class="sourceLine" id="cb14-51" title="51">                      <span class="st">&quot;x_prop_old_age_pension&quot;</span>, <span class="st">&quot;x_prop_insurance_payment&quot;</span>, </a>
-<a class="sourceLine" id="cb14-52" title="52">                      <span class="st">&quot;x_prop_sanction_interest&quot;</span>,<span class="st">&quot;x_prop_household&quot;</span>,<span class="st">&quot;x_prop_statement&quot;</span>,</a>
-<a class="sourceLine" id="cb14-53" title="53">                      <span class="st">&quot;x_prop_interest_credited&quot;</span>, <span class="st">&quot;x_prop_loan_payment&quot;</span>, <span class="st">&quot;x_prop_other&quot;</span>)</a>
-<a class="sourceLine" id="cb14-54" title="54">  </a>
-<a class="sourceLine" id="cb14-55" title="55">  <span class="co"># excluding redundant variables</span></a>
-<a class="sourceLine" id="cb14-56" title="56">  dataset &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(dataset, <span class="op">-</span><span class="kw">c</span>(<span class="st">&quot;x_loan_status&quot;</span>, <span class="st">&quot;x_loan_contract_status&quot;</span>, </a>
-<a class="sourceLine" id="cb14-57" title="57">                                 <span class="st">&#39;x_prop_sanction_interest&#39;</span>))</a>
-<a class="sourceLine" id="cb14-58" title="58">  </a>
-<a class="sourceLine" id="cb14-59" title="59">  <span class="co"># coercing variable domains and data types</span></a>
-<a class="sourceLine" id="cb14-60" title="60">  dataset<span class="op">$</span>x_card_type =<span class="st"> </span><span class="kw">ifelse</span>(<span class="kw">is.na</span>(dataset<span class="op">$</span>x_card_type), <span class="st">&#39;no card&#39;</span>, </a>
-<a class="sourceLine" id="cb14-61" title="61">                            <span class="kw">as.character</span>(dataset<span class="op">$</span>x_card_type))</a>
-<a class="sourceLine" id="cb14-62" title="62">  </a>
-<a class="sourceLine" id="cb14-63" title="63">  dataset<span class="op">$</span>x_card_age_month =<span class="st"> </span><span class="kw">ifelse</span>(<span class="kw">is.na</span>(dataset<span class="op">$</span>x_card_age_month), <span class="dv">0</span>, </a>
-<a class="sourceLine" id="cb14-64" title="64">                                 dataset<span class="op">$</span>x_card_age_month)</a>
-<a class="sourceLine" id="cb14-65" title="65">  </a>
-<a class="sourceLine" id="cb14-66" title="66">  dataset<span class="op">$</span>y_loan_defaulter =<span class="st"> </span><span class="kw">as.integer</span>(dataset<span class="op">$</span>y_loan_defaulter)</a>
-<a class="sourceLine" id="cb14-67" title="67">  </a>
-<a class="sourceLine" id="cb14-68" title="68">  <span class="co"># creating dummies</span></a>
-<a class="sourceLine" id="cb14-69" title="69">  dataset &lt;-<span class="st"> </span>fastDummies<span class="op">::</span><span class="kw">dummy_cols</span>(dataset,</a>
-<a class="sourceLine" id="cb14-70" title="70">                                  <span class="dt">remove_first_dummy =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb14-71" title="71">                                  <span class="dt">select_columns =</span> <span class="kw">c</span>(<span class="st">&quot;x_client_gender&quot;</span>, <span class="st">&quot;x_district_name&quot;</span>, </a>
-<a class="sourceLine" id="cb14-72" title="72">                                                     <span class="st">&quot;x_region&quot;</span>, <span class="st">&quot;x_card_type&quot;</span>))</a>
-<a class="sourceLine" id="cb14-73" title="73">  </a>
-<a class="sourceLine" id="cb14-74" title="74">  dataset &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(dataset, <span class="op">-</span><span class="kw">c</span>(<span class="st">&quot;x_client_gender&quot;</span>, <span class="st">&quot;x_district_name&quot;</span>, <span class="st">&quot;x_region&quot;</span>, </a>
-<a class="sourceLine" id="cb14-75" title="75">                          <span class="st">&quot;x_card_type&quot;</span>))</a>
-<a class="sourceLine" id="cb14-76" title="76">  </a>
-<a class="sourceLine" id="cb14-77" title="77">  <span class="co"># reordering variables</span></a>
-<a class="sourceLine" id="cb14-78" title="78">  dataset &lt;-<span class="st"> </span>dataset[ , <span class="kw">order</span>(<span class="kw">names</span>(dataset))]</a>
-<a class="sourceLine" id="cb14-79" title="79">  </a>
-<a class="sourceLine" id="cb14-80" title="80">  dataset &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(dataset, y_loan_defaulter, <span class="kw">everything</span>())</a>
-<a class="sourceLine" id="cb14-81" title="81">  </a>
-<a class="sourceLine" id="cb14-82" title="82">  <span class="co"># excluding non desirable characters in variable names</span></a>
-<a class="sourceLine" id="cb14-83" title="83">  <span class="kw">colnames</span>(dataset) &lt;-<span class="st"> </span>stringr<span class="op">::</span><span class="kw">str_replace_all</span>(<span class="kw">names</span>(dataset), <span class="st">&#39; &#39;</span>, <span class="st">&#39;_&#39;</span>)</a>
-<a class="sourceLine" id="cb14-84" title="84">  <span class="kw">colnames</span>(dataset) &lt;-<span class="st"> </span>stringr<span class="op">::</span><span class="kw">str_replace_all</span>(<span class="kw">names</span>(dataset), <span class="st">&#39;_-_&#39;</span>, <span class="st">&#39;_&#39;</span>)</a>
-<a class="sourceLine" id="cb14-85" title="85">  <span class="kw">colnames</span>(dataset) &lt;-<span class="st"> </span><span class="kw">trimws</span>(<span class="kw">names</span>(dataset))</a>
-<a class="sourceLine" id="cb14-86" title="86">  <span class="kw">colnames</span>(dataset) &lt;-<span class="st"> </span>textclean<span class="op">::</span><span class="kw">replace_non_ascii</span>(<span class="kw">names</span>(dataset))</a>
-<a class="sourceLine" id="cb14-87" title="87"></a>
-<a class="sourceLine" id="cb14-88" title="88">  <span class="kw">return</span>(dataset)</a>
-<a class="sourceLine" id="cb14-89" title="89"></a>
-<a class="sourceLine" id="cb14-90" title="90">}</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1"><span class="co"># dataset preparation ---------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb14-2" title="2"></a>
+<a class="sourceLine" id="cb14-3" title="3"><span class="co"># The objective of this step is to return a DataFrame to be used in predictive </span></a>
+<a class="sourceLine" id="cb14-4" title="4"><span class="co"># modeling. Therefore, it will join loan, client, district, creditcard, </span></a>
+<a class="sourceLine" id="cb14-5" title="5"><span class="co"># account_balance, account_balance_pattern. Finally, it will rename the variables </span></a>
+<a class="sourceLine" id="cb14-6" title="6"><span class="co"># and create the appropriate dummy variables to be used in the modeling process.</span></a>
+<a class="sourceLine" id="cb14-7" title="7"></a>
+<a class="sourceLine" id="cb14-8" title="8"><span class="co"># joining datasets</span></a>
+<a class="sourceLine" id="cb14-9" title="9">source_dataset &lt;-<span class="st"> </span><span class="kw">left_join</span>(loan, disposition, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&#39;account_id&#39;</span>, <span class="st">&#39;type&#39;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb14-10" title="10"><span class="st">  </span><span class="kw">left_join</span>(client, <span class="dt">by =</span> <span class="st">&#39;client_id&#39;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb14-11" title="11"><span class="st">  </span><span class="kw">left_join</span>(district, <span class="dt">by =</span> <span class="st">&#39;district_id&#39;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb14-12" title="12"><span class="st">  </span><span class="kw">left_join</span>(creditcard, <span class="dt">by =</span> <span class="st">&#39;disp_id&#39;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb14-13" title="13"><span class="st">  </span><span class="kw">left_join</span>(account_balance, <span class="dt">by =</span> <span class="st">&#39;account_id&#39;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb14-14" title="14"><span class="st">  </span><span class="kw">left_join</span>(account_transaction_pattern, <span class="dt">by =</span> <span class="st">&#39;account_id&#39;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb14-15" title="15"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">card_age_month =</span> (issued <span class="op">%--%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb14-16" title="16"><span class="st">                             </span><span class="kw">make_date</span>(<span class="dv">1998</span>, <span class="dv">12</span>, <span class="dv">31</span>)) <span class="op">/</span><span class="st"> </span><span class="kw">months</span>(<span class="dv">1</span>), </a>
+<a class="sourceLine" id="cb14-17" title="17">         <span class="dt">last_transaction_age_days =</span> ((last_transaction_date.y <span class="op">%--%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb14-18" title="18"><span class="st">                                         </span><span class="kw">make_date</span>(<span class="dv">1998</span>, <span class="dv">12</span>, <span class="dv">31</span>)) <span class="op">/</span><span class="st"> </span><span class="kw">days</span>(<span class="dv">1</span>))) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb14-19" title="19"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(<span class="kw">c</span>(<span class="st">&quot;amount.x&quot;</span>, <span class="st">&quot;duration&quot;</span>, <span class="st">&quot;payments&quot;</span>, <span class="st">&quot;status&quot;</span>, <span class="st">&quot;defaulter&quot;</span>, </a>
+<a class="sourceLine" id="cb14-20" title="20">                  <span class="st">&quot;contract_status&quot;</span>, <span class="st">&quot;gender&quot;</span>, <span class="st">&quot;age&quot;</span>, <span class="st">&quot;district_name&quot;</span>, </a>
+<a class="sourceLine" id="cb14-21" title="21">                  <span class="st">&quot;region&quot;</span>, <span class="st">&quot;no_of_inhabitants&quot;</span>, </a>
+<a class="sourceLine" id="cb14-22" title="22">                  <span class="st">&quot;no_of_municip_inhabitants_less_499&quot;</span>, </a>
+<a class="sourceLine" id="cb14-23" title="23">                  <span class="st">&quot;no_of_municip_500_to_1999&quot;</span>, <span class="st">&quot;no_of_municip_2000_to_9999&quot;</span>, </a>
+<a class="sourceLine" id="cb14-24" title="24">                  <span class="st">&quot;no_of_municip_greater_10000&quot;</span>, <span class="st">&quot;no_of_cities&quot;</span>, </a>
+<a class="sourceLine" id="cb14-25" title="25">                  <span class="st">&quot;ratio_of_urban_inhabitants&quot;</span>, </a>
+<a class="sourceLine" id="cb14-26" title="26">                  <span class="st">&quot;average_salary&quot;</span>, <span class="st">&quot;unemploymant_rate_1995&quot;</span>, </a>
+<a class="sourceLine" id="cb14-27" title="27">                  <span class="st">&quot;unemploymant_rate_1996&quot;</span>, </a>
+<a class="sourceLine" id="cb14-28" title="28">                  <span class="st">&quot;no_of_enterpreneurs_per_1000_inhabitants&quot;</span>, </a>
+<a class="sourceLine" id="cb14-29" title="29">                  <span class="st">&quot;no_of_commited_crimes_1995&quot;</span>, </a>
+<a class="sourceLine" id="cb14-30" title="30">                  <span class="st">&quot;no_of_commited_crimes_1996&quot;</span>, <span class="st">&quot;type.y&quot;</span>, </a>
+<a class="sourceLine" id="cb14-31" title="31">                  <span class="st">&quot;card_age_month&quot;</span>,<span class="st">&quot;account_balance&quot;</span>, </a>
+<a class="sourceLine" id="cb14-32" title="32">                  <span class="st">&quot;avg_balance&quot;</span>,<span class="st">&quot;transaction_count&quot;</span>, <span class="st">&quot;amount.y&quot;</span>, </a>
+<a class="sourceLine" id="cb14-33" title="33">                  <span class="st">&quot;last_transaction_age_days&quot;</span>, <span class="st">&quot;prop_old_age_pension&quot;</span>, </a>
+<a class="sourceLine" id="cb14-34" title="34">                  <span class="st">&quot;prop_insurance_payment&quot;</span>, </a>
+<a class="sourceLine" id="cb14-35" title="35">                  <span class="st">&quot;prop_sanction_interest&quot;</span>,<span class="st">&quot;prop_household&quot;</span>, </a>
+<a class="sourceLine" id="cb14-36" title="36">                  <span class="st">&quot;prop_statement&quot;</span>, <span class="st">&quot;prop_interest_credited&quot;</span>, </a>
+<a class="sourceLine" id="cb14-37" title="37">                  <span class="st">&quot;prop_loan_payment&quot;</span>, <span class="st">&quot;prop_other&quot;</span>))</a>
+<a class="sourceLine" id="cb14-38" title="38"></a>
+<a class="sourceLine" id="cb14-39" title="39"><span class="co"># renaming variables</span></a>
+<a class="sourceLine" id="cb14-40" title="40"><span class="kw">colnames</span>(source_dataset) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;x_loan_amount&quot;</span>, <span class="st">&quot;x_loan_duration&quot;</span>, <span class="st">&quot;x_loan_payments&quot;</span>, </a>
+<a class="sourceLine" id="cb14-41" title="41">                       <span class="st">&quot;x_loan_status&quot;</span>, <span class="st">&quot;y_loan_defaulter&quot;</span>, <span class="st">&quot;x_loan_contract_status&quot;</span>,</a>
+<a class="sourceLine" id="cb14-42" title="42">                       <span class="st">&quot;x_client_gender&quot;</span>, <span class="st">&quot;x_client_age&quot;</span>, </a>
+<a class="sourceLine" id="cb14-43" title="43">                       <span class="st">&quot;x_district_name&quot;</span>, <span class="st">&quot;x_region&quot;</span>, </a>
+<a class="sourceLine" id="cb14-44" title="44">                       <span class="st">&quot;x_no_of_inhabitants&quot;</span>, <span class="st">&quot;x_no_of_municip_inhabitants_less_499&quot;</span>, </a>
+<a class="sourceLine" id="cb14-45" title="45">                       <span class="st">&quot;x_no_of_municip_500_to_1999&quot;</span>, <span class="st">&quot;x_no_of_municip_2000_to_9999&quot;</span>, </a>
+<a class="sourceLine" id="cb14-46" title="46">                       <span class="st">&quot;x_no_of_municip_greater_10000&quot;</span>, <span class="st">&quot;x_no_of_cities&quot;</span>, </a>
+<a class="sourceLine" id="cb14-47" title="47">                       <span class="st">&quot;x_ratio_of_urban_inhabitants&quot;</span>, </a>
+<a class="sourceLine" id="cb14-48" title="48">                       <span class="st">&quot;x_average_salary&quot;</span>, <span class="st">&quot;x_unemploymant_rate_1995&quot;</span>, </a>
+<a class="sourceLine" id="cb14-49" title="49">                       <span class="st">&quot;x_unemploymant_rate_1996&quot;</span>, </a>
+<a class="sourceLine" id="cb14-50" title="50">                       <span class="st">&quot;x_no_of_enterpreneurs_per_1000_inhabitants&quot;</span>, </a>
+<a class="sourceLine" id="cb14-51" title="51">                       <span class="st">&quot;x_no_of_commited_crimes_1995&quot;</span>, </a>
+<a class="sourceLine" id="cb14-52" title="52">                       <span class="st">&quot;x_no_of_commited_crimes_1996&quot;</span>, <span class="st">&quot;x_card_type&quot;</span>, </a>
+<a class="sourceLine" id="cb14-53" title="53">                       <span class="st">&quot;x_card_age_month&quot;</span>,<span class="st">&quot;x_account_balance&quot;</span>, </a>
+<a class="sourceLine" id="cb14-54" title="54">                       <span class="st">&quot;x_avg_account_balance&quot;</span>,<span class="st">&quot;x_transaction_count&quot;</span>, </a>
+<a class="sourceLine" id="cb14-55" title="55">                       <span class="st">&quot;x_transaction_amount&quot;</span>, <span class="st">&quot;x_last_transaction_age_days&quot;</span>, </a>
+<a class="sourceLine" id="cb14-56" title="56">                       <span class="st">&quot;x_prop_old_age_pension&quot;</span>, <span class="st">&quot;x_prop_insurance_payment&quot;</span>, </a>
+<a class="sourceLine" id="cb14-57" title="57">                       <span class="st">&quot;x_prop_sanction_interest&quot;</span>,<span class="st">&quot;x_prop_household&quot;</span>,<span class="st">&quot;x_prop_statement&quot;</span>,</a>
+<a class="sourceLine" id="cb14-58" title="58">                       <span class="st">&quot;x_prop_interest_credited&quot;</span>, <span class="st">&quot;x_prop_loan_payment&quot;</span>, <span class="st">&quot;x_prop_other&quot;</span>)</a>
+<a class="sourceLine" id="cb14-59" title="59"></a>
+<a class="sourceLine" id="cb14-60" title="60"><span class="co"># excluding redundant variables</span></a>
+<a class="sourceLine" id="cb14-61" title="61">source_dataset &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(source_dataset, <span class="op">-</span><span class="kw">c</span>(<span class="st">&quot;x_loan_status&quot;</span>, <span class="st">&quot;x_loan_contract_status&quot;</span>, </a>
+<a class="sourceLine" id="cb14-62" title="62">                                     <span class="st">&#39;x_prop_sanction_interest&#39;</span>))</a>
+<a class="sourceLine" id="cb14-63" title="63"></a>
+<a class="sourceLine" id="cb14-64" title="64"><span class="co"># coercing variable domains and data types</span></a>
+<a class="sourceLine" id="cb14-65" title="65">source_dataset<span class="op">$</span>x_card_type =<span class="st"> </span><span class="kw">ifelse</span>(<span class="kw">is.na</span>(source_dataset<span class="op">$</span>x_card_type), <span class="st">&#39;no card&#39;</span>, </a>
+<a class="sourceLine" id="cb14-66" title="66">                             <span class="kw">as.character</span>(source_dataset<span class="op">$</span>x_card_type))</a>
+<a class="sourceLine" id="cb14-67" title="67"></a>
+<a class="sourceLine" id="cb14-68" title="68">source_dataset<span class="op">$</span>x_card_age_month =<span class="st"> </span><span class="kw">ifelse</span>(<span class="kw">is.na</span>(source_dataset<span class="op">$</span>x_card_age_month), <span class="dv">0</span>, </a>
+<a class="sourceLine" id="cb14-69" title="69">                                  source_dataset<span class="op">$</span>x_card_age_month)</a>
+<a class="sourceLine" id="cb14-70" title="70"></a>
+<a class="sourceLine" id="cb14-71" title="71">source_dataset<span class="op">$</span>y_loan_defaulter =<span class="st"> </span><span class="kw">as.integer</span>(source_dataset<span class="op">$</span>y_loan_defaulter)</a>
+<a class="sourceLine" id="cb14-72" title="72"></a>
+<a class="sourceLine" id="cb14-73" title="73"><span class="co"># creating dummies</span></a>
+<a class="sourceLine" id="cb14-74" title="74">source_dataset &lt;-<span class="st"> </span>fastDummies<span class="op">::</span><span class="kw">dummy_cols</span>(source_dataset,</a>
+<a class="sourceLine" id="cb14-75" title="75">                                   <span class="dt">remove_first_dummy =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb14-76" title="76">                                   <span class="dt">select_columns =</span> <span class="kw">c</span>(<span class="st">&quot;x_client_gender&quot;</span>, <span class="st">&quot;x_district_name&quot;</span>, </a>
+<a class="sourceLine" id="cb14-77" title="77">                                                      <span class="st">&quot;x_region&quot;</span>, <span class="st">&quot;x_card_type&quot;</span>))</a>
+<a class="sourceLine" id="cb14-78" title="78"></a>
+<a class="sourceLine" id="cb14-79" title="79">source_dataset &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(source_dataset, <span class="op">-</span><span class="kw">c</span>(<span class="st">&quot;x_client_gender&quot;</span>, <span class="st">&quot;x_district_name&quot;</span>, <span class="st">&quot;x_region&quot;</span>, </a>
+<a class="sourceLine" id="cb14-80" title="80">                                     <span class="st">&quot;x_card_type&quot;</span>))</a>
+<a class="sourceLine" id="cb14-81" title="81"></a>
+<a class="sourceLine" id="cb14-82" title="82"><span class="co"># reordering variables</span></a>
+<a class="sourceLine" id="cb14-83" title="83">source_dataset &lt;-<span class="st"> </span>source_dataset[ , <span class="kw">order</span>(<span class="kw">names</span>(source_dataset))]</a>
+<a class="sourceLine" id="cb14-84" title="84"></a>
+<a class="sourceLine" id="cb14-85" title="85">source_dataset &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(source_dataset, y_loan_defaulter, <span class="kw">everything</span>())</a>
+<a class="sourceLine" id="cb14-86" title="86"></a>
+<a class="sourceLine" id="cb14-87" title="87"><span class="co"># excluding non desirable characters in variable names</span></a>
+<a class="sourceLine" id="cb14-88" title="88"><span class="kw">colnames</span>(source_dataset) &lt;-<span class="st"> </span>stringr<span class="op">::</span><span class="kw">str_replace_all</span>(<span class="kw">names</span>(source_dataset), <span class="st">&#39; &#39;</span>, <span class="st">&#39;_&#39;</span>)</a>
+<a class="sourceLine" id="cb14-89" title="89"><span class="kw">colnames</span>(source_dataset) &lt;-<span class="st"> </span>stringr<span class="op">::</span><span class="kw">str_replace_all</span>(<span class="kw">names</span>(source_dataset), <span class="st">&#39;_-_&#39;</span>, <span class="st">&#39;_&#39;</span>)</a>
+<a class="sourceLine" id="cb14-90" title="90"><span class="kw">colnames</span>(source_dataset) &lt;-<span class="st"> </span><span class="kw">trimws</span>(<span class="kw">names</span>(source_dataset))</a></code></pre></div>
+</div>
+<div id="spliting-dataset-into-train-and-test-data" class="section level2">
+<h2><span class="header-section-number">1.7</span> Spliting dataset into Train and Test data</h2>
+<p>The below function was created to be used in the modeling exercises to be split the source_dataset into train and test datasets.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1"><span class="co"># SplitTestTrainDataset -------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb15-2" title="2"><span class="co"># The objective of this function is to split a given dataset </span></a>
+<a class="sourceLine" id="cb15-3" title="3"><span class="co"># in train and test datasets</span></a>
+<a class="sourceLine" id="cb15-4" title="4">SplitTestTrainDataset &lt;-<span class="st"> </span><span class="cf">function</span>(dataset) {</a>
+<a class="sourceLine" id="cb15-5" title="5">  <span class="kw">set.seed</span>(<span class="dv">12345</span>)</a>
+<a class="sourceLine" id="cb15-6" title="6">  </a>
+<a class="sourceLine" id="cb15-7" title="7">  dataset<span class="op">$</span>y_loan_defaulter &lt;-<span class="st"> </span><span class="kw">as.integer</span>(dataset<span class="op">$</span>y_loan_defaulter)</a>
+<a class="sourceLine" id="cb15-8" title="8">  </a>
+<a class="sourceLine" id="cb15-9" title="9">  index &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">createDataPartition</span>(dataset<span class="op">$</span>y_loan_defaulter, </a>
+<a class="sourceLine" id="cb15-10" title="10">                                      <span class="dt">p=</span> <span class="fl">0.7</span>, <span class="dt">list =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb15-11" title="11">  data.train &lt;-<span class="st"> </span>dataset[index, ]</a>
+<a class="sourceLine" id="cb15-12" title="12">  data.test  &lt;-<span class="st"> </span>dataset[<span class="op">-</span>index,]</a>
+<a class="sourceLine" id="cb15-13" title="13">  </a>
+<a class="sourceLine" id="cb15-14" title="14">  <span class="co"># checking event proportion in sample and test datasets against full dataset.</span></a>
+<a class="sourceLine" id="cb15-15" title="15">  event_proportion &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(<span class="kw">prop.table</span>(<span class="kw">table</span>(dataset<span class="op">$</span>y_loan_defaulter)),</a>
+<a class="sourceLine" id="cb15-16" title="16">                                <span class="kw">prop.table</span>(<span class="kw">table</span>(data.train<span class="op">$</span>y_loan_defaulter)),</a>
+<a class="sourceLine" id="cb15-17" title="17">                                <span class="kw">prop.table</span>(<span class="kw">table</span>(data.test<span class="op">$</span>y_loan_defaulter)))</a>
+<a class="sourceLine" id="cb15-18" title="18">  </a>
+<a class="sourceLine" id="cb15-19" title="19">  event_proportion<span class="op">$</span>scope =<span class="st"> &#39;&#39;</span></a>
+<a class="sourceLine" id="cb15-20" title="20">  event_proportion<span class="op">$</span>scope[<span class="dv">1</span>] =<span class="st"> &#39;full dataset&#39;</span></a>
+<a class="sourceLine" id="cb15-21" title="21">  event_proportion<span class="op">$</span>scope[<span class="dv">2</span>] =<span class="st"> &#39;train dataset&#39;</span></a>
+<a class="sourceLine" id="cb15-22" title="22">  event_proportion<span class="op">$</span>scope[<span class="dv">3</span>] =<span class="st"> &#39;test dataset&#39;</span></a>
+<a class="sourceLine" id="cb15-23" title="23">  </a>
+<a class="sourceLine" id="cb15-24" title="24">  event_proportion &lt;-<span class="st"> </span><span class="kw">select</span>(event_proportion, scope, <span class="kw">everything</span>())</a>
+<a class="sourceLine" id="cb15-25" title="25">  </a>
+<a class="sourceLine" id="cb15-26" title="26">  SplitDataset &lt;-<span class="st">  </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb15-27" title="27">  SplitDataset<span class="op">$</span>data.train &lt;-<span class="st"> </span>data.train</a>
+<a class="sourceLine" id="cb15-28" title="28">  SplitDataset<span class="op">$</span>data.test  &lt;-<span class="st"> </span>data.test</a>
+<a class="sourceLine" id="cb15-29" title="29">  SplitDataset<span class="op">$</span>event.proportion &lt;-<span class="st"> </span>event_proportion</a>
+<a class="sourceLine" id="cb15-30" title="30">  </a>
+<a class="sourceLine" id="cb15-31" title="31">  <span class="kw">return</span>(SplitDataset)</a>
+<a class="sourceLine" id="cb15-32" title="32">}</a></code></pre></div>
+<p>To make sure all the models uses the same datasets fro Train and Testing we are saving the initial sampling to be reused across the models.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1"><span class="co"># calling function to split and create train and test databases</span></a>
+<a class="sourceLine" id="cb16-2" title="2"><span class="co"># this function will split the dataset into train and test data and save the sampling in disk</span></a>
+<a class="sourceLine" id="cb16-3" title="3"><span class="co"># to resample just delete &#39;./models/source_train_test_dataset.rds&#39; file and rerun this script</span></a>
+<a class="sourceLine" id="cb16-4" title="4"><span class="cf">if</span> (<span class="kw">file.exists</span>(<span class="st">&#39;./models/source_train_test_dataset.rds&#39;</span>)) {</a>
+<a class="sourceLine" id="cb16-5" title="5">  source_train_test_dataset &lt;-<span class="st"> </span><span class="kw">readRDS</span>(<span class="st">&#39;./models/source_train_test_dataset.rds&#39;</span>)</a>
+<a class="sourceLine" id="cb16-6" title="6">} <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb16-7" title="7">  source_train_test_dataset &lt;-<span class="st"> </span><span class="kw">SplitTestTrainDataset</span>(source_dataset)</a>
+<a class="sourceLine" id="cb16-8" title="8">  <span class="kw">saveRDS</span>(source_train_test_dataset, <span class="st">&#39;./models/source_train_test_dataset.rds&#39;</span>)  </a>
+<a class="sourceLine" id="cb16-9" title="9">}</a></code></pre></div>
 </div>
 </div>
 
