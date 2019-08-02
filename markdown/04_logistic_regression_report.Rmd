@@ -371,14 +371,17 @@ prob.full = list()
 prob.train = list()
 prob.test = list()
 
-prob.full$logistic.actual         <- loan_dataset_logistic$y_loan_defaulter
-prob.full$logistic.predicted      <- predict(logistic.step, type = "response", newdata = loan_dataset_logistic)
+prob.full$logistic.actual     <- loan_dataset_logistic$y_loan_defaulter
+prob.full$logistic.predicted  <- predict(logistic.step, type = "response", 
+                                         newdata = loan_dataset_logistic)
 
-prob.train$logistic.actual         <- data.train_logistic$y_loan_defaulter
-prob.train$logistic.predicted      <- predict(logistic.step, type = "response", newdata = data.train_logistic)
+prob.train$logistic.actual    <- data.train_logistic$y_loan_defaulter
+prob.train$logistic.predicted <- predict(logistic.step, type = "response", 
+                                         newdata = data.train_logistic)
 
-prob.test$logistic.actual         <- data.test_logistic$y_loan_defaulter
-prob.test$logistic.predicted      <- predict(logistic.step, type = "response", newdata = data.test_logistic)
+prob.test$logistic.actual     <- data.test_logistic$y_loan_defaulter
+prob.test$logistic.predicted  <- predict(logistic.step, type = "response", 
+                                         newdata = data.test_logistic)
 
 prob.full   <- prob.full %>% as_tibble()
 prob.train  <- prob.train %>% as_tibble()
@@ -400,7 +403,8 @@ We will use a custom function developed in this paper to calculate the best cut 
 calculateModelMetrics <- function(cutData, realData, predData){
   cuttedData <- as.factor(ifelse(predData>=cutData, 1, 0))
   
-  invisible(capture.output(out <- CrossTable(realData, cuttedData, prop.c = F, prop.t = F, prop.r = T, prop.chisq = F)))
+  invisible(capture.output(out <- CrossTable(realData, cuttedData, 
+                                             prop.c = F, prop.t = F, prop.r = T, prop.chisq = F)))
   
   out <- as.data.frame(out) %>% 
     mutate(merged=paste0(t.x, t.y)) %>% 
@@ -461,7 +465,7 @@ metricsByCutoff.test_log$Plot
 
 With the optimized cut off we calculate the full set of model metrics.
 
-```{r get_measures_full, echo=TRUE, out.width= '100%'}
+```{r get_measures_full, echo=TRUE, out.width= '100%', warning=FALSE}
 # logistic regression
 measures.logistic.train <- HMeasure(prob.train$logistic.actual, 
                                     prob.train$logistic.predicted, 
@@ -490,11 +494,31 @@ kable(measures, row.names = FALSE)
 
 In general this model has not delivered a good accuracy, we will compare how it performe agaisnt other classes of models in the Final Report section.
 
-```{r see_accuracy, echo=TRUE, out.width= '100%'}
+Below the confusion matrix and general performance of the model that we get from our custom function:
+```{r see_accuracy, eval=FALSE}
+accuracy <- function(score, actual, threshold = 0.5) {
+  
+  fitted.results <- ifelse(score > threshold ,1 ,0)
+  
+  misClasificError <- mean(fitted.results != actual)
+  
+  misClassCount <- misclassCounts(fitted.results, actual)
+  
+  print(kable(misClassCount$conf.matrix))
+  
+  print('--------------------------------------------------------------')
+  print(paste('Model General Accuracy of: ', 
+              round((1 - misClassCount$metrics['ER']) * 100, 2), '%', 
+              sep = ''))
+  print(paste('True Positive Rate of    : ', 
+              round(misClassCount$metrics['TPR'] * 100, 2), '%',
+              sep = ''))
+}
+```
+
+```{r see_accuracy_1, echo=TRUE, out.width= '100%'}
 # accuracy metrics ---------------------------------------------------------------
-
 # logistic regression
-
 accuracy(score = prob.test$logistic.predicted, 
          actual = prob.test$logistic.actual, 
          threshold = metricsByCutoff.test_log[["BestCut"]][["Cut"]])
