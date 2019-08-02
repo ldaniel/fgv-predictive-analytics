@@ -14,7 +14,7 @@ if(!file.exists('data/transaction.feather')) {
   transaction   <- read.csv2(paste(dataDirectory, "trans.asc", sep = ""), stringsAsFactors = TRUE)
   write_feather(transaction, 'data/transaction.faether')
 } else {
-  read_feather('data/transaction.feather')
+  transaction   <- read_feather('data/transaction.feather')
 }
 
 # performing data casting, column renaming and small touch-ups ----------------
