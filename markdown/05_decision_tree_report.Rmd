@@ -108,7 +108,7 @@ With the final cleaned dataset, we got from above steps we fit our Decision Tree
 
 We choose to change the default **minbucket** parameter to **5** to deliberate create a fully grown tree as the database is not big enouth for this model.
 
-```{r fit_DT_full, echo=TRUE}
+```{r fit_DT_full, echo=TRUE, out.width= '100%'}
 tree.full <- rpart(data= data.train_DT, y_loan_defaulter ~ .,
                    control = rpart.control(minbucket = 5),
                    method = "class")
@@ -123,7 +123,7 @@ plotcp(tree.full)
 
 ### Evaluating necessity of prunning
 
-```{r fit_DT_prune, echo=TRUE}
+```{r fit_DT_prune, echo=TRUE, out.width= '100%'}
 tree.prune <- prune(tree.full, cp= tree.full$cptable[which.min(tree.full$cptable[,"xerror"]),"CP"])
 tree.prune <- tree.full
 
@@ -137,7 +137,7 @@ tree.prune <- tree.full
 
 We started this step by making predictions using our model on the X's variables in our Train and Test datasets.
 
-```{r get_scores, echo=TRUE}
+```{r get_scores, echo=TRUE, out.width= '100%'}
 ## making preditions for each model and consilidating in a single data frame
 
 prob.full = list()
@@ -231,7 +231,5 @@ p3 <- KS_Plot(prob.test$decision.tree.predicted[prob.test$decision.tree.actual =
         'KS Plot') + theme(axis.title.y = element_blank(),
                            axis.text.y = element_blank())
 
-p1
-p2
-p3
+ggarrange(p1, p2, p3, nrow = 3)
 ```
