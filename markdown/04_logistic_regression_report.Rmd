@@ -492,7 +492,7 @@ Below are the metrics on the train and test dataset:
 kable(measures, row.names = FALSE)
 ```
 
-In general this model has not delivered a good accuracy, we will compare how it performe agaisnt other classes of models in the Final Report section.
+In general, this model has not delivered a good accuracy, we will compare how it performed against other classes of models in the Final Report section.
 
 Below the confusion matrix and general performance of the model that we get from our custom function:
 ```{r see_accuracy, eval=FALSE}
@@ -522,4 +522,25 @@ accuracy <- function(score, actual, threshold = 0.5) {
 accuracy(score = prob.test$logistic.predicted, 
          actual = prob.test$logistic.actual, 
          threshold = metricsByCutoff.test_log[["BestCut"]][["Cut"]])
+```
+
+We can finally look at the score distribution charts how well the model is able to split Defaulters and Non-Defaulters
+
+```{r model_plots, echo=TRUE, out.width= '100%'}
+p1 <- Score_Histograms(prob.test, 
+                 prob.test$logistic.predicted,
+                 prob.test$logistic.actual,
+                 'Density Plot') + theme(axis.title.y = element_blank())
+
+p2 <- Score_Boxplot(prob.test, 
+              prob.test$logistic.predicted, 
+              prob.test$logistic.actual,
+              'Score Boxplot')
+
+p3 <- KS_Plot(prob.test$logistic.predicted[prob.test$logistic.actual == 0],
+        prob.test$logistic.predicted[prob.test$logistic.actual == 1],
+        'KS Plot') + theme(axis.title.y = element_blank(),
+                           axis.text.y = element_blank())
+
+ggarrange(p1, p2, p3, nrow = 3)
 ```
