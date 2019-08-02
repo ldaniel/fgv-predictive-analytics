@@ -346,3 +346,144 @@ summary(logistic.step)
 # Evaluating the model performance
 
 We started this step by making predictions using our model on the X's variables in our Train and Test datasets.
+
+```{r get_scores, echo=TRUE}
+## making preditions for each model and consilidating in a single data frame
+
+prob.full = list()
+prob.train = list()
+prob.test = list()
+
+prob.full$logistic.actual         <- loan_dataset_logistic$y_loan_defaulter
+prob.full$logistic.predicted      <- predict(logistic.step, type = "response", newdata = loan_dataset_logistic)
+
+prob.train$logistic.actual         <- data.train_logistic$y_loan_defaulter
+prob.train$logistic.predicted      <- predict(logistic.step, type = "response", newdata = data.train_logistic)
+
+prob.test$logistic.actual         <- data.test_logistic$y_loan_defaulter
+prob.test$logistic.predicted      <- predict(logistic.step, type = "response", newdata = data.test_logistic)
+
+prob.full   <- prob.full %>% as_tibble()
+prob.train  <- prob.train %>% as_tibble()
+prob.test   <- prob.test %>% as_tibble()
+```
+
+## Getting Performance Measures:
+
+To calculate the performance measures, derived from the confusion matrix, we need to find the score cut off that best split our test dataset into Defaulters and Non-Defaulters.
+
+In this exercise we decide to not prioritize the accuracy on predicting Defaulters and Non-Defaulters, therefore we are looking for the score cut off that best predict each class equally.
+
+We will use a custom function developed in this paper to calculate the best cut off for each model:
+
+```{r get_measures_functions, eval=FALSE}
+## making preditions for each model and consilidating in a single data frame
+# calculateModelMetrics -------------------------------------------------------
+# The objective of this function is to calculate main metrics of model performance according to a cutoff value.
+calculateModelMetrics <- function(cutData, realData, predData){
+  cuttedData <- as.factor(ifelse(predData>=cutData, 1, 0))
+  
+  invisible(capture.output(out <- CrossTable(realData, cuttedData, prop.c = F, prop.t = F, prop.r = T, prop.chisq = F)))
+  
+  out <- as.data.frame(out) %>% 
+    mutate(merged=paste0(t.x, t.y)) %>% 
+    dplyr::select(merged, val=t.Freq)
+  
+  TN <- filter(out, merged == "00")$val[1]
+  FP <- filter(out, merged == "01")$val[1]
+  FN <- filter(out, merged == "10")$val[1]
+  TP <- filter(out, merged == "11")$val[1]
+  
+  return(data.frame(Cut = cutData,
+                    TN = TN, 
+                    FP = FP,
+                    FN = FN, 
+                    TP = TP,
+                    TPR = TP/(TP+FN), TNR=TN/(TN+FP),
+                    Error = (FP+FN)/(TP+TN+FP+FN),
+                    Precision = TP/(TP+FP),
+                    F1 = 2*(TP/(TP+FN))*(TP/(TP+FP))/((TP/(TP+FP)) + (TP/(TP+FN)))))
+}
+
+# modelMetrics ----------------------------------------------------------------
+# The objective of this function is to calculate main metrics of model performance 
+# for cutoffs from 0-1 based on given step.
+modelMetrics <- function(realData, predData, stepping = 0.01, 
+                         plot_title = "TPR/TNR by cutoff over full dataset"){
+  probCuts <- seq(from = 0, to = 1, by = stepping)
+  out <- bind_rows(lapply(probCuts, calculateModelMetrics, realData = realData, predData = predData))
+  out <- out[complete.cases(out),] %>% mutate(Difference = abs(TPR-TNR))
+  
+  best <- out %>% arrange(Difference) %>% head(1) %>% dplyr::select(-Difference)
+  
+  p <- plot_ly(x = ~out$Cut, y = ~out$Difference, name = 'Abs. Diff.', type = 'bar', opacity = 0.3) %>% 
+    add_trace(x = ~out$Cut, y = ~out$TPR, name = 'TPR', type = 'scatter', mode = 'lines', opacity = 1) %>% 
+    add_trace(x = ~out$Cut, y = ~out$TNR, name = 'TNR', type = 'scatter', mode = 'lines', opacity = 1) %>% 
+    add_text(x = best$Cut, y = best$TPR, text = best$Cut, opacity = 1) %>% 
+    layout(xaxis = list(title = "Cutoff Value"),
+           yaxis = list(title = "True Ratio (%)"),
+           title = plot_title)
+  
+  return(list(TableResults = out,
+              BestCut = best,
+              Plot = p))
+}
+
+```
+
+With the returned object from this function we can plot the comparison between TPR (True Positive Rate) and TNR (True Negative Rate) to find the best cut off.
+
+```{r get_measures, echo=TRUE, out.width= '100%'}
+## getting measures -----------------------------------------------------------------
+
+metricsByCutoff.test_log    <- modelMetrics(prob.test$logistic.actual, 
+                                            prob.test$logistic.predicted, 
+                                            plot_title = 'Logistic Regression')
+metricsByCutoff.test_log$Plot
+```
+
+With the optimized cut off we calculate the full set of model metrics.
+
+```{r get_measures_full, echo=TRUE, out.width= '100%'}
+# logistic regression
+measures.logistic.train <- HMeasure(prob.train$logistic.actual, 
+                                    prob.train$logistic.predicted, 
+                                    threshold = metricsByCutoff.test_log$BestCut['Cut'])
+measures.logistic.test <- HMeasure(prob.test$logistic.actual, 
+                                   prob.test$logistic.predicted, 
+                                   threshold = metricsByCutoff.test_log$BestCut['Cut'])
+
+# join measures in a single data frame
+measures <- t(bind_rows(measures.logistic.train$metrics,
+                        measures.logistic.test$metrics)
+              ) %>% as_tibble(., rownames = NA)
+
+colnames(measures) <- c('logistic - train', 'logistic - test')
+
+measures$metric = rownames(measures)
+
+measures <- dplyr::select(measures, metric, everything())
+
+```
+
+Below are the metrics on the train dataset:
+```{r see_train_measures, echo=TRUE, out.width= '100%'}
+kable(dplyr::select(measures, contains('train')), row.names = TRUE)
+```
+
+Below are the metrics on the test dataset:
+```{r see_score_measures, echo=TRUE, out.width= '100%'}
+kable(dplyr::select(measures, contains('test')), row.names = TRUE)
+```
+
+In general this model has not delivered a good accuracy, we will compare how it performe agaisnt other classes of models in the Final Report section.
+
+```{r see_accuracy, echo=TRUE, out.width= '100%'}
+# accuracy metrics ---------------------------------------------------------------
+
+# logistic regression
+
+accuracy(score = prob.test$logistic.predicted, 
+         actual = prob.test$logistic.actual, 
+         threshold = metricsByCutoff.test_log$BestCut['Cut'])
+```
