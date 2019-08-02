@@ -53,7 +53,8 @@ GetAgeFromBirthnumber <- function(var_birth_number) {
 calculateModelMetrics <- function(cutData, realData, predData){
   cuttedData <- as.factor(ifelse(predData>=cutData, 1, 0))
   
-  invisible(capture.output(out <- CrossTable(realData, cuttedData, prop.c = F, prop.t = F, prop.r = T, prop.chisq = F)))
+  invisible(capture.output(out <- CrossTable(realData, cuttedData, 
+                                             prop.c = F, prop.t = F, prop.r = T, prop.chisq = F)))
   
   out <- as.data.frame(out) %>% 
     mutate(merged=paste0(t.x, t.y)) %>% 
