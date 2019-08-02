@@ -8,26 +8,43 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(fig.pos =  "h")
 knitr::opts_knit$set(root.dir = "../")
 
-# loading required libraries
-library(rmarkdown)
+# loading required libraries ----------------------------------------------------------
+# libraries for data prep
 library(dplyr)
-library(tidyr)
+library(readr)
+library(magrittr)
 library(forcats)
 library(lubridate)
-library(tinytex)
+library(stringr)
 library(feather)
-library(corrplot)
+library(fastDummies)
+library(reshape2)
+library(knitr)
+
+#libraries for plots
+library(ggplot2)
+library(ggthemes)
+library(ggcorrplot)
+library(ggpubr)
+library(plotly)
+
+# libraries for data clean
+library(VIM)
+library(rms)
 library(mctest)
+
+# libraries for modeling
 library(caret)
+library(gmodels)
+library(MASS)
+library(rpart)
+library(rpart.plot)
+library(adabag)
+library(randomForest)
+
+# libraries for measures
 library(hmeasure)
 library(pROC)
-library(rms)
-library(knitr)
-library(ggplot2)
-library(ggcorrplot)
-library(ggthemes)
-library(reshape2)
-library(ggpubr)
 
 ```
 
@@ -466,14 +483,9 @@ measures <- dplyr::select(measures, metric, everything())
 
 ```
 
-Below are the metrics on the train dataset:
+Below are the metrics on the train and test dataset:
 ```{r see_train_measures, echo=TRUE, out.width= '100%'}
-kable(dplyr::select(measures, contains('train')), row.names = TRUE)
-```
-
-Below are the metrics on the test dataset:
-```{r see_score_measures, echo=TRUE, out.width= '100%'}
-kable(dplyr::select(measures, contains('test')), row.names = TRUE)
+kable(measures, row.names = FALSE)
 ```
 
 In general this model has not delivered a good accuracy, we will compare how it performe agaisnt other classes of models in the Final Report section.
@@ -485,5 +497,5 @@ In general this model has not delivered a good accuracy, we will compare how it 
 
 accuracy(score = prob.test$logistic.predicted, 
          actual = prob.test$logistic.actual, 
-         threshold = metricsByCutoff.test_log$BestCut['Cut'])
+         threshold = metricsByCutoff.test_log[["BestCut"]][["Cut"]])
 ```
