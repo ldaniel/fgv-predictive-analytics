@@ -176,7 +176,7 @@ cutoffs
 
 Having the best score cut off of each model we use **HMeasure()** function from **hmeasure** library to calculate the full set of metrics for classification methods.
 
-```{r get_measures_full, echo=TRUE, out.width= '100%'}
+```{r get_measures_full, echo=TRUE, out.width= '100%', warning=FALSE}
 # logistic regression
 measures.logistic.train <- HMeasure(prob.train$logistic.actual, 
                                     prob.train$logistic.predicted, 
@@ -369,7 +369,11 @@ We get this chart by plotting the True positive rate (TPR) against the False Pos
 
 The bigger the Area Under the Curve (AUC) the better the model is in classifying the observation.
 
+<<<<<<< HEAD
 ```{r plotROC, echo=TRUE, out.width= '100%'}
+=======
+```{r ROC, echo=TRUE, out.width= '100%', warning=FALSE}
+>>>>>>> 76142c6a41e00cae6aa1d767f84f64373bc063fe
 Plot_ROC(prob.test, smooth_opt = FALSE)
 ```
 
@@ -381,7 +385,7 @@ We will use the custom functions described in Auxiliary metrics functions topic 
 
 Random Forest is the best model we got in this exercise.
 
-```{r ROC, echo=TRUE, out.width= '100%'}
+```{r accuracy, echo=TRUE, out.width= '100%'}
 # logistic regression
 accuracy(score = prob.test$logistic.predicted, 
          actual = prob.test$logistic.actual, 
@@ -403,6 +407,6 @@ accuracy(score = prob.test$random.forest.predicted,
          threshold = metricsByCutoff.test_rf[["BestCut"]][["Cut"]])
 ```
 
-Unfortunately, this is not a real dataset with really interest variables client income, credit rate, and so on.
+Unfortunately, this is not a real dataset with really interest variables such as client income, credit rate, and so on.
 
 The dataset is also not big enough to deliver consistent results, we saw significant variation in the models depending on the split ratio, and the hyperparameters used in each model, but the dataset served very well for the intent of practicing the techniques and R programing skills learned in the class.
