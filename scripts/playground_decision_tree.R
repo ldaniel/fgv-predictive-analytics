@@ -43,3 +43,5 @@ rpart.plot(tree.prune, cex = 1.3, type = 0,
 
 printcp(tree.prune)
 plotcp(tree.prune)
+
+tree.prune <- tree.full

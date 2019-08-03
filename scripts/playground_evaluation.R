@@ -65,7 +65,7 @@ rm(clean, clean_dataset, cor_mtx_clean, cor_mtx_full, cor_mtx_high_VIF,
 invisible(gc)
 
 source('scripts/playground_decision_tree.R')
-rm(SplitDataset, tree.full)
+rm(SplitDataset)
 invisible(gc)
 
 source('scripts/playground_boosting.R')
