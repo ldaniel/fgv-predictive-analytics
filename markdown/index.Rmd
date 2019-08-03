@@ -4,9 +4,11 @@ title: 'FGV MBA: Business Analytics & Big Data'
 
 # Predictive analysis
 
-This website intends to present the work analysis for the *"Análise Preditiva"* class.
+In the predictive analysis discipline we aim to develop statistical models, based on data, for a particular outcome of interest. From this model, we make sure that behavioral learning and past experiences have a model with good generalization.
 
-The ideia is Practicing R using a real anonymized Czech bank transactions, account info, and loan records released for PKDD'99 Discovery Challenge.
+In this project, we developed a set of models using a real anonymized Czech bank transactions, account info, and loan records released for PKDD'99 Discovery Challenge.
+
+This website intends to present the work analysis for the *"Análise Preditiva"* class.
 
 Use the menu above to navigate and see the final report.
 
@@ -14,7 +16,7 @@ Use the menu above to navigate and see the final report.
 - João Rafael Dias (magister.analytica@gmail.com)
 
 ## Authors / students
-- Daniel Campos (A57549661 / daniel.ferraz.campos@gmail.com)
+- Daniel Campos (A57635769 / daniel.ferraz.campos@gmail.com)
 - Leandro Daniel (A57622988 / contato@leandrodaniel.com)
 - Rodrigo Goncalves (A57566093 / rodrigo.goncalves@me.com)
 - Ygor Lima (A57549661 / ygor_redesocial@hotmail.com)
