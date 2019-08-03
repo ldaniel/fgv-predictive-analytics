@@ -32,7 +32,11 @@ navbar:
           href: 07_random_forest_report.html
     - text: "Final Report"
       icon: fa-file-invoice-dollar
-      href: 08_conclusion.html
+      menu:
+        - text: "Conclusion"
+          href: 08_conclusion.html
+        - text: "References"
+          href: 09_references.html
 output:
   html_document: 
     theme: cosmo
