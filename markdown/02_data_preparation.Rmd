@@ -24,7 +24,7 @@ Before starting the Berka Analysis, a few important steps were taken in order to
 - **Step 05**: Data Enhancement.
 - **Step 06**: Dataset Preparation
 
-# Step 1 - Create Functions
+# Create Functions (step 1)
 This step create functions to be used in the next steps. Following, all functions created are described.
 
 ## Specific data ingestion functions
@@ -156,7 +156,7 @@ Functions used in the evaluation step to compare the models.
 * KS_Plot
 * accuracy
 
-# Step 2 - Data Ingestion
+# Data Ingestion (step 2)
 The process of data ingestion — preparing data for analysis — usually includes steps called extract (taking the data from its current location), transform (cleansing and normalizing the data), and load (placing the data in a database where it can be analyzed).
 
 During this step, in addition to the loading data processes, it was performed data casting, column renaming and small touch-ups. The list below describe each table adjustment taken:
@@ -168,7 +168,7 @@ During this step, in addition to the loading data processes, it was performed da
 - **Permanent Order**: casting columns with decimal values;
 - **Transaction**: casting columns in table transaction to the right data types.
 
-# Step 3 - Data Cleaning
+# Data Cleaning (step 3)
 
 The objective of this step is analysing missing values and other strange conditions. In order to accomplish this task, a few R functions were used to quickly discover missing values, like NA and empty fields.
 
@@ -204,7 +204,7 @@ kable(transaction_empty_cols)
 
 For the exploration analysis report, we did not take any additional action, since the missing values was not relevant.
 
-# Step 4 - Label Translation
+# Label Translation (step 4)
 In order to make the data information more understandable, it was translated some relevant labels and domains from Czech to English.
 
 ``` {r translate, eval = FALSE}
@@ -242,7 +242,7 @@ transaction$k_symbol <- plyr::mapvalues(transaction$k_symbol,
                                           'household', 'old age pension', 'loan payment'))
 ```
 
-# Step 5 - Data Enhancement
+# Data Enhancement (step 5)
 This step aims to improve the analysis by adding auxiliary information. Data enhancement is all about making sure any data that is coming into the business is being looked at with a critical eye and is being filtered down to maximize its value.
 
 The code below get gender, birthday and age from birth_number column using *GetGenderFromBirthnumber* and *GetBirthdateFromBirthnumber* functions.
@@ -306,7 +306,7 @@ account_transaction_pattern <- select(transaction, c(trans_id, account_id, date,
               prop_statement = sum(`statement`) / amount)
 ```
 
-# Step 6 - Data Preparation for Predictive Modeling
+# Data Preparation for Predictive Modeling (step 6)
 
 ## Selecting the target dataset
 
