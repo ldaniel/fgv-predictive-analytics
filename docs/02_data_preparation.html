@@ -438,25 +438,34 @@ $(document).ready(function () {
 
 <div id="TOC">
 <ul>
-<li><a href="#data-ingestion-cleaning-translation-and-enhancement"><span class="toc-section-number">1</span> Data ingestion, cleaning, translation and enhancement</a><ul>
-<li><a href="#create-functions"><span class="toc-section-number">1.1</span> Create Functions</a><ul>
-<li><a href="#specific-data-ingestion-functions"><span class="toc-section-number">1.1.1</span> Specific data ingestion functions</a></li>
-<li><a href="#auxiliary-metrics-functions"><span class="toc-section-number">1.1.2</span> Auxiliary metrics functions</a></li>
-<li><a href="#data-preparation-functions"><span class="toc-section-number">1.1.3</span> Data preparation functions</a></li>
-<li><a href="#auxiliary-plot-functions"><span class="toc-section-number">1.1.4</span> Auxiliary plot functions</a></li>
+<li><a href="#using-a-step-by-step-approach"><span class="toc-section-number">1</span> Using a step by step approach</a></li>
+<li><a href="#step-1---create-functions"><span class="toc-section-number">2</span> Step 1 - Create Functions</a><ul>
+<li><a href="#specific-data-ingestion-functions"><span class="toc-section-number">2.1</span> Specific data ingestion functions</a><ul>
+<li><a href="#getgenderfrombirthnumber"><span class="toc-section-number">2.1.1</span> GetGenderFromBirthnumber</a></li>
+<li><a href="#getbirthdatefrombirthnumber"><span class="toc-section-number">2.1.2</span> GetBirthdateFromBirthnumber</a></li>
+<li><a href="#converttodate"><span class="toc-section-number">2.1.3</span> ConvertToDate</a></li>
+<li><a href="#getagefrombirthnumber"><span class="toc-section-number">2.1.4</span> GetAgeFromBirthnumber</a></li>
 </ul></li>
-<li><a href="#data-ingestion"><span class="toc-section-number">1.2</span> Data Ingestion</a></li>
-<li><a href="#data-cleaning"><span class="toc-section-number">1.3</span> Data Cleaning</a></li>
-<li><a href="#label-translation"><span class="toc-section-number">1.4</span> Label Translation</a></li>
-<li><a href="#data-enhancement"><span class="toc-section-number">1.5</span> Data Enhancement</a></li>
-<li><a href="#data-preparation-for-predictive-modeling"><span class="toc-section-number">1.6</span> Data Preparation for Predictive Modeling</a></li>
-<li><a href="#splitting-dataset-into-train-and-test-data"><span class="toc-section-number">1.7</span> Splitting dataset into Train and Test data</a></li>
+<li><a href="#auxiliary-metrics-functions"><span class="toc-section-number">2.2</span> Auxiliary metrics functions</a><ul>
+<li><a href="#calculatemodelmetrics"><span class="toc-section-number">2.2.1</span> calculateModelMetrics</a></li>
+<li><a href="#modelmetrics"><span class="toc-section-number">2.2.2</span> modelMetrics</a></li>
+</ul></li>
+<li><a href="#data-preparation-functions"><span class="toc-section-number">2.3</span> Data preparation functions</a></li>
+<li><a href="#auxiliary-plot-functions"><span class="toc-section-number">2.4</span> Auxiliary plot functions</a></li>
+</ul></li>
+<li><a href="#step-2---data-ingestion"><span class="toc-section-number">3</span> Step 2 - Data Ingestion</a></li>
+<li><a href="#step-3---data-cleaning"><span class="toc-section-number">4</span> Step 3 - Data Cleaning</a></li>
+<li><a href="#step-4---label-translation"><span class="toc-section-number">5</span> Step 4 - Label Translation</a></li>
+<li><a href="#step-5---data-enhancement"><span class="toc-section-number">6</span> Step 5 - Data Enhancement</a></li>
+<li><a href="#step-6---data-preparation-for-predictive-modeling"><span class="toc-section-number">7</span> Step 6 - Data Preparation for Predictive Modeling</a><ul>
+<li><a href="#selecting-the-target-dataset"><span class="toc-section-number">7.1</span> Selecting the target dataset</a></li>
+<li><a href="#splitting-dataset-into-train-and-test-data"><span class="toc-section-number">7.2</span> Splitting dataset into Train and Test data</a></li>
 </ul></li>
 </ul>
 </div>
 
-<div id="data-ingestion-cleaning-translation-and-enhancement" class="section level1">
-<h1><span class="header-section-number">1</span> Data ingestion, cleaning, translation and enhancement</h1>
+<div id="using-a-step-by-step-approach" class="section level1">
+<h1><span class="header-section-number">1</span> Using a step by step approach</h1>
 <p>Before starting the Berka Analysis, a few important steps were taken in order to prepare the source data files. These steps are listed below:</p>
 <ul>
 <li><strong>Step 01</strong>: Create Functions;</li>
@@ -466,13 +475,14 @@ $(document).ready(function () {
 <li><strong>Step 05</strong>: Data Enhancement.</li>
 <li><strong>Step 06</strong>: Dataset Preparation</li>
 </ul>
-<div id="create-functions" class="section level2">
-<h2><span class="header-section-number">1.1</span> Create Functions</h2>
+</div>
+<div id="step-1---create-functions" class="section level1">
+<h1><span class="header-section-number">2</span> Step 1 - Create Functions</h1>
 <p>This step create functions to be used in the next steps. Following, all functions created are described.</p>
-<div id="specific-data-ingestion-functions" class="section level3">
-<h3><span class="header-section-number">1.1.1</span> Specific data ingestion functions</h3>
-<div id="getgenderfrombirthnumber" class="section level4">
-<h4><span class="header-section-number">1.1.1.1</span> GetGenderFromBirthnumber</h4>
+<div id="specific-data-ingestion-functions" class="section level2">
+<h2><span class="header-section-number">2.1</span> Specific data ingestion functions</h2>
+<div id="getgenderfrombirthnumber" class="section level3">
+<h3><span class="header-section-number">2.1.1</span> GetGenderFromBirthnumber</h3>
 <p>The birth_number column is given in the form of YYMMDD for men, and YYMM+50DD for women. The objective of this function is to return the gender of the client via the birth_number.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">GetGenderFromBirthnumber &lt;-<span class="st"> </span><span class="cf">function</span>(var_birth_number) {</a>
 <a class="sourceLine" id="cb1-2" title="2">  month &lt;-<span class="st"> </span><span class="kw">substr</span>(var_birth_number, <span class="dv">3</span>, <span class="dv">4</span>)</a>
@@ -481,8 +491,8 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb1-5" title="5">  <span class="kw">return</span>(<span class="kw">as.factor</span>(result))</a>
 <a class="sourceLine" id="cb1-6" title="6">}</a></code></pre></div>
 </div>
-<div id="getbirthdatefrombirthnumber" class="section level4">
-<h4><span class="header-section-number">1.1.1.2</span> GetBirthdateFromBirthnumber</h4>
+<div id="getbirthdatefrombirthnumber" class="section level3">
+<h3><span class="header-section-number">2.1.2</span> GetBirthdateFromBirthnumber</h3>
 <p>The birth_number column is given in the form of YYMMDD for men, # and YYMM+50DD for women. The objective of this function is to return the final birthday as Date.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">GetBirthdateFromBirthnumber &lt;-<span class="st"> </span><span class="cf">function</span>(var_birth_number, var_gender) {</a>
 <a class="sourceLine" id="cb2-2" title="2">  year &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="st">&quot;19&quot;</span>, <span class="kw">substr</span>(var_birth_number, <span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">sep=</span><span class="st">&quot;&quot;</span>)</a>
@@ -494,8 +504,8 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb2-8" title="8">  <span class="kw">return</span>(result)</a>
 <a class="sourceLine" id="cb2-9" title="9">}</a></code></pre></div>
 </div>
-<div id="converttodate" class="section level4">
-<h4><span class="header-section-number">1.1.1.3</span> ConvertToDate</h4>
+<div id="converttodate" class="section level3">
+<h3><span class="header-section-number">2.1.3</span> ConvertToDate</h3>
 <p>The objective of this function is to convert the strange bank date style to the regular R Date datatype.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">ConvertToDate &lt;-<span class="st"> </span><span class="cf">function</span>(var_date) {</a>
 <a class="sourceLine" id="cb3-2" title="2">  year &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="st">&quot;19&quot;</span>, <span class="kw">substr</span>(var_date, <span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">sep=</span><span class="st">&quot;&quot;</span>)</a>
@@ -506,8 +516,8 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb3-7" title="7">  <span class="kw">return</span>(result)</a>
 <a class="sourceLine" id="cb3-8" title="8">}</a></code></pre></div>
 </div>
-<div id="getagefrombirthnumber" class="section level4">
-<h4><span class="header-section-number">1.1.1.4</span> GetAgeFromBirthnumber</h4>
+<div id="getagefrombirthnumber" class="section level3">
+<h3><span class="header-section-number">2.1.4</span> GetAgeFromBirthnumber</h3>
 <p>The objective of this function is to get age given the birth_number.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">GetAgeFromBirthnumber &lt;-<span class="st"> </span><span class="cf">function</span>(var_birth_number) {</a>
 <a class="sourceLine" id="cb4-2" title="2">  base_year &lt;-<span class="st"> </span><span class="dv">99</span> <span class="co"># considering 1999 as the base year for this exercise</span></a>
@@ -518,10 +528,10 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb4-7" title="7">}</a></code></pre></div>
 </div>
 </div>
-<div id="auxiliary-metrics-functions" class="section level3">
-<h3><span class="header-section-number">1.1.2</span> Auxiliary metrics functions</h3>
-<div id="calculatemodelmetrics" class="section level4">
-<h4><span class="header-section-number">1.1.2.1</span> calculateModelMetrics</h4>
+<div id="auxiliary-metrics-functions" class="section level2">
+<h2><span class="header-section-number">2.2</span> Auxiliary metrics functions</h2>
+<div id="calculatemodelmetrics" class="section level3">
+<h3><span class="header-section-number">2.2.1</span> calculateModelMetrics</h3>
 <p>The objective of this function is to calculate main metrics of model performance according to a cutoff value.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">calculateModelMetrics &lt;-<span class="st"> </span><span class="cf">function</span>(cutData, realData, predData){</a>
 <a class="sourceLine" id="cb5-2" title="2">  cuttedData &lt;-<span class="st"> </span><span class="kw">as.factor</span>(<span class="kw">ifelse</span>(predData<span class="op">&gt;=</span>cutData, <span class="dv">1</span>, <span class="dv">0</span>))</a>
@@ -549,8 +559,8 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb5-24" title="24">                    <span class="dt">F1 =</span> <span class="dv">2</span><span class="op">*</span>(TP<span class="op">/</span>(TP<span class="op">+</span>FN))<span class="op">*</span>(TP<span class="op">/</span>(TP<span class="op">+</span>FP))<span class="op">/</span>((TP<span class="op">/</span>(TP<span class="op">+</span>FP)) <span class="op">+</span><span class="st"> </span>(TP<span class="op">/</span>(TP<span class="op">+</span>FN)))))</a>
 <a class="sourceLine" id="cb5-25" title="25">}</a></code></pre></div>
 </div>
-<div id="modelmetrics" class="section level4">
-<h4><span class="header-section-number">1.1.2.2</span> modelMetrics</h4>
+<div id="modelmetrics" class="section level3">
+<h3><span class="header-section-number">2.2.2</span> modelMetrics</h3>
 <p>The objective of this function is to calculate main metrics of model performance for cutoffs from 0-1 based on given step.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">modelMetrics &lt;-<span class="st"> </span><span class="cf">function</span>(realData, predData, <span class="dt">stepping =</span> <span class="fl">0.01</span>, </a>
 <a class="sourceLine" id="cb6-2" title="2">                         <span class="dt">plot_title =</span> <span class="st">&quot;TPR/TNR by cutoff over full dataset&quot;</span>){</a>
@@ -574,15 +584,15 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb6-20" title="20">}</a></code></pre></div>
 </div>
 </div>
-<div id="data-preparation-functions" class="section level3">
-<h3><span class="header-section-number">1.1.3</span> Data preparation functions</h3>
+<div id="data-preparation-functions" class="section level2">
+<h2><span class="header-section-number">2.3</span> Data preparation functions</h2>
 <div id="splittesttraindataset" class="section level4">
-<h4><span class="header-section-number">1.1.3.1</span> SplitTestTrainDataset</h4>
+<h4><span class="header-section-number">2.3.0.1</span> SplitTestTrainDataset</h4>
 <p>See topic “Splitting dataset into Train and Test data” for further details.</p>
 </div>
 </div>
-<div id="auxiliary-plot-functions" class="section level3">
-<h3><span class="header-section-number">1.1.4</span> Auxiliary plot functions</h3>
+<div id="auxiliary-plot-functions" class="section level2">
+<h2><span class="header-section-number">2.4</span> Auxiliary plot functions</h2>
 <p>Functions used in the evaluation step to compare the models.</p>
 <ul>
 <li>Score_Boxplot</li>
@@ -592,8 +602,8 @@ $(document).ready(function () {
 </ul>
 </div>
 </div>
-<div id="data-ingestion" class="section level2">
-<h2><span class="header-section-number">1.2</span> Data Ingestion</h2>
+<div id="step-2---data-ingestion" class="section level1">
+<h1><span class="header-section-number">3</span> Step 2 - Data Ingestion</h1>
 <p>The process of data ingestion — preparing data for analysis — usually includes steps called extract (taking the data from its current location), transform (cleansing and normalizing the data), and load (placing the data in a database where it can be analyzed).</p>
 <p>During this step, in addition to the loading data processes, it was performed data casting, column renaming and small touch-ups. The list below describe each table adjustment taken:</p>
 <ul>
@@ -605,8 +615,8 @@ $(document).ready(function () {
 <li><strong>Transaction</strong>: casting columns in table transaction to the right data types.</li>
 </ul>
 </div>
-<div id="data-cleaning" class="section level2">
-<h2><span class="header-section-number">1.3</span> Data Cleaning</h2>
+<div id="step-3---data-cleaning" class="section level1">
+<h1><span class="header-section-number">4</span> Step 3 - Data Cleaning</h1>
 <p>The objective of this step is analysing missing values and other strange conditions. In order to accomplish this task, a few R functions were used to quickly discover missing values, like NA and empty fields.</p>
 <p>First thing done, was fixing observations in k_symbol transaction table with ’ ’ (one space) to empty string (’’), using the following command.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">transaction<span class="op">$</span>k_symbol =<span class="st"> </span><span class="kw">trimws</span>(transaction<span class="op">$</span>k_symbol)</a></code></pre></div>
@@ -718,8 +728,8 @@ $(document).ready(function () {
 </table>
 <p>For the exploration analysis report, we did not take any additional action, since the missing values was not relevant.</p>
 </div>
-<div id="label-translation" class="section level2">
-<h2><span class="header-section-number">1.4</span> Label Translation</h2>
+<div id="step-4---label-translation" class="section level1">
+<h1><span class="header-section-number">5</span> Step 4 - Label Translation</h1>
 <p>In order to make the data information more understandable, it was translated some relevant labels and domains from Czech to English.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="co"># Translating relevant labels and domains to english --------------------------------------------</span></a>
 <a class="sourceLine" id="cb10-2" title="2"></a>
@@ -754,8 +764,8 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb10-31" title="31">                                          <span class="st">&#39;interest credited&#39;</span>, <span class="st">&#39;sanction interest&#39;</span>, </a>
 <a class="sourceLine" id="cb10-32" title="32">                                          <span class="st">&#39;household&#39;</span>, <span class="st">&#39;old age pension&#39;</span>, <span class="st">&#39;loan payment&#39;</span>))</a></code></pre></div>
 </div>
-<div id="data-enhancement" class="section level2">
-<h2><span class="header-section-number">1.5</span> Data Enhancement</h2>
+<div id="step-5---data-enhancement" class="section level1">
+<h1><span class="header-section-number">6</span> Step 5 - Data Enhancement</h1>
 <p>This step aims to improve the analysis by adding auxiliary information. Data enhancement is all about making sure any data that is coming into the business is being looked at with a critical eye and is being filtered down to maximize its value.</p>
 <p>The code below get gender, birthday and age from birth_number column using <em>GetGenderFromBirthnumber</em> and <em>GetBirthdateFromBirthnumber</em> functions.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">client &lt;-<span class="st"> </span>client <span class="op">%&gt;%</span><span class="st"> </span></a>
@@ -799,8 +809,10 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb15-16" title="16">              <span class="dt">prop_sanction_interest =</span> <span class="kw">sum</span>(<span class="st">`</span><span class="dt">sanction interest</span><span class="st">`</span>) <span class="op">/</span><span class="st"> </span>amount,</a>
 <a class="sourceLine" id="cb15-17" title="17">              <span class="dt">prop_statement =</span> <span class="kw">sum</span>(<span class="st">`</span><span class="dt">statement</span><span class="st">`</span>) <span class="op">/</span><span class="st"> </span>amount)</a></code></pre></div>
 </div>
-<div id="data-preparation-for-predictive-modeling" class="section level2">
-<h2><span class="header-section-number">1.6</span> Data Preparation for Predictive Modeling</h2>
+<div id="step-6---data-preparation-for-predictive-modeling" class="section level1">
+<h1><span class="header-section-number">7</span> Step 6 - Data Preparation for Predictive Modeling</h1>
+<div id="selecting-the-target-dataset" class="section level2">
+<h2><span class="header-section-number">7.1</span> Selecting the target dataset</h2>
 <p>The below function was created to be used in the modeling exercises to be performed, the idea is to have a standard way to get the prepared data set already prepared with correct data types and dummies.</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1"><span class="co"># dataset preparation ---------------------------------------------------------</span></a>
 <a class="sourceLine" id="cb16-2" title="2"></a>
@@ -894,7 +906,7 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb16-90" title="90"><span class="kw">colnames</span>(source_dataset) &lt;-<span class="st"> </span><span class="kw">trimws</span>(<span class="kw">names</span>(source_dataset))</a></code></pre></div>
 </div>
 <div id="splitting-dataset-into-train-and-test-data" class="section level2">
-<h2><span class="header-section-number">1.7</span> Splitting dataset into Train and Test data</h2>
+<h2><span class="header-section-number">7.2</span> Splitting dataset into Train and Test data</h2>
 <p>The below function was created to be used in the modeling exercises to be split the source_dataset into train and test datasets.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1"><span class="co"># SplitTestTrainDataset -------------------------------------------------------</span></a>
 <a class="sourceLine" id="cb17-2" title="2"><span class="co"># The objective of this function is to split a given dataset </span></a>
