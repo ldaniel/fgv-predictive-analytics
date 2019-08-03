@@ -403,6 +403,6 @@ accuracy(score = prob.test$random.forest.predicted,
          threshold = metricsByCutoff.test_rf[["BestCut"]][["Cut"]])
 ```
 
-Unfortunately, this is not a real dataset with really interest variables client income, credit rate, and so on.
+Unfortunately, this is not a real dataset with really interest variables such as client income, credit rate, and so on.
 
 The dataset is also not big enough to deliver consistent results, we saw significant variation in the models depending on the split ratio, and the hyperparameters used in each model, but the dataset served very well for the intent of practicing the techniques and R programing skills learned in the class.
