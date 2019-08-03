@@ -110,7 +110,7 @@ Both datasets keep the same proportion for the explained variable around 11%.
 
 With the final cleaned dataset, we got from above steps we fit our Decision Tree Model for y_loan_defaulter on all x variables.
 
-We choose to change the default parameters **minbucket** and **maxdepth** parameter to **5**to deliberate create a fully-grown tree as the database is not big enough for this model.
+We choose to change the default parameters **minbucket** and **maxdepth** parameter to **5** to deliberate create a fully-grown tree as the database is not big enough for this model.
 
 ```{r fit_DT_full, echo=TRUE, out.width= '100%'}
 tree.full <- rpart(data= data.train_DT, y_loan_defaulter ~ .,
@@ -119,7 +119,7 @@ tree.full <- rpart(data= data.train_DT, y_loan_defaulter ~ .,
                    method = "class")
 
 rpart.plot(tree.full, cex = 1.3, type = 0,
-           extra = 104, box.palette = 'BuRd',
+           extra = 60, box.palette = 'BuRd',
            branch.lty = 3, shadow.col = 'gray', 
            nn = TRUE, main = 'Decision Tree - Prune')
 
@@ -127,7 +127,7 @@ rpart.plot(tree.full, cex = 1.3, type = 0,
 
 ## Evaluating necessity of prunning
 
-Pruning is a technique in machine learning used to reduce the size of decision tree by removing nodes that provide little power of classification.
+Pruning is a technique in machine learning used to reduce the size of decision trees by removing nodes that provide little power of classification.
 
 The idea is reducing the complexity of the decision tree and thereof avoid overfit to the train dataset.
 
@@ -141,11 +141,9 @@ cp_prune = tree.full$cptable[which.min(tree.full$cptable[,"xerror"]), "CP"]
 tree.prune <- prune(tree.full, cp = cp_prune)
 
 rpart.plot(tree.prune, cex = 1.3, type = 0,
-           extra = 104, box.palette = 'BuRd',
+           extra = 60, box.palette = 'BuRd',
            branch.lty = 3, shadow.col = 'gray', 
            nn = TRUE, main = 'Decision Tree - Prune')
-
-#tree.prune <- tree.full
 
 ```
 
@@ -190,7 +188,7 @@ A comparison against all the models will be provided in the Final Report session
 We started this step by making predictions using our model on the X's variables in our Train and Test datasets.
 
 ```{r get_scores, echo=TRUE, out.width= '100%'}
-## making preditions for each model and consilidating in a single data frame
+## making preditions for each model and consolidating in a single data frame
 
 prob.full = list()
 prob.train = list()
@@ -254,7 +252,7 @@ Below are the metrics on the train and test dataset:
 kable(measures, row.names = FALSE)
 ```
 
-## evaluating classification performance:
+## Evaluating classification performance:
 
 In general, such as the Logistic Regression model, this model is not delivering good accuracy, we will compare how it performed against other classes of models in the Final Report session
 
@@ -286,7 +284,9 @@ p3 <- KS_Plot(prob.test$decision.tree.predicted[prob.test$decision.tree.actual =
         'KS Plot') + theme(axis.title.y = element_blank(),
                            axis.text.y = element_blank())
 
-ggarrange(p1, p2, p3, nrow = 3)
+ggarrange(p1, p2, nrow = 2)
+
+p3
 ```
 
 By the score density we see that our Decision Tree is very narrow on the scores it assigns to the observations.

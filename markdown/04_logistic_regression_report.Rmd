@@ -146,7 +146,7 @@ kable(tibble(variables = names(loan_dataset_logistic)))
 
 ### Multicollinearity on feature variables
 
-Multicollinearity is the phenomenon in which a given predictor has a strong correlation with one or more predictors, in this scenario the multiple regression coefficient estimates may vary erratically depending on the data or the model may not even be possible to be calculate in the case of a perfect correlation on the predictors.
+Multicollinearity is the phenomenon in which a given predictor has a strong correlation with one or more predictors, in this scenario the multiple regression coefficient estimates may vary erratically depending on the data, or the model may not even be possible to be calculate in the case of a perfect correlation on the predictors.
 
 So before we try to fit a model we ran a multicollinearity test to identify additional variables to drop from the model specification.
 
@@ -156,7 +156,7 @@ Just looking at correlation indexes among pairs of predictors is limited as it i
 
 That’s why we will really on a test called Variance Inflation Factors, VII for short, to detect multicollinearity.
 
-Multicollinearity is poison for Regression algorithms!!! :skull: `:skull:`:skull: `:skull:`:skull: `:skull:`
+Multicollinearity is poison for Regression algorithms!!!
 
 ```{r check_correl, out.width = '100%', warning=FALSE}
 vars.quant <- select_if(loan_dataset_logistic, is.numeric)
@@ -199,7 +199,7 @@ We will now exclude the variables with High VIF maintaining only the variables t
 
 We will use the pairwise correlation indexes to choose the variable to reject, code below will exclude the variable in the pair that have the greater correlation index sum against the other predictor not in the pair.
 
-at the end we will have only variables that have a correlation index smaller than our selected **threshold (0.6)**.
+At the end we will have only variables that have a correlation index smaller than our selected **threshold (0.6)**.
 
 ```{r check_correl_3, out.width = '100%'}
 correl_threshold <- 0.6
@@ -370,7 +370,7 @@ This will ensure consistency when comparing the models against each other.
 
 ## Fit the logistic model 
 
-With the final cleaned dataset, we got from above steps we fit our Logistic Regression model for y_loan_defaulter on all x variables.
+With the final cleaned dataset, we got from above steps we fit our Logistic Regression model for **y_loan_defaulter** on all **x_variables**.
 
 ```{r fit_model_full, echo=TRUE}
 logistic.full <- glm(formula = y_loan_defaulter ~ .,
@@ -381,7 +381,7 @@ names(logistic.full$coefficients) <- stringr::str_sub(names(logistic.full$coeffi
 summary(logistic.full)
 ```
 
-With the full model fitted we will run the stepwise method to automate the selection of predictors using the **(Akaike Information Criterion) AIC for short**.
+With the full model fitted we will run the stepwise method to automate the selection of predictors using the **(Akaike Information Criterion)** AIC for short.
 
 This is a broadly used estimator that evaluates the relative quality of statistical methods for a given set of data.
 
@@ -413,11 +413,13 @@ Meaning that it can be used not only in predicting the classification into Defau
 In the Logistic Regression the effect of an increase or decrease of a predictor is not linear, but we can see the predictors that have the greater influence and by its coefficient signal the associated with an increase or decrease on the likelihood of default.
 
 In our model we see that below variables are associated to an increase in the likelihood of default:
+
 - **x_loan_amount**
 - **x_prop_interest_credited**
 - **x_prop_statement**
 
-on the other hand, below variables are associated to a decrease in the likelihood of default:
+On the other hand, below variables are associated to a decrease in the likelihood of default:
+
 - **x_card_type_classic**
 - **x_loan_duration**
 - **x_no_of_commited_crimes_1995**
@@ -556,7 +558,7 @@ Below are the metrics on the train and test dataset:
 kable(measures, row.names = FALSE)
 ```
 
-## evaluating classification performance:
+## Evaluating classification performance:
 
 In general the Logistic Regression model is not delivering good accuracy, we will compare how it performed against other classes of models in the Final Report session
 

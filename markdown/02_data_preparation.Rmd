@@ -387,7 +387,9 @@ SplitTestTrainDataset <- function(dataset) {
 }
 ```
 
-To make sure all the models uses the same datasets fro Train and Testing we are saving the initial sampling to be reused across the models.
+To make sure all the models uses the same datasets for Train and Testing we are saving the initial sampling to be reused across the models.
+
+This will ensure consistency when comparing the models against each other.
 
 ``` {r save_dataset, eval = FALSE}
 # calling function to split and create train and test databases
