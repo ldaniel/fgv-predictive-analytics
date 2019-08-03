@@ -14,7 +14,7 @@ Use the menu above to navigate and see the final report.
 - João Rafael Dias (magister.analytica@gmail.com)
 
 ## Authors / students
-- Daniel Campos (A57549661 / daniel.ferraz.campos@gmail.com)
+- Daniel Campos (A57635769 / daniel.ferraz.campos@gmail.com)
 - Leandro Daniel (A57622988 / contato@leandrodaniel.com)
 - Rodrigo Goncalves (A57566093 / rodrigo.goncalves@me.com)
 - Ygor Lima (A57549661 / ygor_redesocial@hotmail.com)
