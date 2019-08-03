@@ -1,4 +1,5 @@
-# GetGenderFromBirthnumber ----------------------------------------------------
+# specific data ingestion functions -------------------------------------------
+
 # The birth_number column is given in the form of YYMMDD for men,
 # and YYMM+50DD for women. The objective of this function is to return
 # the gender of the client via the birth_number.
@@ -10,7 +11,6 @@ GetGenderFromBirthnumber <- function(var_birth_number) {
   return(as.factor(result))
 }
 
-# GetBirthdateFromBirthnumber -------------------------------------------------
 # The birth_number column is given in the form of YYMMDD for men,
 # and YYMM+50DD for women. The objective of this function is to return
 # the final birthday as Date.
@@ -24,7 +24,6 @@ GetBirthdateFromBirthnumber <- function(var_birth_number, var_gender) {
   return(result)
 }
 
-# ConvertToDate ---------------------------------------------------------------
 # The objective of this function is to convert the strange bank date style 
 # to the regular R Date datatype.
 ConvertToDate <- function(var_date) {
@@ -37,7 +36,6 @@ ConvertToDate <- function(var_date) {
   return(result)
 }
 
-# GetAgeFromBirthnumber -------------------------------------------------------
 # The objective of this function is to get age given the birth_number.
 GetAgeFromBirthnumber <- function(var_birth_number) {
   
@@ -48,7 +46,8 @@ GetAgeFromBirthnumber <- function(var_birth_number) {
   return(result)
 }
 
-# calculateModelMetrics -------------------------------------------------------
+# metrics functions -----------------------------------------------------------
+
 # The objective of this function is to calculate main metrics of model performance according to a cutoff value.
 calculateModelMetrics <- function(cutData, realData, predData){
   cuttedData <- as.factor(ifelse(predData>=cutData, 1, 0))
@@ -76,7 +75,6 @@ calculateModelMetrics <- function(cutData, realData, predData){
                     F1 = 2*(TP/(TP+FN))*(TP/(TP+FP))/((TP/(TP+FP)) + (TP/(TP+FN)))))
 }
 
-# modelMetrics ----------------------------------------------------------------
 # The objective of this function is to calculate main metrics of model performance 
 # for cutoffs from 0-1 based on given step.
 modelMetrics <- function(realData, predData, stepping = 0.01, 
@@ -100,6 +98,7 @@ modelMetrics <- function(realData, predData, stepping = 0.01,
               Plot = p))
 }
 
+<<<<<<< HEAD
 # accuracy ----------------------------------------------------------------
 # The objective of this function is to calculate main accuracy metrix of the model performance.
 accuracy <- function(score, actual, threshold = 0.5) {
@@ -122,6 +121,9 @@ accuracy <- function(score, actual, threshold = 0.5) {
 }
 
 # SplitTestTrainDataset -------------------------------------------------------
+=======
+# data preparation functions --------------------------------------------------
+>>>>>>> 1cd92551efd1b6d6a4d2f3d89aa0aa3a0fbc4a47
 # The objective of this function is to split a given dataset 
 # in train and test datasets
 SplitTestTrainDataset <- function(dataset) {

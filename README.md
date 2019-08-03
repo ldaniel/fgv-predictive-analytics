@@ -1,8 +1,10 @@
 # Introduction
 
-This project intends to present the work analysis for "Análise Preditiva" class.
+In the predictive analysis discipline we aim to develop statistical models, based on data, for a particular outcome of interest. From this model, we make sure that behavioral learning and past experiences have a model with good generalization.
 
-The ideia is Practicing R using a real anonymized Czech bank transactions, account info, and loan records released for PKDD'99 Discovery Challenge.
+In this project, we developed a set of models using a real anonymized Czech bank transactions, account info, and loan records released for PKDD'99 Discovery Challenge.
+
+This website intends to present the work analysis for the *"Análise Preditiva"* class.
 
 See the final website report at: [https://ldaniel.github.io/Predictive-Analytics](https://ldaniel.github.io/Predictive-Analytics).
 
