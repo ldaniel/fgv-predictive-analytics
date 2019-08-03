@@ -53,6 +53,8 @@ source("./scripts/step_06_dataset_preparation.R")
 
 The goal of this session is trying to fit a simple Decision Tree model on Loan data aiming to predict the probability of delinquency for each contract.
 
+*******************************************************************************
+
 # Modeling
 
 ## Dataset preparation
@@ -173,9 +175,11 @@ Our full decision tree model clear shows that below variables are the key featur
 - **x_prop_interest_credited**
 - **x_avg_account_balance**
 - **x_loan_amount**
-- **x_no_of_commited_crimes_195**
+- **x_no_of_commited_crimes_1995**
 
-The result is not so different from the Logistic Regression model we created in the session before.
+The result is similar to the Logistic Regression model we created in the session before.
+
+The predictors selected are roughly the same.
 
 # Evaluating the model performance
 
@@ -255,6 +259,7 @@ kable(measures, row.names = FALSE)
 In general, such as the Logistic Regression model, this model is not delivering good accuracy, we will compare how it performed against other classes of models in the Final Report session
 
 Below the confusion matrix and general performance of the model:
+
 ```{r see_accuracy_1, echo=TRUE, out.width= '100%'}
 # accuracy metrics ---------------------------------------------------------------
 # logistic regression
@@ -263,7 +268,7 @@ accuracy(score = prob.test$decision.tree.predicted,
          threshold = metricsByCutoff.test_DT[["BestCut"]][["Cut"]])
 ```
 
-We finally look at the score distribution charts how well the model is able to discriminate Defaulters and Non-Defaulters
+We finally look at the score distribution charts to check how well the model is able to discriminate Defaulters and Non-Defaulters.
 
 ```{r model_plots, echo=TRUE, out.width= '100%'}
 p1 <- Score_Histograms(prob.test, 
@@ -288,7 +293,7 @@ By the score density we see that our Decision Tree is very narrow on the scores 
 
 This is expected from single Decision Trees.
 
-The box plot also does not show a clear separation between Defaulters and Non-Defaulters.
+The box plot also does not show a clear discrimination between Defaulters and Non-Defaulters.
 
 Finally, the KS metric is far from what is expected for a reasonable classification model.
 

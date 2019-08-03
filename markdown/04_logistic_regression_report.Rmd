@@ -60,11 +60,11 @@ source("./scripts/step_06_dataset_preparation.R")
 
 # Objective
 
-The goal of this report is trying to fit a logistic regression model on Loan data aiming to predict the probability of delinquency for each contract.
+The goal of this session is trying to fit a Logistic Regression model on Loan data aiming to predict the probability of delinquency for each contract.
 
 *******************************************************************************
 
-# Task description
+# Modeling
 
 ## Dataset preparation
 
@@ -83,13 +83,15 @@ kable(tibble(variables = names(loan_dataset_logistic)))
 
 ## Variable selection
 
-Starting from this dataset we investigate the presence of redundant or variables not useful for the model such as the ones with not enough variability.
+Starting from this dataset we investigate the presence of redundant or variables not useful for the model such as the ones with not enough variability or with multicollinearity.
 
 ### Dummy variables
 
 Starting with the dummy variables.
 
-We will keep only dummies that has the event in at least 5% in the dataset:
+We will keep only dummies that has the event in at least 5% of the observation in the dataset.
+
+Below table shows the dummy variables that will be kept in the model:
 
 ```{r dummies_high, echo=TRUE}
 dummy_variables <- dplyr::select(loan_dataset_logistic, 
@@ -110,7 +112,6 @@ dummy_variables_high <- tibble(variables = names(dummy_variables),
 kable(dummy_variables_high)
 ```
 
-
 The remaining dummies will be excluded from the dataset as they do not have enough variability to fit a logistic model on them.
 
 ```{r dummies_reject, echo=FALSE}
@@ -122,7 +123,7 @@ loan_dataset_logistic <- dplyr::select(loan_dataset_logistic, -dummy_variables_l
 
 ### Transaction type proportion variables
 
-After we investigated the low variability in the dummies we look at the calculated variables on the transaction type proportion we calculated dutring the data enhancement process.
+After we investigated the low variability in the dummies, we take care of the calculated variables on the transaction type proportion we calculated during the data enhancement process.
 
 ```{r prop, echo=TRUE}
 prop_variables <- dplyr::select(loan_dataset_logistic, 
@@ -135,7 +136,7 @@ kable(t(prop_variables))
 loan_dataset_logistic <- dplyr::select(loan_dataset_logistic, -x_prop_old_age_pension)
 ```
 
-Variable **x_prop_old_age_pension** is also excluded from the data set as in the dataset no observation has this type of transaction.
+The variable **x_prop_old_age_pension** is also excluded from the dataset as it has not a single observation in this sample.
 
 We ended up having a data set with **40 variables**.
 
@@ -145,7 +146,17 @@ kable(tibble(variables = names(loan_dataset_logistic)))
 
 ### Multicollinearity on feature variables
 
-With the remaining variables we ran a multicollinearity test to identify additional variables to drop from the model specification.
+Multicollinearity is the phenomenon in which a given predictor has a strong correlation with one or more predictors, in this scenario the multiple regression coefficient estimates may vary erratically depending on the data or the model may not even be possible to be calculate in the case of a perfect correlation on the predictors.
+
+So before we try to fit a model we ran a multicollinearity test to identify additional variables to drop from the model specification.
+
+The idea here is to identify the variables with high correlation among them and keep just the variables that have no strong correlation to the other predictors. we will do so by preferring to keep the variables that have lowest correlation against the others.
+
+Just looking at correlation indexes among pairs of predictors is limited as it is possible that the pairwise correlations are small, and yet a linear dependence exists among three or more variables.
+
+That’s why we will really on a test called Variance Inflation Factors, VII for short, to detect multicollinearity.
+
+Multicollinearity is poison for Regression algorithms!!! :skull: `:skull:`:skull: `:skull:`:skull: `:skull:`
 
 ```{r check_correl, out.width = '100%', warning=FALSE}
 vars.quant <- select_if(loan_dataset_logistic, is.numeric)
@@ -158,7 +169,9 @@ VIF_Table_Before <- tibble(variable = names(VIF$idiags[,1]),
 knitr::kable(VIF_Table_Before)
 ```
 
-Then we look at the correlogram in the high VIF variables.
+Having identified the predictors with high VIF we look at the correlogram on those variables.
+
+Here we are hiding the variable names for readability.
 
 ```{r check_correl_2, out.width = '100%'}
 low_VIF <- filter(VIF_Table_Before, VIF <= 5)$variable
@@ -182,7 +195,11 @@ print(high_VIF_correlogram_before)
 
 ```
 
-Then we exclude the variables with high correlation keeping the variables with less correlation with the others.
+We will now exclude the variables with High VIF maintaining only the variables that are not correlated.
+
+We will use the pairwise correlation indexes to choose the variable to reject, code below will exclude the variable in the pair that have the greater correlation index sum against the other predictor not in the pair.
+
+at the end we will have only variables that have a correlation index smaller than our selected **threshold (0.6)**.
 
 ```{r check_correl_3, out.width = '100%'}
 correl_threshold <- 0.6
@@ -209,7 +226,10 @@ clean_dataset <- dplyr::select(loan_dataset_logistic, -reject_variables_vector)
 kable(reject_variables_vector)
 ```
 
-We finally look on the complete dataset correlogram with the clean data set.
+After the high VIF predictors exclusion we reevaluate the correlation matrix of the original dataset and the cleaned dataset.
+
+Variable names are hidden for readability.
+Trust us, there is no correlation greater than 0.6 here.
 
 ```{r check_correl_4, out.width = '100%'}
 cor_mtx_full <- cor(loan_dataset_logistic)
@@ -238,7 +258,7 @@ print(ggarrange(full, clean))
 loan_dataset_logistic <- clean_dataset
 ```
 
-We also look again at the VIF estimates for the clena dataset.
+Once again let’s look on the VIF estimates.
 
 ```{r check_correl_5, out.width = '100%'}
 vars.quant <- select_if(loan_dataset_logistic, is.numeric)
@@ -273,7 +293,9 @@ ggplot(VIF_Table_After, aes(x = fct_reorder(variable, VIF),
 loan_dataset_logistic <- dplyr::select(loan_dataset_logistic, -x_average_salary)
 ```
 
-We finally texclude one last variable that still has a VIF higher than our threshold (5)
+Although **x_average_salary** have no correlation index greater than our defined **threshold (0.6)** it still have a VIF greater than 5, and for pure methodological puritanism we decided to exclude this variable as well.
+
+We did try to keep it, but it had no real difference.
 
 ```{r check_correl_6, echo=FALSE, out.width = '100%'}
 vars.quant <- select_if(loan_dataset_logistic, is.numeric)
@@ -306,11 +328,21 @@ ggplot(VIF_Table_After, aes(x = fct_reorder(variable, VIF),
        Variables with VIF more than 5 will be droped from the model")
 ```
 
-After variable selection step we end up with **28 variables** in the dataset.
+After all this work we end up having **28 variables** in the dataset.
 
 ```{r variables_final, echo=TRUE}
 kable(tibble(variables = names(loan_dataset_logistic)))
 ```
+
+## Looking for outliers
+
+And what about outliers?
+
+Regression algorithms are known for its sensitivity for outliers.
+
+So, before we go for the modeling juice we will look for those bastards!!!
+
+Working in progress !!!!
 
 ## Sample split into Test and Training Data
 
@@ -332,6 +364,10 @@ kable(SplitDataset$event.proportion)
 
 Both datasets keep the same proportion for the explained variable around 11%.
 
+This split was saved in disk using the function described in the Data Prep session to be reused in the other models fitted in this exercise.
+
+This will ensure consistency when comparing the models against each other.
+
 ## Fit the logistic model 
 
 With the final cleaned dataset, we got from above steps we fit our Logistic Regression model for y_loan_defaulter on all x variables.
@@ -345,7 +381,11 @@ names(logistic.full$coefficients) <- stringr::str_sub(names(logistic.full$coeffi
 summary(logistic.full)
 ```
 
-Alternatively we fit a second model only with variables statistically significant p-value less than 10% using the stepwise method.
+With the full model fitted we will run the stepwise method to automate the selection of predictors using the **(Akaike Information Criterion) AIC for short**.
+
+This is a broadly used estimator that evaluates the relative quality of statistical methods for a given set of data.
+
+The lower the AIC the better.
 
 ```{r fit_model_step_0, include=FALSE}
 logistic.step <- step(logistic.full, direction = "both", test = "F")
@@ -363,6 +403,26 @@ names(logistic.step$coefficients) <- stringr::str_sub(names(logistic.step$coeffi
 ```{r fit_model_step_show, echo=FALSE}
 summary(logistic.step)
 ```
+
+# Interpreting model output
+
+Logistic Regression models are not only good for prediction but also for inference.
+
+Meaning that it can be used not only in predicting the classification into Defaulters and Non-Defaulters but also to understand the relationship between the predictors and the likelihood of delinquency.
+
+In the Logistic Regression the effect of an increase or decrease of a predictor is not linear, but we can see the predictors that have the greater influence and by its coefficient signal the associated with an increase or decrease on the likelihood of default.
+
+In our model we see that below variables are associated to an increase in the likelihood of default:
+- **x_loan_amount**
+- **x_prop_interest_credited**
+- **x_prop_statement**
+
+on the other hand, below variables are associated to a decrease in the likelihood of default:
+- **x_card_type_classic**
+- **x_loan_duration**
+- **x_no_of_commited_crimes_1995**
+- **x_loan_amount**
+- **x_region_north_Bohemia**
 
 # Evaluating the model performance
 
@@ -398,7 +458,7 @@ To calculate the performance measures, derived from the confusion matrix, we nee
 
 In this exercise we decide to not prioritize the accuracy on predicting Defaulters and Non-Defaulters, therefore we are looking for the score cut off that best predict each class equally.
 
-We will use a custom function developed in this paper to calculate the best cut off for each model:
+Below functions were developed in this exercise to provide that.
 
 ```{r get_measures_functions, eval=FALSE}
 ## making preditions for each model and consilidating in a single data frame
@@ -467,7 +527,7 @@ metricsByCutoff.test_log    <- modelMetrics(prob.test$logistic.actual,
 metricsByCutoff.test_log$Plot
 ```
 
-With the optimized cut off we calculate the full set of model metrics.
+With the optimized cut off we calculate the full set of model metrics using the function HMeasure from hmeasure library.
 
 ```{r get_measures_full, echo=TRUE, out.width= '100%', warning=FALSE}
 # logistic regression
@@ -496,9 +556,12 @@ Below are the metrics on the train and test dataset:
 kable(measures, row.names = FALSE)
 ```
 
-In general, this model has not delivered a good accuracy, we will compare how it performed against other classes of models in the Final Report section.
+## evaluating classification performance:
 
-Below the confusion matrix and general performance of the model that we get from our custom function:
+In general the Logistic Regression model is not delivering good accuracy, we will compare how it performed against other classes of models in the Final Report session
+
+Below the confusion matrix and general performance of the model using our custom function developed in this exercise:
+
 ```{r see_accuracy, eval=FALSE}
 accuracy <- function(score, actual, threshold = 0.5) {
   
@@ -528,7 +591,7 @@ accuracy(score = prob.test$logistic.predicted,
          threshold = metricsByCutoff.test_log[["BestCut"]][["Cut"]])
 ```
 
-We can finally look at the score distribution charts how well the model is able to split Defaulters and Non-Defaulters
+We finally look at the score distribution charts to check how well the model is able to discriminate Defaulters and Non-Defaulters.
 
 ```{r model_plots, echo=TRUE, out.width= '100%'}
 p1 <- Score_Histograms(prob.test, 
@@ -547,3 +610,12 @@ p3 <- KS_Plot(prob.test$logistic.predicted[prob.test$logistic.actual == 0],
                            axis.text.y = element_blank())
 ggarrange(p1, p2, p3, nrow = 3)
 ```
+
+By the score density we see that our Logistic Regression model is very broad on the scores it assigns to the observations, especially for the real Defaulters not providing a good separation between each class.
+
+The box plot also does not show a clear discrimination between Defaulters and Non-Defaulters.
+
+Finally, the KS metric is far from what is expected for a reasonable classification model.
+
+In the Final Report session, we will look more closely on the AUC and Gini metrics by plotting the ROC curve and comparing against other models.
+
