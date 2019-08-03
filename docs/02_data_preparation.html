@@ -439,7 +439,7 @@ $(document).ready(function () {
 <div id="TOC">
 <ul>
 <li><a href="#using-a-step-by-step-approach"><span class="toc-section-number">1</span> Using a step by step approach</a></li>
-<li><a href="#step-1---create-functions"><span class="toc-section-number">2</span> Step 1 - Create Functions</a><ul>
+<li><a href="#create-functions-step-1"><span class="toc-section-number">2</span> Create Functions (step 1)</a><ul>
 <li><a href="#specific-data-ingestion-functions"><span class="toc-section-number">2.1</span> Specific data ingestion functions</a><ul>
 <li><a href="#getgenderfrombirthnumber"><span class="toc-section-number">2.1.1</span> GetGenderFromBirthnumber</a></li>
 <li><a href="#getbirthdatefrombirthnumber"><span class="toc-section-number">2.1.2</span> GetBirthdateFromBirthnumber</a></li>
@@ -453,11 +453,11 @@ $(document).ready(function () {
 <li><a href="#data-preparation-functions"><span class="toc-section-number">2.3</span> Data preparation functions</a></li>
 <li><a href="#auxiliary-plot-functions"><span class="toc-section-number">2.4</span> Auxiliary plot functions</a></li>
 </ul></li>
-<li><a href="#step-2---data-ingestion"><span class="toc-section-number">3</span> Step 2 - Data Ingestion</a></li>
-<li><a href="#step-3---data-cleaning"><span class="toc-section-number">4</span> Step 3 - Data Cleaning</a></li>
-<li><a href="#step-4---label-translation"><span class="toc-section-number">5</span> Step 4 - Label Translation</a></li>
-<li><a href="#step-5---data-enhancement"><span class="toc-section-number">6</span> Step 5 - Data Enhancement</a></li>
-<li><a href="#step-6---data-preparation-for-predictive-modeling"><span class="toc-section-number">7</span> Step 6 - Data Preparation for Predictive Modeling</a><ul>
+<li><a href="#data-ingestion-step-2"><span class="toc-section-number">3</span> Data Ingestion (step 2)</a></li>
+<li><a href="#data-cleaning-step-3"><span class="toc-section-number">4</span> Data Cleaning (step 3)</a></li>
+<li><a href="#label-translation-step-4"><span class="toc-section-number">5</span> Label Translation (step 4)</a></li>
+<li><a href="#data-enhancement-step-5"><span class="toc-section-number">6</span> Data Enhancement (step 5)</a></li>
+<li><a href="#data-preparation-for-predictive-modeling-step-6"><span class="toc-section-number">7</span> Data Preparation for Predictive Modeling (step 6)</a><ul>
 <li><a href="#selecting-the-target-dataset"><span class="toc-section-number">7.1</span> Selecting the target dataset</a></li>
 <li><a href="#splitting-dataset-into-train-and-test-data"><span class="toc-section-number">7.2</span> Splitting dataset into Train and Test data</a></li>
 </ul></li>
@@ -476,8 +476,8 @@ $(document).ready(function () {
 <li><strong>Step 06</strong>: Dataset Preparation</li>
 </ul>
 </div>
-<div id="step-1---create-functions" class="section level1">
-<h1><span class="header-section-number">2</span> Step 1 - Create Functions</h1>
+<div id="create-functions-step-1" class="section level1">
+<h1><span class="header-section-number">2</span> Create Functions (step 1)</h1>
 <p>This step create functions to be used in the next steps. Following, all functions created are described.</p>
 <div id="specific-data-ingestion-functions" class="section level2">
 <h2><span class="header-section-number">2.1</span> Specific data ingestion functions</h2>
@@ -602,8 +602,8 @@ $(document).ready(function () {
 </ul>
 </div>
 </div>
-<div id="step-2---data-ingestion" class="section level1">
-<h1><span class="header-section-number">3</span> Step 2 - Data Ingestion</h1>
+<div id="data-ingestion-step-2" class="section level1">
+<h1><span class="header-section-number">3</span> Data Ingestion (step 2)</h1>
 <p>The process of data ingestion — preparing data for analysis — usually includes steps called extract (taking the data from its current location), transform (cleansing and normalizing the data), and load (placing the data in a database where it can be analyzed).</p>
 <p>During this step, in addition to the loading data processes, it was performed data casting, column renaming and small touch-ups. The list below describe each table adjustment taken:</p>
 <ul>
@@ -615,8 +615,8 @@ $(document).ready(function () {
 <li><strong>Transaction</strong>: casting columns in table transaction to the right data types.</li>
 </ul>
 </div>
-<div id="step-3---data-cleaning" class="section level1">
-<h1><span class="header-section-number">4</span> Step 3 - Data Cleaning</h1>
+<div id="data-cleaning-step-3" class="section level1">
+<h1><span class="header-section-number">4</span> Data Cleaning (step 3)</h1>
 <p>The objective of this step is analysing missing values and other strange conditions. In order to accomplish this task, a few R functions were used to quickly discover missing values, like NA and empty fields.</p>
 <p>First thing done, was fixing observations in k_symbol transaction table with ’ ’ (one space) to empty string (’’), using the following command.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">transaction<span class="op">$</span>k_symbol =<span class="st"> </span><span class="kw">trimws</span>(transaction<span class="op">$</span>k_symbol)</a></code></pre></div>
@@ -728,8 +728,8 @@ $(document).ready(function () {
 </table>
 <p>For the exploration analysis report, we did not take any additional action, since the missing values was not relevant.</p>
 </div>
-<div id="step-4---label-translation" class="section level1">
-<h1><span class="header-section-number">5</span> Step 4 - Label Translation</h1>
+<div id="label-translation-step-4" class="section level1">
+<h1><span class="header-section-number">5</span> Label Translation (step 4)</h1>
 <p>In order to make the data information more understandable, it was translated some relevant labels and domains from Czech to English.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="co"># Translating relevant labels and domains to english --------------------------------------------</span></a>
 <a class="sourceLine" id="cb10-2" title="2"></a>
@@ -764,8 +764,8 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb10-31" title="31">                                          <span class="st">&#39;interest credited&#39;</span>, <span class="st">&#39;sanction interest&#39;</span>, </a>
 <a class="sourceLine" id="cb10-32" title="32">                                          <span class="st">&#39;household&#39;</span>, <span class="st">&#39;old age pension&#39;</span>, <span class="st">&#39;loan payment&#39;</span>))</a></code></pre></div>
 </div>
-<div id="step-5---data-enhancement" class="section level1">
-<h1><span class="header-section-number">6</span> Step 5 - Data Enhancement</h1>
+<div id="data-enhancement-step-5" class="section level1">
+<h1><span class="header-section-number">6</span> Data Enhancement (step 5)</h1>
 <p>This step aims to improve the analysis by adding auxiliary information. Data enhancement is all about making sure any data that is coming into the business is being looked at with a critical eye and is being filtered down to maximize its value.</p>
 <p>The code below get gender, birthday and age from birth_number column using <em>GetGenderFromBirthnumber</em> and <em>GetBirthdateFromBirthnumber</em> functions.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">client &lt;-<span class="st"> </span>client <span class="op">%&gt;%</span><span class="st"> </span></a>
@@ -809,8 +809,8 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb15-16" title="16">              <span class="dt">prop_sanction_interest =</span> <span class="kw">sum</span>(<span class="st">`</span><span class="dt">sanction interest</span><span class="st">`</span>) <span class="op">/</span><span class="st"> </span>amount,</a>
 <a class="sourceLine" id="cb15-17" title="17">              <span class="dt">prop_statement =</span> <span class="kw">sum</span>(<span class="st">`</span><span class="dt">statement</span><span class="st">`</span>) <span class="op">/</span><span class="st"> </span>amount)</a></code></pre></div>
 </div>
-<div id="step-6---data-preparation-for-predictive-modeling" class="section level1">
-<h1><span class="header-section-number">7</span> Step 6 - Data Preparation for Predictive Modeling</h1>
+<div id="data-preparation-for-predictive-modeling-step-6" class="section level1">
+<h1><span class="header-section-number">7</span> Data Preparation for Predictive Modeling (step 6)</h1>
 <div id="selecting-the-target-dataset" class="section level2">
 <h2><span class="header-section-number">7.1</span> Selecting the target dataset</h2>
 <p>The below function was created to be used in the modeling exercises to be performed, the idea is to have a standard way to get the prepared data set already prepared with correct data types and dummies.</p>
