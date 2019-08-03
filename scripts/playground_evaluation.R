@@ -80,9 +80,9 @@ invisible(gc())
 # model evaluation -------------------------------------------------------------------
 
 ## making preditions for each model and consilidating in a single data frame
-prob.full = list()
-prob.train = list()
-prob.test = list()
+prob.full   <-  list()
+prob.train  <-  list()
+prob.test   <-  list()
 
 # getting predicted and actual values in the full dataset
 prob.full$logistic.actual         <- loan_dataset_logistic$y_loan_defaulter
@@ -127,9 +127,9 @@ prob.test$random.forest.predicted <- predict(rf.full, type = "prob",
                                              newdata = data.test_rf)[, 2]
 
 # converting lists into tibble
-prob.full   <- prob.full %>% as_tibble()
-prob.train  <- prob.train %>% as_tibble()
-prob.test   <- prob.test %>% as_tibble()
+prob.full   <- prob.full   %>% as_tibble()
+prob.train  <- prob.train  %>% as_tibble()
+prob.test   <- prob.test   %>% as_tibble()
 
 # clean global environment
 rm(loan_dataset_boost, loan_dataset_DT, loan_dataset_logistic, loan_dataset_rf,
@@ -137,7 +137,7 @@ rm(loan_dataset_boost, loan_dataset_DT, loan_dataset_logistic, loan_dataset_rf,
    data.train_boost, data.train_DT, data.train_logistic, data.train_rf)
 invisible(gc())
 
-## getting measures -----------------------------------------------------------------
+## getting cut off measures -----------------------------------------------------------------
 
 metricsByCutoff.test_log    <- modelMetrics(prob.test$logistic.actual, 
                                             prob.test$logistic.predicted, 
