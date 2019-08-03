@@ -327,8 +327,15 @@ boxplots
 
 ### KS Plots
 
-Here we look at the acumulated probability distribution curves delivered by each model.
-From this plot we can derivate a key measure KS (Kolmogorov–Smirnov).
+Now we look to the custom KS plots of each model side by side.
+
+The KS metric is the maximum distance between the cumulative distribution functions of two samples.
+
+KS metric ranges from 0 to 1, 0 meaning that there is no discrimination at all and 1 meaning a full discrimination.
+
+In this case we are comparing the cumulative distribution sample of Defaulters and Non-Defaulters.
+
+The bigger the KS metric the better the model are to discriminate Defaulters to Non-Defaulters.
 
 ```{r KS_plots, echo=TRUE, out.width= '100%'}
 KS_plots <- ggarrange(
@@ -353,3 +360,48 @@ KS_plots <- annotate_figure(KS_plots,
 KS_plots
 ```
 
+### ROC Curve
+
+Now we look to the ROC curve of our models.
+
+The Receiver Operating Characteristic Curve is a plot that shows the discrimination ability of a binary classifier model as its classification threshold changes.
+
+We get this chart by plotting the True positive rate (TPR) against the False Positive Rate (FPR) at different threshold settings.
+
+The bigger the Area Under the Curve (AUC) the better the model is in classifying the observation.
+
+```{r ROC, echo=TRUE, out.width= '100%'}
+Plot_ROC(prob.test, smooth_opt = FALSE)
+```
+
+### Acurracy
+
+We finally look at the Confusion Matrix at the best cut off each model to get a sense of the accuracy we were able to get in this exercise.
+
+Random Forest is the best model we got in this exercise.
+
+```{r ROC, echo=TRUE, out.width= '100%'}
+# logistic regression
+accuracy(score = prob.test$logistic.predicted, 
+         actual = prob.test$logistic.actual, 
+         threshold = metricsByCutoff.test_log[["BestCut"]][["Cut"]])
+
+# decision tree
+accuracy(score = prob.test$decision.tree.predicted, 
+         actual = prob.test$decision.tree.actual, 
+         threshold = metricsByCutoff.test_DT[["BestCut"]][["Cut"]])
+
+# boosting
+accuracy(score = prob.test$boosting.predicted, 
+         actual = prob.test$boosting.actual, 
+         threshold = metricsByCutoff.test_boost[["BestCut"]][["Cut"]])
+
+# random forest
+accuracy(score = prob.test$random.forest.predicted, 
+         actual = prob.test$random.forest.actual, 
+         threshold = metricsByCutoff.test_rf[["BestCut"]][["Cut"]])
+```
+
+Unfortunately, this is not a real dataset with really interest variables client income, credit rate, and so on.
+
+The dataset is also not big enough to deliver consistent results, we saw significant variation in the models depending on the split ratio, and the hyperparameters used in each model, but the dataset served very well for the intent of practicing the techniques and R programing skills learned in the class.
