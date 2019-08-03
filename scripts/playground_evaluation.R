@@ -282,60 +282,59 @@ KS_plots
 
 ## ROC Curve ----------------------------------------------------------------------
 
-# logistic regression
 
-roc_logistic      <- roc(prob.test$logistic.actual,
-                         prob.test$logistic.predicted)
+Plot_ROC <- function(dataset, smooth_opt = FALSE) {
+   # logistic regression
+   roc_logistic      <- roc(logistic.actual ~ logistic.predicted,
+                            dataset,
+                            smooth = smooth_opt)
 
-# decision tree
+   # decision tree
+   roc_decision.tree <- roc(decision.tree.actual ~ decision.tree.predicted,
+                            dataset,
+                            smooth = smooth_opt)
 
-roc_decision.tree <- roc(prob.test$decision.tree.actual, 
-                         prob.test$decision.tree.predicted)
+   # boosting
+   roc_boosting      <- roc(boosting.actual ~ boosting.predicted,
+                            dataset,
+                            smooth = smooth_opt)
 
-# boosting
+   # random forest
+   roc_random.forest <- roc(random.forest.actual ~ random.forest.predicted,
+                            dataset,
+                            smooth = smooth_opt)
+   
+   p <- ggplot() +
+      geom_line(aes(x = 1 - roc_logistic$specificities, 
+                    y = roc_logistic$sensitivities),
+                color = 'red',
+                size = 1,
+                linetype = 1) +
+      geom_line(aes(x = 1 - roc_decision.tree$specificities, 
+                    y = roc_decision.tree$sensitivities),
+                color = 'blue',
+                size = 1,
+                linetype = 1) +
+      geom_line(aes(x = 1 - roc_boosting$specificities, 
+                    y = roc_boosting$sensitivities),
+                color = 'green',
+                size = 1,
+                linetype = 1) +
+      geom_line(aes(x = 1 - roc_random.forest$specificities, 
+                    y = roc_random.forest$sensitivities),
+                color = 'purple',
+                size = 1,
+                linetype = 1) +
+      labs(y = 'True Positive Rate',
+           x = 'False Positive Rate')
+      theme_economist() +
+      theme(panel.grid = element_blank())
 
-roc_boosting      <- roc(prob.test$boosting.actual,
-                         prob.test$boosting.predicted)
+   print(p)
+}
 
-# random forest
+Plot_ROC(prob.test, smooth_opt = FALSE)
 
-roc_random.forest <- roc(prob.test$random.forest.actual,
-                         prob.test$random.forest.predicted)
-
-
-# logistic regression
-
-y1 <- roc_logistic$sensitivities
-x1 <- 1 - roc_logistic$specificities
-
-# decision tree
-
-y2 <- roc_decision.tree$sensitivities
-x2 <- 1 - roc_decision.tree$specificities
-
-# boosting
-
-y3 <- roc_boosting$sensitivities
-x3 <- 1 - roc_boosting$specificities
-
-# random.forest
-
-y4 <- roc_random.forest$sensitivities
-x4 <- 1 - roc_random.forest$specificities
-
-plot(x1, y1,  type="n",
-     xlab = "False Positive Rate (Specificities)", 
-     ylab = "True Positive Rate (Sensitivities)")
-
-lines(x1, y1, lwd = 3, lty = 1, col="red") 
-lines(x2, y2, lwd = 3, lty = 1, col="blue")
-lines(x3, y3, lwd = 3, lty = 1, col="green")
-lines(x4, y4, lwd = 3, lty = 1, col="purple")
-
-legend("bottomright", c('Logistic', 'Decision Tree', 'Boosting', 'Random Forest'), 
-       lty = 1, col = c('red', 'blue', 'green', 'purple'))
-
-abline(0, 1, lty = 2)
 
 # accuracy metrics ---------------------------------------------------------------
 
