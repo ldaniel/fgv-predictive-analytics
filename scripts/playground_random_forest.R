@@ -95,3 +95,4 @@ FitResults <- bind_rows(metricsByCutoff.full$BestCut,
 kable(FitResults)
 
 # Optimized cut-off selected parameter: 0.15
+
