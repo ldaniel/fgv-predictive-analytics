@@ -98,7 +98,6 @@ modelMetrics <- function(realData, predData, stepping = 0.01,
               Plot = p))
 }
 
-<<<<<<< HEAD
 # accuracy ----------------------------------------------------------------
 # The objective of this function is to calculate main accuracy metrix of the model performance.
 accuracy <- function(score, actual, threshold = 0.5) {
@@ -120,10 +119,7 @@ accuracy <- function(score, actual, threshold = 0.5) {
               sep = ''))
 }
 
-# SplitTestTrainDataset -------------------------------------------------------
-=======
 # data preparation functions --------------------------------------------------
->>>>>>> 1cd92551efd1b6d6a4d2f3d89aa0aa3a0fbc4a47
 # The objective of this function is to split a given dataset 
 # in train and test datasets
 SplitTestTrainDataset <- function(dataset) {
