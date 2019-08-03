@@ -29,6 +29,7 @@ library(plotly)
 
 # libraries for modeling
 library(caret)
+library(gmodels)
 library(rpart)
 library(rpart.plot)
 
@@ -50,9 +51,9 @@ source("./scripts/step_06_dataset_preparation.R")
 
 # Objective
 
-The goal of this report is trying to fit a simple decision Tree model on Loan data aiming to predict the probability of delinquency for each contract.
+The goal of this session is trying to fit a simple Decision Tree model on Loan data aiming to predict the probability of delinquency for each contract.
 
-# Task description
+# Modeling
 
 ## Dataset preparation
 
@@ -70,8 +71,9 @@ kable(tibble(variables = names(loan_dataset_logistic)))
 
 ## Variable selection
 
-One advantage of Decision Tree models is that it does no require heavy feature enginiring.
-We will only remove **x_prop_old_age_pension** that we found ou to have no variance in the dataset.
+One advantage of Decision Tree models is that it does not require heavy feature engineering.
+
+We will only remove **x_prop_old_age_pension** that we know beforehand to have no variance in the dataset.
 
 This model is also not sensible to outliers, missing values and multicollinearity.
 
@@ -102,38 +104,84 @@ kable(SplitDataset$event.proportion)
 
 Both datasets keep the same proportion for the explained variable around 11%.
 
-## Fit the Decision Tree model 
+## Fiting the Decision Tree model 
 
 With the final cleaned dataset, we got from above steps we fit our Decision Tree Model for y_loan_defaulter on all x variables.
 
-We choose to change the default **minbucket** parameter to **5** to deliberate create a fully grown tree as the database is not big enouth for this model.
+We choose to change the default parameters **minbucket** and **maxdepth** parameter to **5**to deliberate create a fully-grown tree as the database is not big enough for this model.
 
 ```{r fit_DT_full, echo=TRUE, out.width= '100%'}
 tree.full <- rpart(data= data.train_DT, y_loan_defaulter ~ .,
-                   control = rpart.control(minbucket = 5),
+                   control = rpart.control(minbucket = 5,
+                                           maxdepth = 5),
                    method = "class")
 
-tree.full
-summary(tree.full)
-rpart.plot(tree.full)
+rpart.plot(tree.full, cex = 1.3, type = 0,
+           extra = 104, box.palette = 'BuRd',
+           branch.lty = 3, shadow.col = 'gray', 
+           nn = TRUE, main = 'Decision Tree - Prune')
 
-printcp(tree.full)
-plotcp(tree.full)
 ```
 
-### Evaluating necessity of prunning
+## Evaluating necessity of prunning
+
+Pruning is a technique in machine learning used to reduce the size of decision tree by removing nodes that provide little power of classification.
+
+The idea is reducing the complexity of the decision tree and thereof avoid overfit to the train dataset.
+
+Pruning process is done by comparing different variations of the fully-grown tree and evaluating the relative error trend comparing to a zero node tree, each node that does not affect the classification power of the tree is replaced by a leaf node.
 
 ```{r fit_DT_prune, echo=TRUE, out.width= '100%'}
-tree.prune <- prune(tree.full, cp= tree.full$cptable[which.min(tree.full$cptable[,"xerror"]),"CP"])
-tree.prune <- tree.full
+printcp(tree.full)
+plotcp(tree.full)
 
-plotcp(tree.prune)
-rpart.plot(tree.prune)
+cp_prune = tree.full$cptable[which.min(tree.full$cptable[,"xerror"]), "CP"]
+tree.prune <- prune(tree.full, cp = cp_prune)
 
+rpart.plot(tree.prune, cex = 1.3, type = 0,
+           extra = 104, box.palette = 'BuRd',
+           branch.lty = 3, shadow.col = 'gray', 
+           nn = TRUE, main = 'Decision Tree - Prune')
+
+#tree.prune <- tree.full
+
+```
+
+On performing the pruning process in our decision tree, we end up with a tree with only one node split.
+This is because splitting the train data set of just one node provide an overall accuracy greater than any other combination.
+
+Here the technique falls short for this dataset, we would be interest in give a greater weight on correctly predict the real defaulters than the general accuracy of the model.
+
+A Decision Tree is definitely not a good model for this dataset, but as we are just exercising the modeling technique (just having fun here !!!) we will use the full decision tree we got to compare its metrics and see how it perform against the other models we created in this class exercise.
+
+We tried different parameters for **minbucket** and **maxdepth**, as our dataset is not big enough all of then presented huge differences in performance, the one we chose for this exercise seems to be a reasonable trade-off on overfitting to compare against the other models.
+
+We can do this by simply feeding back the full tree to our prune tree object and move on to the performance metrics.
+
+```{r fit_DT_prune_1, echo=TRUE, out.width= '100%'}
 tree.prune <- tree.full
 ```
 
+# Interpreting model output
+
+Decision Trees are known by its very descriptive rules on how it is classifying each observation.
+It provides a very clear human readable set of rules that can show the importance of each variable on the decision process.
+
+Our full decision tree model clear shows that below variables are the key features that can be used to decide the likelihood of default in each contract:
+
+- **x_account_balance**
+- **x_prop_interest_credited**
+- **x_avg_account_balance**
+- **x_loan_amount**
+- **x_no_of_commited_crimes_195**
+
+The result is not so different from the Logistic Regression model we created in the session before.
+
 # Evaluating the model performance
+
+Here we will perform basically the same steps we did in the Logistic Regression model.
+
+A comparison against all the models will be provided in the Final Report session of this exercise.
 
 We started this step by making predictions using our model on the X's variables in our Train and Test datasets.
 
@@ -158,7 +206,7 @@ prob.train  <- prob.train %>% as_tibble()
 prob.test   <- prob.test %>% as_tibble()
 ```
 
-## Getting Performance Measures:
+## Getting performance measures:
 
 To calculate the performance measures, derived from the confusion matrix, we need to find the score cut off that best split our test dataset into Defaulters and Non-Defaulters.
 
@@ -174,7 +222,7 @@ metricsByCutoff.test_DT     <- modelMetrics(prob.test$decision.tree.actual,
 metricsByCutoff.test_DT$Plot
 ```
 
-With the optimized cut off we calculate the full set of model metrics.
+With the optimized cut off we calculate the full set of model metrics using the function HMeasure from hmeasure library.
 
 ```{r get_measures_full, echo=TRUE, out.width= '100%', warning=FALSE}
 # decision tree
@@ -202,9 +250,11 @@ Below are the metrics on the train and test dataset:
 kable(measures, row.names = FALSE)
 ```
 
-In general, this model has not delivered a good accuracy, we will compare how it performed against other classes of models in the Final Report section.
+## evaluating classification performance:
 
-Below the confusion matrix and general performance of the model that we get from our custom function:
+In general, such as the Logistic Regression model, this model is not delivering good accuracy, we will compare how it performed against other classes of models in the Final Report session
+
+Below the confusion matrix and general performance of the model:
 ```{r see_accuracy_1, echo=TRUE, out.width= '100%'}
 # accuracy metrics ---------------------------------------------------------------
 # logistic regression
@@ -213,7 +263,7 @@ accuracy(score = prob.test$decision.tree.predicted,
          threshold = metricsByCutoff.test_DT[["BestCut"]][["Cut"]])
 ```
 
-We can finally look at the score distribution charts how well the model is able to split Defaulters and Non-Defaulters
+We finally look at the score distribution charts how well the model is able to discriminate Defaulters and Non-Defaulters
 
 ```{r model_plots, echo=TRUE, out.width= '100%'}
 p1 <- Score_Histograms(prob.test, 
@@ -233,3 +283,15 @@ p3 <- KS_Plot(prob.test$decision.tree.predicted[prob.test$decision.tree.actual =
 
 ggarrange(p1, p2, p3, nrow = 3)
 ```
+
+By the score density we see that our Decision Tree is very narrow on the scores it assigns to the observations.
+
+This is expected from single Decision Trees.
+
+The box plot also does not show a clear separation between Defaulters and Non-Defaulters.
+
+Finally, the KS metric is far from what is expected for a reasonable classification model.
+
+In the Final Report session, we will look more closely on the AUC and Gini metrics by plotting the ROC curve and comparing against other models.
+
+Stay tuned!!!
