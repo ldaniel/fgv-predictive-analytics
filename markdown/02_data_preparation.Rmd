@@ -141,7 +141,7 @@ calculateModelMetrics <- function(cutData, realData, predData){
 #### modelMetrics  
 The objective of this function is to calculate main metrics of model performance for cutoffs from 0-1 based on given step.
 
-``` {r calculateModelMetrics, eval = FALSE}
+``` {r modelMetrics, eval = FALSE}
 modelMetrics <- function(realData, predData, stepping = 0.01, 
                          plot_title = "TPR/TNR by cutoff over full dataset"){
   probCuts <- seq(from = 0, to = 1, by = stepping)
