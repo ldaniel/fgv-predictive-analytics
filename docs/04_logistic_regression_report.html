@@ -436,26 +436,32 @@ $(document).ready(function () {
 <div id="TOC">
 <ul>
 <li><a href="#objective"><span class="toc-section-number">1</span> Objective</a></li>
-<li><a href="#task-description"><span class="toc-section-number">2</span> Task description</a><ul>
+<li><a href="#modeling"><span class="toc-section-number">2</span> Modeling</a><ul>
 <li><a href="#dataset-preparation"><span class="toc-section-number">2.1</span> Dataset preparation</a></li>
-<li><a href="#variable-selection"><span class="toc-section-number">2.2</span> Variable selection</a></li>
-<li><a href="#investigating-multicollinearity"><span class="toc-section-number">2.3</span> Investigating Multicollinearity</a></li>
+<li><a href="#variable-selection"><span class="toc-section-number">2.2</span> Variable selection</a><ul>
+<li><a href="#dummy-variables"><span class="toc-section-number">2.2.1</span> Dummy variables</a></li>
+<li><a href="#transaction-type-proportion-variables"><span class="toc-section-number">2.2.2</span> Transaction type proportion variables</a></li>
+<li><a href="#multicollinearity-on-feature-variables"><span class="toc-section-number">2.2.3</span> Multicollinearity on feature variables</a></li>
+</ul></li>
+<li><a href="#looking-for-outliers"><span class="toc-section-number">2.3</span> Looking for outliers</a></li>
 <li><a href="#sample-split-into-test-and-training-data"><span class="toc-section-number">2.4</span> Sample split into Test and Training Data</a></li>
 <li><a href="#fit-the-logistic-model"><span class="toc-section-number">2.5</span> Fit the logistic model</a></li>
 </ul></li>
-<li><a href="#evaluating-the-model-performance"><span class="toc-section-number">3</span> Evaluating the model performance</a><ul>
-<li><a href="#getting-performance-measures"><span class="toc-section-number">3.1</span> Getting Performance Measures:</a></li>
+<li><a href="#interpreting-model-output"><span class="toc-section-number">3</span> Interpreting model output</a></li>
+<li><a href="#evaluating-the-model-performance"><span class="toc-section-number">4</span> Evaluating the model performance</a><ul>
+<li><a href="#getting-performance-measures"><span class="toc-section-number">4.1</span> Getting Performance Measures:</a></li>
+<li><a href="#evaluating-classification-performance"><span class="toc-section-number">4.2</span> evaluating classification performance:</a></li>
 </ul></li>
 </ul>
 </div>
 
 <div id="objective" class="section level1">
 <h1><span class="header-section-number">1</span> Objective</h1>
-<p>The goal of this report is trying to fit a logistic regression model on Loan data aiming to predict the probability of delinquency for each contract.</p>
+<p>The goal of this session is trying to fit a Logistic Regression model on Loan data aiming to predict the probability of delinquency for each contract.</p>
 <hr />
 </div>
-<div id="task-description" class="section level1">
-<h1><span class="header-section-number">2</span> Task description</h1>
+<div id="modeling" class="section level1">
+<h1><span class="header-section-number">2</span> Modeling</h1>
 <div id="dataset-preparation" class="section level2">
 <h2><span class="header-section-number">2.1</span> Dataset preparation</h2>
 <p>Using the vanilla transaction dataset, we calculated several derived variables for each account as described in the Data Preparation session.</p>
@@ -830,9 +836,12 @@ $(document).ready(function () {
 </div>
 <div id="variable-selection" class="section level2">
 <h2><span class="header-section-number">2.2</span> Variable selection</h2>
-<p>Starting from this dataset we investigate the presence of redundant or variables not useful for the model such as the ones with not enough variability.</p>
+<p>Starting from this dataset we investigate the presence of redundant or variables not useful for the model such as the ones with not enough variability or with multicollinearity.</p>
+<div id="dummy-variables" class="section level3">
+<h3><span class="header-section-number">2.2.1</span> Dummy variables</h3>
 <p>Starting with the dummy variables.</p>
-<p>We will keep only dummies that has the event in at least 5% in the dataset:</p>
+<p>We will keep only dummies that has the event in at least 5% of the observation in the dataset.</p>
+<p>Below table shows the dummy variables that will be kept in the model:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">dummy_variables &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(loan_dataset_logistic, </a>
 <a class="sourceLine" id="cb2-2" title="2">                                 <span class="kw">starts_with</span>(<span class="st">&#39;x_client_gender&#39;</span>), </a>
 <a class="sourceLine" id="cb2-3" title="3">                                 <span class="kw">starts_with</span>(<span class="st">&#39;x_district_name&#39;</span>),</a>
@@ -922,7 +931,10 @@ $(document).ready(function () {
 </tbody>
 </table>
 <p>The remaining dummies will be excluded from the dataset as they do not have enough variability to fit a logistic model on them.</p>
-<p>After we investigated the low variability in the dummies we look at the calculated variables on the transaction type proportion we calculated dutring the data enhancement process.</p>
+</div>
+<div id="transaction-type-proportion-variables" class="section level3">
+<h3><span class="header-section-number">2.2.2</span> Transaction type proportion variables</h3>
+<p>After we investigated the low variability in the dummies, we take care of the calculated variables on the transaction type proportion we calculated during the data enhancement process.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">prop_variables &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(loan_dataset_logistic, </a>
 <a class="sourceLine" id="cb3-2" title="2">                                <span class="kw">starts_with</span>(<span class="st">&#39;x_prop&#39;</span>))</a>
 <a class="sourceLine" id="cb3-3" title="3"></a>
@@ -997,7 +1009,7 @@ $(document).ready(function () {
 </tbody>
 </table>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">loan_dataset_logistic &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(loan_dataset_logistic, <span class="op">-</span>x_prop_old_age_pension)</a></code></pre></div>
-<p>Variable <strong>x_prop_old_age_pension</strong> is also excluded from the data set as in the dataset no observation has this type of transaction.</p>
+<p>The variable <strong>x_prop_old_age_pension</strong> is also excluded from the dataset as it has not a single observation in this sample.</p>
 <p>We ended up having a data set with <strong>40 variables</strong>.</p>
 <table>
 <thead>
@@ -1129,9 +1141,14 @@ $(document).ready(function () {
 </tbody>
 </table>
 </div>
-<div id="investigating-multicollinearity" class="section level2">
-<h2><span class="header-section-number">2.3</span> Investigating Multicollinearity</h2>
-<p>With the remaining variables we ran a multicollinearity test to identify additional variables to drop from the model specification.</p>
+<div id="multicollinearity-on-feature-variables" class="section level3">
+<h3><span class="header-section-number">2.2.3</span> Multicollinearity on feature variables</h3>
+<p>Multicollinearity is the phenomenon in which a given predictor has a strong correlation with one or more predictors, in this scenario the multiple regression coefficient estimates may vary erratically depending on the data or the model may not even be possible to be calculate in the case of a perfect correlation on the predictors.</p>
+<p>So before we try to fit a model we ran a multicollinearity test to identify additional variables to drop from the model specification.</p>
+<p>The idea here is to identify the variables with high correlation among them and keep just the variables that have no strong correlation to the other predictors. we will do so by preferring to keep the variables that have lowest correlation against the others.</p>
+<p>Just looking at correlation indexes among pairs of predictors is limited as it is possible that the pairwise correlations are small, and yet a linear dependence exists among three or more variables.</p>
+<p>That’s why we will really on a test called Variance Inflation Factors, VII for short, to detect multicollinearity.</p>
+<p>Multicollinearity is poison for Regression algorithms!!! :skull: <code>:skull:</code>:skull: <code>:skull:</code>:skull: <code>:skull:</code></p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">vars.quant &lt;-<span class="st"> </span><span class="kw">select_if</span>(loan_dataset_logistic, is.numeric)</a>
 <a class="sourceLine" id="cb5-2" title="2">VIF &lt;-<span class="st"> </span><span class="kw">imcdiag</span>(vars.quant, loan_dataset_logistic<span class="op">$</span>y_loan_defaulter)</a>
 <a class="sourceLine" id="cb5-3" title="3"></a>
@@ -1310,7 +1327,8 @@ $(document).ready(function () {
 </tr>
 </tbody>
 </table>
-<p>Then we look at the correlogram in the high VIF variables.</p>
+<p>Having identified the predictors with high VIF we look at the correlogram on those variables.</p>
+<p>Here we are hiding the variable names for readability.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">low_VIF &lt;-<span class="st"> </span><span class="kw">filter</span>(VIF_Table_Before, VIF <span class="op">&lt;=</span><span class="st"> </span><span class="dv">5</span>)<span class="op">$</span>variable</a>
 <a class="sourceLine" id="cb6-2" title="2">high_VIF &lt;-<span class="st"> </span><span class="kw">filter</span>(VIF_Table_Before, VIF <span class="op">&gt;</span><span class="st"> </span><span class="dv">5</span>)<span class="op">$</span>variable</a>
 <a class="sourceLine" id="cb6-3" title="3"></a>
@@ -1330,7 +1348,9 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb6-17" title="17"></a>
 <a class="sourceLine" id="cb6-18" title="18"><span class="kw">print</span>(high_VIF_correlogram_before)</a></code></pre></div>
 <p><img src="04_logistic_regression_report_files/figure-html/check_correl_2-1.png" width="100%" /></p>
-<p>Then we exclude the variables with high correlation keeping the variables with less correlation with the others.</p>
+<p>We will now exclude the variables with High VIF maintaining only the variables that are not correlated.</p>
+<p>We will use the pairwise correlation indexes to choose the variable to reject, code below will exclude the variable in the pair that have the greater correlation index sum against the other predictor not in the pair.</p>
+<p>at the end we will have only variables that have a correlation index smaller than our selected <strong>threshold (0.6)</strong>.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">correl_threshold &lt;-<span class="st"> </span><span class="fl">0.6</span></a>
 <a class="sourceLine" id="cb7-2" title="2"></a>
 <a class="sourceLine" id="cb7-3" title="3">reject_variables_vector &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">var_1 =</span> <span class="kw">row.names</span>(cor_mtx_high_VIF)) <span class="op">%&gt;%</span><span class="st"> </span></a>
@@ -1395,7 +1415,8 @@ $(document).ready(function () {
 </tr>
 </tbody>
 </table>
-<p>We finally look on the complete dataset correlogram with the clean data set.</p>
+<p>After the high VIF predictors exclusion we reevaluate the correlation matrix of the original dataset and the cleaned dataset.</p>
+<p>Variable names are hidden for readability. Trust us, there is no correlation greater than 0.6 here.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">cor_mtx_full &lt;-<span class="st"> </span><span class="kw">cor</span>(loan_dataset_logistic)</a>
 <a class="sourceLine" id="cb8-2" title="2">cor_mtx_clean &lt;-<span class="st"> </span><span class="kw">cor</span>(clean_dataset,)</a>
 <a class="sourceLine" id="cb8-3" title="3"></a>
@@ -1420,7 +1441,7 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb8-22" title="22"><span class="kw">print</span>(<span class="kw">ggarrange</span>(full, clean))</a></code></pre></div>
 <p><img src="04_logistic_regression_report_files/figure-html/check_correl_4-1.png" width="100%" /></p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">loan_dataset_logistic &lt;-<span class="st"> </span>clean_dataset</a></code></pre></div>
-<p>We also look again at the VIF estimates for the clena dataset.</p>
+<p>Once again let’s look on the VIF estimates.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">vars.quant &lt;-<span class="st"> </span><span class="kw">select_if</span>(loan_dataset_logistic, is.numeric)</a>
 <a class="sourceLine" id="cb10-2" title="2"></a>
 <a class="sourceLine" id="cb10-3" title="3">VIF &lt;-<span class="st"> </span><span class="kw">imcdiag</span>(vars.quant, loan_dataset_logistic<span class="op">$</span>y_loan_defaulter)</a>
@@ -1451,9 +1472,10 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb10-28" title="28"><span class="st">       Variables with VIF more than 5 will be droped from the model&quot;</span>)</a></code></pre></div>
 <p><img src="04_logistic_regression_report_files/figure-html/check_correl_5-1.png" width="100%" /></p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">loan_dataset_logistic &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(loan_dataset_logistic, <span class="op">-</span>x_average_salary)</a></code></pre></div>
-<p>We finally texclude one last variable that still has a VIF higher than our threshold (5)</p>
+<p>Although <strong>x_average_salary</strong> have no correlation index greater than our defined <strong>threshold (0.6)</strong> it still have a VIF greater than 5, and for pure methodological puritanism we decided to exclude this variable as well.</p>
+<p>We did try to keep it, but it had no real difference.</p>
 <p><img src="04_logistic_regression_report_files/figure-html/check_correl_6-1.png" width="100%" /></p>
-<p>After variable selection step we end up with <strong>28 variables</strong> in the dataset.</p>
+<p>After all this work we end up having <strong>28 variables</strong> in the dataset.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="kw">kable</span>(<span class="kw">tibble</span>(<span class="dt">variables =</span> <span class="kw">names</span>(loan_dataset_logistic)))</a></code></pre></div>
 <table>
 <thead>
@@ -1549,6 +1571,14 @@ $(document).ready(function () {
 </tbody>
 </table>
 </div>
+</div>
+<div id="looking-for-outliers" class="section level2">
+<h2><span class="header-section-number">2.3</span> Looking for outliers</h2>
+<p>And what about outliers?</p>
+<p>Regression algorithms are known for its sensitivity for outliers.</p>
+<p>So, before we go for the modeling juice we will look for those bastards!!!</p>
+<p>Working in progress !!!!</p>
+</div>
 <div id="sample-split-into-test-and-training-data" class="section level2">
 <h2><span class="header-section-number">2.4</span> Sample split into Test and Training Data</h2>
 <p>The available data in Loan Dataset is split into Train and Testing data on the following proportion:</p>
@@ -1591,10 +1621,12 @@ $(document).ready(function () {
 </tbody>
 </table>
 <p>Both datasets keep the same proportion for the explained variable around 11%.</p>
+<p>This split was saved in disk using the function described in the Data Prep session to be reused in the other models fitted in this exercise.</p>
+<p>This will ensure consistency when comparing the models against each other.</p>
 </div>
 <div id="fit-the-logistic-model" class="section level2">
 <h2><span class="header-section-number">2.5</span> Fit the logistic model</h2>
-<p>With the final cleaned dataset, we got from above steps we fit our Logistic Regression Y_loan_defaulter on all x variables.</p>
+<p>With the final cleaned dataset, we got from above steps we fit our Logistic Regression model for y_loan_defaulter on all x variables.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1">logistic.full &lt;-<span class="st"> </span><span class="kw">glm</span>(<span class="dt">formula =</span> y_loan_defaulter <span class="op">~</span><span class="st"> </span>.,</a>
 <a class="sourceLine" id="cb14-2" title="2">                     <span class="dt">data=</span> data.train_logistic, </a>
 <a class="sourceLine" id="cb14-3" title="3">                     <span class="dt">family=</span> <span class="kw">binomial</span>(<span class="dt">link=</span><span class="st">&#39;logit&#39;</span>))</a>
@@ -1650,7 +1682,9 @@ $(document).ready(function () {
 ## AIC: 293.44
 ## 
 ## Number of Fisher Scoring iterations: 17</code></pre>
-<p>Alternatively we fit a second model only with variables statistically significant p-value less than 10% using the stepwise method.</p>
+<p>With the full model fitted we will run the stepwise method to automate the selection of predictors using the <strong>(Akaike Information Criterion) AIC for short</strong>.</p>
+<p>This is a broadly used estimator that evaluates the relative quality of statistical methods for a given set of data.</p>
+<p>The lower the AIC the better.</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1">logistic.step &lt;-<span class="st"> </span><span class="kw">step</span>(logistic.full, <span class="dt">direction =</span> <span class="st">&quot;both&quot;</span>, <span class="dt">test =</span> <span class="st">&quot;F&quot;</span>)</a>
 <a class="sourceLine" id="cb16-2" title="2"></a>
 <a class="sourceLine" id="cb16-3" title="3"><span class="kw">names</span>(logistic.step<span class="op">$</span>coefficients) &lt;-<span class="st"> </span>stringr<span class="op">::</span><span class="kw">str_sub</span>(<span class="kw">names</span>(logistic.step<span class="op">$</span>coefficients), <span class="dv">1</span>, <span class="dv">25</span>)</a></code></pre></div>
@@ -1687,8 +1721,16 @@ $(document).ready(function () {
 ## Number of Fisher Scoring iterations: 17</code></pre>
 </div>
 </div>
+<div id="interpreting-model-output" class="section level1">
+<h1><span class="header-section-number">3</span> Interpreting model output</h1>
+<p>Logistic Regression models are not only good for prediction but also for inference.</p>
+<p>Meaning that it can be used not only in predicting the classification into Defaulters and Non-Defaulters but also to understand the relationship between the predictors and the likelihood of delinquency.</p>
+<p>In the Logistic Regression the effect of an increase or decrease of a predictor is not linear, but we can see the predictors that have the greater influence and by its coefficient signal the associated with an increase or decrease on the likelihood of default.</p>
+<p>In our model we see that below variables are associated to an increase in the likelihood of default: - <strong>x_loan_amount</strong> - <strong>x_prop_interest_credited</strong> - <strong>x_prop_statement</strong></p>
+<p>on the other hand, below variables are associated to a decrease in the likelihood of default: - <strong>x_card_type_classic</strong> - <strong>x_loan_duration</strong> - <strong>x_no_of_commited_crimes_1995</strong> - <strong>x_loan_amount</strong> - <strong>x_region_north_Bohemia</strong></p>
+</div>
 <div id="evaluating-the-model-performance" class="section level1">
-<h1><span class="header-section-number">3</span> Evaluating the model performance</h1>
+<h1><span class="header-section-number">4</span> Evaluating the model performance</h1>
 <p>We started this step by making predictions using our model on the X’s variables in our Train and Test datasets.</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1"><span class="co">## making preditions for each model and consilidating in a single data frame</span></a>
 <a class="sourceLine" id="cb18-2" title="2"></a>
@@ -1712,10 +1754,10 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb18-20" title="20">prob.train  &lt;-<span class="st"> </span>prob.train <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a>
 <a class="sourceLine" id="cb18-21" title="21">prob.test   &lt;-<span class="st"> </span>prob.test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a></code></pre></div>
 <div id="getting-performance-measures" class="section level2">
-<h2><span class="header-section-number">3.1</span> Getting Performance Measures:</h2>
+<h2><span class="header-section-number">4.1</span> Getting Performance Measures:</h2>
 <p>To calculate the performance measures, derived from the confusion matrix, we need to find the score cut off that best split our test dataset into Defaulters and Non-Defaulters.</p>
 <p>In this exercise we decide to not prioritize the accuracy on predicting Defaulters and Non-Defaulters, therefore we are looking for the score cut off that best predict each class equally.</p>
-<p>We will use a custom function developed in this paper to calculate the best cut off for each model:</p>
+<p>Below functions were developed in this exercise to provide that.</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" title="1"><span class="co">## making preditions for each model and consilidating in a single data frame</span></a>
 <a class="sourceLine" id="cb19-2" title="2"><span class="co"># calculateModelMetrics -------------------------------------------------------</span></a>
 <a class="sourceLine" id="cb19-3" title="3"><span class="co"># The objective of this function is to calculate main metrics of model performance according to a cutoff value.</span></a>
@@ -1775,9 +1817,9 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb20-4" title="4">                                            prob.test<span class="op">$</span>logistic.predicted, </a>
 <a class="sourceLine" id="cb20-5" title="5">                                            <span class="dt">plot_title =</span> <span class="st">&#39;Logistic Regression&#39;</span>)</a>
 <a class="sourceLine" id="cb20-6" title="6">metricsByCutoff.test_log<span class="op">$</span>Plot</a></code></pre></div>
-<div id="htmlwidget-2e14c3dcec6805c975e3" style="width:100%;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-2e14c3dcec6805c975e3">{"x":{"visdat":{"a947a926228":["function () ","plotlyVisDat"]},"cur_data":"a947a926228","attrs":{"a947a926228":{"x":{},"y":{},"opacity":0.3,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"bar"},"a947a926228.1":{"x":{},"y":{},"opacity":1,"name":"TPR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"a947a926228.2":{"x":{},"y":{},"opacity":1,"name":"TNR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"a947a926228.3":{"x":0.08,"y":0.64,"opacity":1,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","text":0.08,"mode":"text","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"title":"Cutoff Value"},"yaxis":{"domain":[0,1],"automargin":true,"title":"True Ratio (%)"},"title":"Logistic Regression","hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77],"y":[0.820335195530726,0.686256983240223,0.516871508379888,0.415418994413408,0.26927374301676,0.167821229050279,0.0319553072625699,0.0303910614525139,0.0918435754189943,0.130949720670391,0.147709497206704,0.215642458100559,0.277988826815642,0.311508379888268,0.357094972067039,0.36268156424581,0.413854748603352,0.419441340782123,0.465027932960894,0.521787709497207,0.527374301675978,0.567374301675978,0.57854748603352,0.61854748603352,0.629720670391061,0.635307262569832,0.640893854748603,0.640893854748603,0.640893854748603,0.646480446927374,0.646480446927374,0.646480446927374,0.692067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.783240223463687,0.823240223463687,0.863240223463687,0.903240223463687,0.903240223463687,0.903240223463687,0.903240223463687,0.908826815642458,0.908826815642458,0.908826815642458,0.908826815642458,0.914413407821229,0.914413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.96],"opacity":0.3,"name":"Abs. Diff.","type":"bar","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77],"y":[0.96,0.96,0.88,0.84,0.8,0.76,0.68,0.64,0.64,0.64,0.64,0.6,0.56,0.56,0.52,0.52,0.48,0.48,0.44,0.4,0.4,0.36,0.36,0.32,0.32,0.32,0.32,0.32,0.32,0.32,0.32,0.32,0.28,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.16,0.12,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04],"opacity":1,"name":"TPR","type":"scatter","mode":"lines","marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"line":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77],"y":[0.139664804469274,0.273743016759777,0.363128491620112,0.424581005586592,0.53072625698324,0.592178770949721,0.64804469273743,0.670391061452514,0.731843575418994,0.770949720670391,0.787709497206704,0.815642458100559,0.837988826815642,0.871508379888268,0.877094972067039,0.88268156424581,0.893854748603352,0.899441340782123,0.905027932960894,0.921787709497207,0.927374301675978,0.927374301675978,0.93854748603352,0.93854748603352,0.949720670391061,0.955307262569832,0.960893854748603,0.960893854748603,0.960893854748603,0.966480446927374,0.966480446927374,0.966480446927374,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.988826815642458,0.988826815642458,0.988826815642458,0.988826815642458,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,1],"opacity":1,"name":"TNR","type":"scatter","mode":"lines","marker":{"color":"rgba(44,160,44,1)","line":{"color":"rgba(44,160,44,1)"}},"error_y":{"color":"rgba(44,160,44,1)"},"error_x":{"color":"rgba(44,160,44,1)"},"line":{"color":"rgba(44,160,44,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.08],"y":[0.64],"opacity":1,"name":"Abs. Diff.","type":"scatter","text":0.08,"mode":"text","marker":{"color":"rgba(214,39,40,1)","line":{"color":"rgba(214,39,40,1)"}},"error_y":{"color":"rgba(214,39,40,1)"},"error_x":{"color":"rgba(214,39,40,1)"},"line":{"color":"rgba(214,39,40,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
-<p>With the optimized cut off we calculate the full set of model metrics.</p>
+<div id="htmlwidget-775aa0bf2da17c5982d5" style="width:100%;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-775aa0bf2da17c5982d5">{"x":{"visdat":{"6a854b16560":["function () ","plotlyVisDat"]},"cur_data":"6a854b16560","attrs":{"6a854b16560":{"x":{},"y":{},"opacity":0.3,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"bar"},"6a854b16560.1":{"x":{},"y":{},"opacity":1,"name":"TPR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"6a854b16560.2":{"x":{},"y":{},"opacity":1,"name":"TNR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"6a854b16560.3":{"x":0.08,"y":0.64,"opacity":1,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","text":0.08,"mode":"text","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"title":"Cutoff Value"},"yaxis":{"domain":[0,1],"automargin":true,"title":"True Ratio (%)"},"title":"Logistic Regression","hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77],"y":[0.820335195530726,0.686256983240223,0.516871508379888,0.415418994413408,0.26927374301676,0.167821229050279,0.0319553072625699,0.0303910614525139,0.0918435754189943,0.130949720670391,0.147709497206704,0.215642458100559,0.277988826815642,0.311508379888268,0.357094972067039,0.36268156424581,0.413854748603352,0.419441340782123,0.465027932960894,0.521787709497207,0.527374301675978,0.567374301675978,0.57854748603352,0.61854748603352,0.629720670391061,0.635307262569832,0.640893854748603,0.640893854748603,0.640893854748603,0.646480446927374,0.646480446927374,0.646480446927374,0.692067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.783240223463687,0.823240223463687,0.863240223463687,0.903240223463687,0.903240223463687,0.903240223463687,0.903240223463687,0.908826815642458,0.908826815642458,0.908826815642458,0.908826815642458,0.914413407821229,0.914413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.96],"opacity":0.3,"name":"Abs. Diff.","type":"bar","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77],"y":[0.96,0.96,0.88,0.84,0.8,0.76,0.68,0.64,0.64,0.64,0.64,0.6,0.56,0.56,0.52,0.52,0.48,0.48,0.44,0.4,0.4,0.36,0.36,0.32,0.32,0.32,0.32,0.32,0.32,0.32,0.32,0.32,0.28,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.16,0.12,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04],"opacity":1,"name":"TPR","type":"scatter","mode":"lines","marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"line":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77],"y":[0.139664804469274,0.273743016759777,0.363128491620112,0.424581005586592,0.53072625698324,0.592178770949721,0.64804469273743,0.670391061452514,0.731843575418994,0.770949720670391,0.787709497206704,0.815642458100559,0.837988826815642,0.871508379888268,0.877094972067039,0.88268156424581,0.893854748603352,0.899441340782123,0.905027932960894,0.921787709497207,0.927374301675978,0.927374301675978,0.93854748603352,0.93854748603352,0.949720670391061,0.955307262569832,0.960893854748603,0.960893854748603,0.960893854748603,0.966480446927374,0.966480446927374,0.966480446927374,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.988826815642458,0.988826815642458,0.988826815642458,0.988826815642458,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,1],"opacity":1,"name":"TNR","type":"scatter","mode":"lines","marker":{"color":"rgba(44,160,44,1)","line":{"color":"rgba(44,160,44,1)"}},"error_y":{"color":"rgba(44,160,44,1)"},"error_x":{"color":"rgba(44,160,44,1)"},"line":{"color":"rgba(44,160,44,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.08],"y":[0.64],"opacity":1,"name":"Abs. Diff.","type":"scatter","text":0.08,"mode":"text","marker":{"color":"rgba(214,39,40,1)","line":{"color":"rgba(214,39,40,1)"}},"error_y":{"color":"rgba(214,39,40,1)"},"error_x":{"color":"rgba(214,39,40,1)"},"line":{"color":"rgba(214,39,40,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<p>With the optimized cut off we calculate the full set of model metrics using the function HMeasure from hmeasure library.</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1"><span class="co"># logistic regression</span></a>
 <a class="sourceLine" id="cb21-2" title="2">measures.logistic.train &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.train<span class="op">$</span>logistic.actual, </a>
 <a class="sourceLine" id="cb21-3" title="3">                                    prob.train<span class="op">$</span>logistic.predicted, </a>
@@ -1919,8 +1961,11 @@ $(document).ready(function () {
 </tr>
 </tbody>
 </table>
-<p>In general, this model has not delivered a good accuracy, we will compare how it performed against other classes of models in the Final Report section.</p>
-<p>Below the confusion matrix and general performance of the model that we get from our custom function:</p>
+</div>
+<div id="evaluating-classification-performance" class="section level2">
+<h2><span class="header-section-number">4.2</span> evaluating classification performance:</h2>
+<p>In general the Logistic Regression model is not delivering good accuracy, we will compare how it performed against other classes of models in the Final Report session</p>
+<p>Below the confusion matrix and general performance of the model using our custom function developed in this exercise:</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1">accuracy &lt;-<span class="st"> </span><span class="cf">function</span>(score, actual, <span class="dt">threshold =</span> <span class="fl">0.5</span>) {</a>
 <a class="sourceLine" id="cb23-2" title="2">  </a>
 <a class="sourceLine" id="cb23-3" title="3">  fitted.results &lt;-<span class="st"> </span><span class="kw">ifelse</span>(score <span class="op">&gt;</span><span class="st"> </span>threshold ,<span class="dv">1</span> ,<span class="dv">0</span>)</a>
@@ -1953,7 +1998,7 @@ $(document).ready(function () {
 ## [1] &quot;--------------------------------------------------------------&quot;
 ## [1] &quot;Model General Accuracy of: 66.67%&quot;
 ## [1] &quot;True Positive Rate of    : 64%&quot;</code></pre>
-<p>We can finally look at the score distribution charts how well the model is able to split Defaulters and Non-Defaulters</p>
+<p>We finally look at the score distribution charts to check how well the model is able to discriminate Defaulters and Non-Defaulters.</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1">p1 &lt;-<span class="st"> </span><span class="kw">Score_Histograms</span>(prob.test, </a>
 <a class="sourceLine" id="cb26-2" title="2">                 prob.test<span class="op">$</span>logistic.predicted,</a>
 <a class="sourceLine" id="cb26-3" title="3">                 prob.test<span class="op">$</span>logistic.actual,</a>
@@ -1968,9 +2013,12 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb26-12" title="12">        prob.test<span class="op">$</span>logistic.predicted[prob.test<span class="op">$</span>logistic.actual <span class="op">==</span><span class="st"> </span><span class="dv">1</span>],</a>
 <a class="sourceLine" id="cb26-13" title="13">        <span class="st">&#39;KS Plot&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.title.y =</span> <span class="kw">element_blank</span>(),</a>
 <a class="sourceLine" id="cb26-14" title="14">                           <span class="dt">axis.text.y =</span> <span class="kw">element_blank</span>())</a>
-<a class="sourceLine" id="cb26-15" title="15"></a>
-<a class="sourceLine" id="cb26-16" title="16"><span class="kw">ggarrange</span>(p1, p2, p3, <span class="dt">nrow =</span> <span class="dv">3</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb26-15" title="15"><span class="kw">ggarrange</span>(p1, p2, p3, <span class="dt">nrow =</span> <span class="dv">3</span>)</a></code></pre></div>
 <p><img src="04_logistic_regression_report_files/figure-html/model_plots-1.png" width="100%" /></p>
+<p>By the score density we see that our Logistic Regression model is very broad on the scores it assigns to the observations, especially for the real Defaulters not providing a good separation between each class.</p>
+<p>The box plot also does not show a clear discrimination between Defaulters and Non-Defaulters.</p>
+<p>Finally, the KS metric is far from what is expected for a reasonable classification model.</p>
+<p>In the Final Report session, we will look more closely on the AUC and Gini metrics by plotting the ROC curve and comparing against other models.</p>
 </div>
 </div>
 
