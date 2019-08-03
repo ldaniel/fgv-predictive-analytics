@@ -98,6 +98,27 @@ modelMetrics <- function(realData, predData, stepping = 0.01,
               Plot = p))
 }
 
+# accuracy ----------------------------------------------------------------
+# The objective of this function is to calculate main accuracy metrix of the model performance.
+accuracy <- function(score, actual, threshold = 0.5) {
+  
+  fitted.results <- ifelse(score > threshold ,1 ,0)
+  
+  misClasificError <- mean(fitted.results != actual)
+  
+  misClassCount <- misclassCounts(fitted.results, actual)
+  
+  print(kable(misClassCount$conf.matrix))
+  
+  print('--------------------------------------------------------------')
+  print(paste('Model General Accuracy of: ', 
+              round((1 - misClassCount$metrics['ER']) * 100, 2), '%', 
+              sep = ''))
+  print(paste('True Positive Rate of    : ', 
+              round(misClassCount$metrics['TPR'] * 100, 2), '%',
+              sep = ''))
+}
+
 # data preparation functions --------------------------------------------------
 # The objective of this function is to split a given dataset 
 # in train and test datasets
@@ -200,21 +221,70 @@ KS_Plot <- function(zeros, ones, title) {
           plot.title = element_text(hjust = 0.5))
 }
 
-accuracy <- function(score, actual, threshold = 0.5) {
+Plot_ROC <- function(dataset, smooth_opt = FALSE) {
+  roc_logistic      <- roc(logistic.actual ~ logistic.predicted,
+                           dataset,
+                           smooth = smooth_opt)
   
-  fitted.results <- ifelse(score > threshold ,1 ,0)
+  roc_decision.tree <- roc(decision.tree.actual ~ decision.tree.predicted,
+                           dataset,
+                           smooth = smooth_opt)
   
-  misClasificError <- mean(fitted.results != actual)
+  roc_boosting      <- roc(boosting.actual ~ boosting.predicted,
+                           dataset,
+                           smooth = smooth_opt)
   
-  misClassCount <- misclassCounts(fitted.results, actual)
+  roc_random.forest <- roc(random.forest.actual ~ random.forest.predicted,
+                           dataset,
+                           smooth = smooth_opt)
   
-  print(kable(misClassCount$conf.matrix))
+  p <- ggplot() +
+    geom_line(aes(x = 1 - roc_logistic$specificities, 
+                  y = roc_logistic$sensitivities, 
+                  colour = 'Logistic Regression'), # red
+              size = 1,
+              linetype = 1,
+              alpha = 0.7) +
+    geom_line(aes(x = 1 - roc_decision.tree$specificities, 
+                  y = roc_decision.tree$sensitivities,
+                  colour = 'Decision Tree'), # blue
+              size = 1,
+              linetype = 1,
+              alpha = 0.7) +
+    geom_line(aes(x = 1 - roc_boosting$specificities, 
+                  y = roc_boosting$sensitivities,
+                  colour = 'Boosting'), # green
+              size = 1,
+              linetype = 1,
+              alpha = 0.7) +
+    geom_line(aes(x = 1 - roc_random.forest$specificities, 
+                  y = roc_random.forest$sensitivities,
+                  colour = 'Random Forest'), # purple
+              size = 2,
+              linetype = 1,
+              alpha = 1) +
+    geom_abline(aes(intercept = 0, slope = 1),
+                linetype = 2,
+                size = 1) +
+    scale_colour_manual(name = NULL,
+                        breaks = c('Logistic Regression', 
+                                   'Decision Tree',
+                                   'Boosting', 
+                                   'Random Forest'),
+                        labels = c('Logistic Regression', 
+                                   'Decision Tree',
+                                   'Boosting', 
+                                   'Random Forest'),
+                        values = c('#C0392B', 
+                                   '#3498DB', 
+                                   '#28B463', 
+                                   '#9B59B6')) +
+    labs(y = 'True Positive Rate',
+         x = 'False Positive Rate',
+         title = 'Receiver Oerating Characteristic Curve - ROC',
+         subtitle = 'Random Forest is the model that best discriminate Defaulters and Non-Defaulters') +
+    theme_economist() +
+    theme(panel.grid = element_blank())
   
-  print('--------------------------------------------------------------')
-  print(paste('Model General Accuracy of: ', 
-              round((1 - misClassCount$metrics['ER']) * 100, 2), '%', 
-              sep = ''))
-  print(paste('True Positive Rate of    : ', 
-              round(misClassCount$metrics['TPR'] * 100, 2), '%',
-              sep = ''))
+  print(p)
 }
