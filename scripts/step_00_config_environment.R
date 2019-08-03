@@ -7,7 +7,7 @@ options(encoding = "UTF-8")
 
 username <- Sys.info()[["user"]]
 directoryPath <- dirname(rstudioapi::getSourceEditorContext()$path)
-directoryPath <- str_replace(directoryPath, "/scripts", "")
+directoryPath <- stringr::str_replace(directoryPath, "/scripts", "")
 
 setwd(directoryPath)
 getwd()
