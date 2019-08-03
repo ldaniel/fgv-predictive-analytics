@@ -460,63 +460,7 @@ To calculate the performance measures, derived from the confusion matrix, we nee
 
 In this exercise we decide to not prioritize the accuracy on predicting Defaulters and Non-Defaulters, therefore we are looking for the score cut off that best predict each class equally.
 
-Below functions were developed in this exercise to provide that.
-
-```{r get_measures_functions, eval=FALSE}
-## making preditions for each model and consilidating in a single data frame
-# calculateModelMetrics -------------------------------------------------------
-# The objective of this function is to calculate main metrics of model performance according to a cutoff value.
-calculateModelMetrics <- function(cutData, realData, predData){
-  cuttedData <- as.factor(ifelse(predData>=cutData, 1, 0))
-  
-  invisible(capture.output(out <- CrossTable(realData, cuttedData, 
-                                             prop.c = F, prop.t = F, prop.r = T, prop.chisq = F)))
-  
-  out <- as.data.frame(out) %>% 
-    mutate(merged=paste0(t.x, t.y)) %>% 
-    dplyr::select(merged, val=t.Freq)
-  
-  TN <- filter(out, merged == "00")$val[1]
-  FP <- filter(out, merged == "01")$val[1]
-  FN <- filter(out, merged == "10")$val[1]
-  TP <- filter(out, merged == "11")$val[1]
-  
-  return(data.frame(Cut = cutData,
-                    TN = TN, 
-                    FP = FP,
-                    FN = FN, 
-                    TP = TP,
-                    TPR = TP/(TP+FN), TNR=TN/(TN+FP),
-                    Error = (FP+FN)/(TP+TN+FP+FN),
-                    Precision = TP/(TP+FP),
-                    F1 = 2*(TP/(TP+FN))*(TP/(TP+FP))/((TP/(TP+FP)) + (TP/(TP+FN)))))
-}
-
-# modelMetrics ----------------------------------------------------------------
-# The objective of this function is to calculate main metrics of model performance 
-# for cutoffs from 0-1 based on given step.
-modelMetrics <- function(realData, predData, stepping = 0.01, 
-                         plot_title = "TPR/TNR by cutoff over full dataset"){
-  probCuts <- seq(from = 0, to = 1, by = stepping)
-  out <- bind_rows(lapply(probCuts, calculateModelMetrics, realData = realData, predData = predData))
-  out <- out[complete.cases(out),] %>% mutate(Difference = abs(TPR-TNR))
-  
-  best <- out %>% arrange(Difference) %>% head(1) %>% dplyr::select(-Difference)
-  
-  p <- plot_ly(x = ~out$Cut, y = ~out$Difference, name = 'Abs. Diff.', type = 'bar', opacity = 0.3) %>% 
-    add_trace(x = ~out$Cut, y = ~out$TPR, name = 'TPR', type = 'scatter', mode = 'lines', opacity = 1) %>% 
-    add_trace(x = ~out$Cut, y = ~out$TNR, name = 'TNR', type = 'scatter', mode = 'lines', opacity = 1) %>% 
-    add_text(x = best$Cut, y = best$TPR, text = best$Cut, opacity = 1) %>% 
-    layout(xaxis = list(title = "Cutoff Value"),
-           yaxis = list(title = "True Ratio (%)"),
-           title = plot_title)
-  
-  return(list(TableResults = out,
-              BestCut = best,
-              Plot = p))
-}
-
-```
+We will use the custom functions described in Auxiliary metrics functions topic in the Data Preparation session of this site.
 
 With the returned object from this function we can plot the comparison between TPR (True Positive Rate) and TNR (True Negative Rate) to find the best cut off.
 
@@ -562,28 +506,7 @@ kable(measures, row.names = FALSE)
 
 In general the Logistic Regression model is not delivering good accuracy, we will compare how it performed against other classes of models in the Final Report session
 
-Below the confusion matrix and general performance of the model using our custom function developed in this exercise:
-
-```{r see_accuracy, eval=FALSE}
-accuracy <- function(score, actual, threshold = 0.5) {
-  
-  fitted.results <- ifelse(score > threshold ,1 ,0)
-  
-  misClasificError <- mean(fitted.results != actual)
-  
-  misClassCount <- misclassCounts(fitted.results, actual)
-  
-  print(kable(misClassCount$conf.matrix))
-  
-  print('--------------------------------------------------------------')
-  print(paste('Model General Accuracy of: ', 
-              round((1 - misClassCount$metrics['ER']) * 100, 2), '%', 
-              sep = ''))
-  print(paste('True Positive Rate of    : ', 
-              round(misClassCount$metrics['TPR'] * 100, 2), '%',
-              sep = ''))
-}
-```
+Below the confusion matrix and general performance of the model using our custom function **accuracy** described in Auxiliary metrics functions topic in the Data Preparation session of this site.
 
 ```{r see_accuracy_1, echo=TRUE, out.width= '100%'}
 # accuracy metrics ---------------------------------------------------------------

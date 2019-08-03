@@ -154,6 +154,30 @@ ggplot(VIF_Table_After, aes(x = fct_reorder(variable, VIF),
 
 loan_dataset_logistic <- dplyr::select(loan_dataset_logistic, -x_average_salary)
 
+# outliers ----------------------------------------------------------------------------
+
+  attach(loan_dataset_logistic)
+
+  par(mfrow=c(2, 3))
+
+  plot(x_last_transaction_age_days, main = "x_last_transaction_age_days", ylab = '')
+  plot(x_avg_account_balance, main = "x_avg_account_balance", ylab = '')
+  plot(x_account_balance, main = "x_account_balance", ylab = '')
+  plot(x_card_age_month, main = "x_card_age_month", ylab = '')
+  plot(x_client_age, main = "x_client_age", ylab = '')
+  plot(x_loan_amount, main = "x_loan_amount", ylab = '')
+  
+  par(mfrow=c(2, 3))
+  
+  plot(x_loan_duration, main = "x_loan_duration", ylab = '')
+  plot(x_loan_payments, main = "x_loan_payments", ylab = '')
+  plot(x_prop_interest_credited, main = "x_prop_interest_credited", ylab = '')
+  plot(x_prop_loan_payment, main = "x_prop_loan_payment", ylab = '')
+  plot(x_prop_statement, main = "x_prop_statement", ylab = '')
+  plot(x_prop_insurance_payment, main = "x_prop_insurance_payment", ylab = '')
+
+  detach(loan_dataset_logistic)
+
 # sampling ----------------------------------------------------------------------------
 
 SplitDataset <- source_train_test_dataset
