@@ -154,7 +154,7 @@ The idea here is to identify the variables with high correlation among them and 
 
 Just looking at correlation indexes among pairs of predictors is limited as it is possible that the pairwise correlations are small, and yet a linear dependence exists among three or more variables.
 
-That’s why we will really on a test called Variance Inflation Factors, VII for short, to detect multicollinearity.
+That’s why we will rely on a test called Variance Inflation Factors, VII for short, to detect multicollinearity.
 
 Multicollinearity is poison for Regression algorithms!!!
 
@@ -610,7 +610,9 @@ p3 <- KS_Plot(prob.test$logistic.predicted[prob.test$logistic.actual == 0],
         prob.test$logistic.predicted[prob.test$logistic.actual == 1],
         'KS Plot') + theme(axis.title.y = element_blank(),
                            axis.text.y = element_blank())
-ggarrange(p1, p2, p3, nrow = 3)
+ggarrange(p1, p2, nrow = 2)
+
+p3
 ```
 
 By the score density we see that our Logistic Regression model is very broad on the scores it assigns to the observations, especially for the real Defaulters not providing a good separation between each class.
@@ -620,4 +622,3 @@ The box plot also does not show a clear discrimination between Defaulters and No
 Finally, the KS metric is far from what is expected for a reasonable classification model.
 
 In the Final Report session, we will look more closely on the AUC and Gini metrics by plotting the ROC curve and comparing against other models.
-
