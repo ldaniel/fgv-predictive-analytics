@@ -1,6 +1,10 @@
-# clear everything before starting --------------------------------------------
+# clearing everything before starting -----------------------------------------
+# clear environment and memory
 rm(list=ls())
 invisible(gc())
+
+# clear console screen
+cat("\014")
 
 # setting the environment -----------------------------------------------------
 options(encoding = "UTF-8")
