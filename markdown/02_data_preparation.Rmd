@@ -49,7 +49,9 @@ Before starting the Berka Analysis, a few important steps were taken in order to
 ## Create Functions
 This step create functions to be used in the next steps. Following, all functions created are described.
 
-### GetGenderFromBirthnumber 
+### Specific data ingestion functions
+
+#### GetGenderFromBirthnumber 
 The birth_number column is given in the form of YYMMDD for men, and YYMM+50DD for women. The objective of this function is to return the gender of the client via the birth_number.
 
 ``` {r GetGenderFromBirthnumber, eval = FALSE}
@@ -61,7 +63,7 @@ GetGenderFromBirthnumber <- function(var_birth_number) {
 }
 ```
 
-### GetBirthdateFromBirthnumber
+#### GetBirthdateFromBirthnumber
 The birth_number column is given in the form of YYMMDD for men, # and YYMM+50DD for women. The objective of this function is to return the final birthday as Date.
 
 ``` {r GetBirthdateFromBirthnumber, eval = FALSE}
@@ -76,7 +78,7 @@ GetBirthdateFromBirthnumber <- function(var_birth_number, var_gender) {
 }
 ```
 
-### ConvertToDate
+#### ConvertToDate
 The objective of this function is to convert the strange bank date style to the regular R Date datatype.
 
 ``` {r ConvertToDate, eval = FALSE}
@@ -90,7 +92,7 @@ ConvertToDate <- function(var_date) {
 }
 ```
 
-### GetAgeFromBirthnumber
+#### GetAgeFromBirthnumber
 The objective of this function is to get age given the birth_number.
 
 ``` {r GetAgeFromBirthnumber, eval = FALSE}
@@ -102,6 +104,79 @@ GetAgeFromBirthnumber <- function(var_birth_number) {
   return(result)
 }
 ```
+
+### Auxiliary metrics functions
+
+#### calculateModelMetrics
+The objective of this function is to calculate main metrics of model performance according to a cutoff value.
+
+``` {r calculateModelMetrics, eval = FALSE}
+calculateModelMetrics <- function(cutData, realData, predData){
+  cuttedData <- as.factor(ifelse(predData>=cutData, 1, 0))
+  
+  invisible(capture.output(out <- CrossTable(realData, cuttedData, 
+                                             prop.c = F, prop.t = F, prop.r = T, prop.chisq = F)))
+  
+  out <- as.data.frame(out) %>% 
+    mutate(merged=paste0(t.x, t.y)) %>% 
+    dplyr::select(merged, val=t.Freq)
+  
+  TN <- filter(out, merged == "00")$val[1]
+  FP <- filter(out, merged == "01")$val[1]
+  FN <- filter(out, merged == "10")$val[1]
+  TP <- filter(out, merged == "11")$val[1]
+  
+  return(data.frame(Cut = cutData,
+                    TN = TN, 
+                    FP = FP,
+                    FN = FN, 
+                    TP = TP,
+                    TPR = TP/(TP+FN), TNR=TN/(TN+FP),
+                    Error = (FP+FN)/(TP+TN+FP+FN),
+                    Precision = TP/(TP+FP),
+                    F1 = 2*(TP/(TP+FN))*(TP/(TP+FP))/((TP/(TP+FP)) + (TP/(TP+FN)))))
+}
+```
+
+#### modelMetrics  
+The objective of this function is to calculate main metrics of model performance for cutoffs from 0-1 based on given step.
+
+``` {r calculateModelMetrics, eval = FALSE}
+modelMetrics <- function(realData, predData, stepping = 0.01, 
+                         plot_title = "TPR/TNR by cutoff over full dataset"){
+  probCuts <- seq(from = 0, to = 1, by = stepping)
+  out <- bind_rows(lapply(probCuts, calculateModelMetrics, realData = realData, predData = predData))
+  out <- out[complete.cases(out),] %>% mutate(Difference = abs(TPR-TNR))
+  
+  best <- out %>% arrange(Difference) %>% head(1) %>% dplyr::select(-Difference)
+  
+  p <- plot_ly(x = ~out$Cut, y = ~out$Difference, name = 'Abs. Diff.', type = 'bar', opacity = 0.3) %>% 
+    add_trace(x = ~out$Cut, y = ~out$TPR, name = 'TPR', type = 'scatter', mode = 'lines', opacity = 1) %>% 
+    add_trace(x = ~out$Cut, y = ~out$TNR, name = 'TNR', type = 'scatter', mode = 'lines', opacity = 1) %>% 
+    add_text(x = best$Cut, y = best$TPR, text = best$Cut, opacity = 1) %>% 
+    layout(xaxis = list(title = "Cutoff Value"),
+           yaxis = list(title = "True Ratio (%)"),
+           title = plot_title)
+  
+  return(list(TableResults = out,
+              BestCut = best,
+              Plot = p))
+}
+```
+
+### Data preparation functions
+
+#### SplitTestTrainDataset
+See topic "Splitting dataset into Train and Test data" for further details.
+
+### Auxiliary plot functions
+
+Functions used in the evaluation step to compare the models.
+
+* Score_Boxplot
+* Score_Histograms
+* KS_Plot
+* accuracy
 
 ## Data Ingestion
 The process of data ingestion — preparing data for analysis — usually includes steps called extract (taking the data from its current location), transform (cleansing and normalizing the data), and load (placing the data in a database where it can be analyzed).
@@ -349,7 +424,7 @@ colnames(source_dataset) <- stringr::str_replace_all(names(source_dataset), '_-_
 colnames(source_dataset) <- trimws(names(source_dataset))
 ```
 
-## Spliting dataset into Train and Test data
+## Splitting dataset into Train and Test data
 The below function was created to be used in the modeling exercises to be split the source_dataset into train and test datasets.
 
 ``` {r split_func, eval = FALSE}
