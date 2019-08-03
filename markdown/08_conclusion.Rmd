@@ -144,8 +144,7 @@ To calculate the performance measures, derived from the confusion matrix, of eac
 
 In this exercise we decide to not prioritize the accuracy on predicting Defaulters and Non-Defaulters, therefore we are looking for the score cut off that best predict each class equally.
 
-We will use a custom function developed in this exercise to calculate the best cut off for each model:
-See function description in the Data Preparation Session of this site.
+We will use the custom functions described in Auxiliary metrics functions topic in the Data Preparation session of this site.
 
 With the returned object from these functions we can plot the comparison between TPR (True Positive Rate) and FPR (False Positive Rate) to find the best cut off.
 
@@ -377,6 +376,8 @@ Plot_ROC(prob.test, smooth_opt = FALSE)
 ### Acurracy
 
 We finally look at the Confusion Matrix at the best cut off each model to get a sense of the accuracy we were able to get in this exercise.
+
+We will use the custom functions described in Auxiliary metrics functions topic in the Data Preparation session of this site.
 
 Random Forest is the best model we got in this exercise.
 
