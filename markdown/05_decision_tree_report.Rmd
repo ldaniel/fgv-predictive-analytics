@@ -162,6 +162,8 @@ We can do this by simply feeding back the full tree to our prune tree object and
 tree.prune <- tree.full
 ```
 
+*******************************************************************************
+
 # Interpreting model output
 
 Decision Trees are known by its very descriptive rules on how it is classifying each observation.
@@ -178,6 +180,8 @@ Our full decision tree model clear shows that below variables are the key featur
 The result is similar to the Logistic Regression model we created in the session before.
 
 The predictors selected are roughly the same.
+
+*******************************************************************************
 
 # Evaluating the model performance
 

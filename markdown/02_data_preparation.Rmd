@@ -21,8 +21,10 @@ Before starting the Berka Analysis, a few important steps were taken in order to
 - **Step 02**: Data Ingestion;
 - **Step 03**: Data Cleaning;
 - **Step 04**: Label Translation;
-- **Step 05**: Data Enhancement.
-- **Step 06**: Dataset Preparation
+- **Step 05**: Data Enhancement;
+- **Step 06**: Dataset Preparation.
+
+*******************************************************************************
 
 # Create Functions (step 1)
 This step create functions to be used in the next steps. Following, all functions created are described.
@@ -83,7 +85,7 @@ GetAgeFromBirthnumber <- function(var_birth_number) {
 }
 ```
 
-## Auxiliary metrics functions
+## Metrics auxiliary functions
 
 ### calculateModelMetrics
 The objective of this function is to calculate main metrics of model performance according to a cutoff value.
@@ -147,7 +149,7 @@ modelMetrics <- function(realData, predData, stepping = 0.01,
 #### SplitTestTrainDataset
 See topic "Splitting dataset into Train and Test data" for further details.
 
-## Auxiliary plot functions
+## Plot auxiliary functions
 
 Functions used in the evaluation step to compare the models.
 
@@ -155,6 +157,8 @@ Functions used in the evaluation step to compare the models.
 * Score_Histograms
 * KS_Plot
 * accuracy
+
+*******************************************************************************
 
 # Data Ingestion (step 2)
 The process of data ingestion — preparing data for analysis — usually includes steps called extract (taking the data from its current location), transform (cleansing and normalizing the data), and load (placing the data in a database where it can be analyzed).
@@ -167,6 +171,8 @@ During this step, in addition to the loading data processes, it was performed da
 - **Loan**: casting columns in table loan to the right data types;
 - **Permanent Order**: casting columns with decimal values;
 - **Transaction**: casting columns in table transaction to the right data types.
+
+*******************************************************************************
 
 # Data Cleaning (step 3)
 
@@ -203,6 +209,8 @@ kable(transaction_empty_cols)
 ```
 
 For the exploration analysis report, we did not take any additional action, since the missing values was not relevant.
+
+*******************************************************************************
 
 # Label Translation (step 4)
 In order to make the data information more understandable, it was translated some relevant labels and domains from Czech to English.
@@ -241,6 +249,8 @@ transaction$k_symbol <- plyr::mapvalues(transaction$k_symbol,
                                           'interest credited', 'sanction interest', 
                                           'household', 'old age pension', 'loan payment'))
 ```
+
+*******************************************************************************
 
 # Data Enhancement (step 5)
 This step aims to improve the analysis by adding auxiliary information. Data enhancement is all about making sure any data that is coming into the business is being looked at with a critical eye and is being filtered down to maximize its value.
@@ -305,6 +315,8 @@ account_transaction_pattern <- select(transaction, c(trans_id, account_id, date,
               prop_sanction_interest = sum(`sanction interest`) / amount,
               prop_statement = sum(`statement`) / amount)
 ```
+
+*******************************************************************************
 
 # Data Preparation for Predictive Modeling (step 6)
 
