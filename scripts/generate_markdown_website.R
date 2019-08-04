@@ -1,3 +1,11 @@
+# clearing everything before starting -----------------------------------------
+# clear environment and memory
+rm(list=ls())
+invisible(gc())
+
+# clear console screen
+cat("\014")
+
 # getting the necessary directories to generate the website -------------------
 scriptsDirectoryPath  <- dirname(rstudioapi::getSourceEditorContext()$path)
 markdownDirectoryPath <- stringr::str_replace(scriptsDirectoryPath, "/scripts", "/markdown")
