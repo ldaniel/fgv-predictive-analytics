@@ -383,14 +383,14 @@ $(document).ready(function () {
 <p>Data from a real Czech bank. From 1999.</p>
 <p>The data about the clients and their accounts consist of following relations:</p>
 <ul>
-<li><p>relation account (4500 objects in the file ACCOUNT.ASC) - each record describes static characteristics of an account,</p></li>
-<li><p>relation client (5369 objects in the file CLIENT.ASC) - each record describes characteristics of a client,</p></li>
-<li><p>relation disposition (5369 objects in the file DISP.ASC) - each record relates together a client with an account i.e. this relation describes the rights of clients to operate accounts,</p></li>
-<li><p>relation permanent order (6471 objects in the file ORDER.ASC) - each record describes characteristics of a payment order,</p></li>
-<li><p>relation transaction (1056320 objects in the file TRANS.ASC) - each record describes one transaction on an account,</p></li>
-<li><p>relation loan (682 objects in the file LOAN.ASC) - each record describes a loan granted for a given account,</p></li>
-<li><p>relation credit card (892 objects in the file CARD.ASC) - each record describes a credit card issued to an account,</p></li>
-<li><p>relation demographic data (77 objects in the file DISTRICT.ASC) - each record describes demographic characteristics of a district.</p></li>
+<li><p>relation <strong>account</strong> (4500 objects in the file ACCOUNT.ASC) - each record describes static characteristics of an account,</p></li>
+<li><p>relation <strong>client</strong> (5369 objects in the file CLIENT.ASC) - each record describes characteristics of a client,</p></li>
+<li><p>relation <strong>disposition</strong> (5369 objects in the file DISP.ASC) - each record relates together a client with an account i.e. this relation describes the rights of clients to operate accounts,</p></li>
+<li><p>relation <strong>permanent order</strong> (6471 objects in the file ORDER.ASC) - each record describes characteristics of a payment order,</p></li>
+<li><p>relation <strong>transaction</strong> (1056320 objects in the file TRANS.ASC) - each record describes one transaction on an account,</p></li>
+<li><p>relation <strong>loan</strong> (682 objects in the file LOAN.ASC) - each record describes a loan granted for a given account,</p></li>
+<li><p>relation <strong>credit card</strong> (892 objects in the file CARD.ASC) - each record describes a credit card issued to an account,</p></li>
+<li><p>relation <strong>demographic data</strong> (77 objects in the file DISTRICT.ASC) - each record describes demographic characteristics of a district.</p></li>
 </ul>
 <p>Each account has both static characteristics (e.g. date of creation, address of the branch) given in relation “account” and dynamic characteristics (e.g. payments debited or credited, balances) given in relations “permanent order” and “transaction”. Relation “client” describes characteristics of persons who can manipulate with the accounts. One client can have more accounts, more clients can manipulate with single account; clients and accounts are related together in relation “disposition”. Relations “loan” and “credit card” describe some services which the bank offers to its clients; more credit cards can be issued to an account, at most one loan can be granted for an account. Relation “demographic data” gives some publicly available information about the districts (e.g. the unemployment rate); additional information about the clients can be deduced from this.</p>
 <p>Source: <a href="https://raw.githubusercontent.com/ldaniel/Predictive-Analytics/master/enunciation/PKDD&#39;99%C2%A0Discovery%C2%A0Challenge.pdf"><em>This database was prepared by Petr Berka and Marta Sochorova.</em></a></p>
