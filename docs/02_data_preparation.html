@@ -446,12 +446,12 @@ $(document).ready(function () {
 <li><a href="#converttodate"><span class="toc-section-number">2.1.3</span> ConvertToDate</a></li>
 <li><a href="#getagefrombirthnumber"><span class="toc-section-number">2.1.4</span> GetAgeFromBirthnumber</a></li>
 </ul></li>
-<li><a href="#auxiliary-metrics-functions"><span class="toc-section-number">2.2</span> Auxiliary metrics functions</a><ul>
+<li><a href="#metrics-auxiliary-functions"><span class="toc-section-number">2.2</span> Metrics auxiliary functions</a><ul>
 <li><a href="#calculatemodelmetrics"><span class="toc-section-number">2.2.1</span> calculateModelMetrics</a></li>
 <li><a href="#modelmetrics"><span class="toc-section-number">2.2.2</span> modelMetrics</a></li>
 </ul></li>
 <li><a href="#data-preparation-functions"><span class="toc-section-number">2.3</span> Data preparation functions</a></li>
-<li><a href="#auxiliary-plot-functions"><span class="toc-section-number">2.4</span> Auxiliary plot functions</a></li>
+<li><a href="#plot-auxiliary-functions"><span class="toc-section-number">2.4</span> Plot auxiliary functions</a></li>
 </ul></li>
 <li><a href="#data-ingestion-step-2"><span class="toc-section-number">3</span> Data Ingestion (step 2)</a></li>
 <li><a href="#data-cleaning-step-3"><span class="toc-section-number">4</span> Data Cleaning (step 3)</a></li>
@@ -472,9 +472,10 @@ $(document).ready(function () {
 <li><strong>Step 02</strong>: Data Ingestion;</li>
 <li><strong>Step 03</strong>: Data Cleaning;</li>
 <li><strong>Step 04</strong>: Label Translation;</li>
-<li><strong>Step 05</strong>: Data Enhancement.</li>
-<li><strong>Step 06</strong>: Dataset Preparation</li>
+<li><strong>Step 05</strong>: Data Enhancement;</li>
+<li><strong>Step 06</strong>: Dataset Preparation.</li>
 </ul>
+<hr />
 </div>
 <div id="create-functions-step-1" class="section level1">
 <h1><span class="header-section-number">2</span> Create Functions (step 1)</h1>
@@ -528,8 +529,8 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb4-7" title="7">}</a></code></pre></div>
 </div>
 </div>
-<div id="auxiliary-metrics-functions" class="section level2">
-<h2><span class="header-section-number">2.2</span> Auxiliary metrics functions</h2>
+<div id="metrics-auxiliary-functions" class="section level2">
+<h2><span class="header-section-number">2.2</span> Metrics auxiliary functions</h2>
 <div id="calculatemodelmetrics" class="section level3">
 <h3><span class="header-section-number">2.2.1</span> calculateModelMetrics</h3>
 <p>The objective of this function is to calculate main metrics of model performance according to a cutoff value.</p>
@@ -591,8 +592,8 @@ $(document).ready(function () {
 <p>See topic “Splitting dataset into Train and Test data” for further details.</p>
 </div>
 </div>
-<div id="auxiliary-plot-functions" class="section level2">
-<h2><span class="header-section-number">2.4</span> Auxiliary plot functions</h2>
+<div id="plot-auxiliary-functions" class="section level2">
+<h2><span class="header-section-number">2.4</span> Plot auxiliary functions</h2>
 <p>Functions used in the evaluation step to compare the models.</p>
 <ul>
 <li>Score_Boxplot</li>
@@ -600,6 +601,7 @@ $(document).ready(function () {
 <li>KS_Plot</li>
 <li>accuracy</li>
 </ul>
+<hr />
 </div>
 </div>
 <div id="data-ingestion-step-2" class="section level1">
@@ -614,6 +616,7 @@ $(document).ready(function () {
 <li><strong>Permanent Order</strong>: casting columns with decimal values;</li>
 <li><strong>Transaction</strong>: casting columns in table transaction to the right data types.</li>
 </ul>
+<hr />
 </div>
 <div id="data-cleaning-step-3" class="section level1">
 <h1><span class="header-section-number">4</span> Data Cleaning (step 3)</h1>
@@ -727,6 +730,7 @@ $(document).ready(function () {
 </tbody>
 </table>
 <p>For the exploration analysis report, we did not take any additional action, since the missing values was not relevant.</p>
+<hr />
 </div>
 <div id="label-translation-step-4" class="section level1">
 <h1><span class="header-section-number">5</span> Label Translation (step 4)</h1>
@@ -763,6 +767,7 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb10-30" title="30">                                        <span class="kw">c</span>(<span class="st">&#39;insurance payment&#39;</span>, <span class="st">&#39;statement&#39;</span>, </a>
 <a class="sourceLine" id="cb10-31" title="31">                                          <span class="st">&#39;interest credited&#39;</span>, <span class="st">&#39;sanction interest&#39;</span>, </a>
 <a class="sourceLine" id="cb10-32" title="32">                                          <span class="st">&#39;household&#39;</span>, <span class="st">&#39;old age pension&#39;</span>, <span class="st">&#39;loan payment&#39;</span>))</a></code></pre></div>
+<hr />
 </div>
 <div id="data-enhancement-step-5" class="section level1">
 <h1><span class="header-section-number">6</span> Data Enhancement (step 5)</h1>
@@ -808,6 +813,7 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb15-15" title="15">              <span class="dt">prop_other =</span> <span class="kw">sum</span>(<span class="st">`</span><span class="dt">other</span><span class="st">`</span>) <span class="op">/</span><span class="st"> </span>amount,</a>
 <a class="sourceLine" id="cb15-16" title="16">              <span class="dt">prop_sanction_interest =</span> <span class="kw">sum</span>(<span class="st">`</span><span class="dt">sanction interest</span><span class="st">`</span>) <span class="op">/</span><span class="st"> </span>amount,</a>
 <a class="sourceLine" id="cb15-17" title="17">              <span class="dt">prop_statement =</span> <span class="kw">sum</span>(<span class="st">`</span><span class="dt">statement</span><span class="st">`</span>) <span class="op">/</span><span class="st"> </span>amount)</a></code></pre></div>
+<hr />
 </div>
 <div id="data-preparation-for-predictive-modeling-step-6" class="section level1">
 <h1><span class="header-section-number">7</span> Data Preparation for Predictive Modeling (step 6)</h1>
