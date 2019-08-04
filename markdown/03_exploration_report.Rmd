@@ -13,6 +13,7 @@ library(rmarkdown)
 library(dplyr)
 library(ggplot2)
 library(ggthemes)
+library(ggpubr)
 library(ggalluvial)
 library(tidyr)
 library(lubridate)
@@ -43,11 +44,10 @@ At first glance, gender equality is well balanced in the bank, even when observe
 
 ```{r gender_distribution_analysis, echo=TRUE, out.width = '100%'}
 # gender distribution of clients in the bank
-ggplot(data = client) +
+gender_plot <- ggplot(data = client) +
   aes(x = gender, fill = gender) +
   geom_bar() +
-  labs(title = "Gender distribution of clients in the bank",
-       subtitle = "A well balanced bank",
+  labs(subtitle = "A well balanced bank",
        x = "Gender",
        y = "Total clients") +
   theme_economist()
@@ -58,17 +58,24 @@ clientGenderOverDecades <- client %>%
   count()
 
 # gender distribution of clients in the bank over the decades
-ggplot(data = clientGenderOverDecades) +
+gender_dist_plot <- ggplot(data = clientGenderOverDecades) +
   aes(x = decade, fill = gender, weight = n) +
   scale_x_continuous(breaks = c(0, 10, 20, 30, 40, 50, 60, 70, 80)) +
   geom_bar() +
   geom_line(aes(y = n, color = gender)) +
-  labs(title = "Gender distribution of clients in the bank over the decades",
-       subtitle = "Equality at its finest",
+  labs(subtitle = "Equality at its finest",
        x = "Decades",
        y = "Total clients") +
   theme_economist() +
   facet_wrap(vars(gender))
+
+gender_plots <- ggarrange(gender_plot, gender_dist_plot)
+
+gender_plots <- annotate_figure(gender_plots, 
+                                 top = text_grob("Gender distribution of clients over the decades", 
+                                                 color = "black", face = "bold", 
+                                                 size = 14))
+gender_plots
 
 # alluvial diagram representation of gender, age group and region
 clientGenderAgeGroupByRegion <- client %>% 
