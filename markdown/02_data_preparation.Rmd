@@ -173,10 +173,198 @@ See topic "Splitting dataset into Train and Test data" for further details.
 
 Functions used in the evaluation step to compare the models.
 
-* Score_Boxplot
-* Score_Histograms
-* KS_Plot
-* accuracy
+### Score_Histograms
+
+Function used to plot the score density plots of the model.
+
+Needs to receive a dataset containing the predicted and actual values, the actual values vector the score (predicted) values value and a custom title.
+
+``` {r Score_Histograms, eval = FALSE}
+Score_Histograms <- function(dataset, predicted, actual, title) {
+  ggplot(data = dataset) +
+    geom_density(aes(x = predicted, fill = as.factor(actual)),
+                 alpha = 0.5) +
+    scale_fill_manual(values = c("0" = "#16a085", "1" = "#e74c3c")) +
+    scale_x_continuous(limits = c(0, 1)) +
+    theme_economist() +
+    labs(title = title,
+         y = 'Score',
+         fill = 'Defaulter |1 = True|') +
+    theme(panel.grid = element_blank(),
+          axis.ticks.y = element_blank(),
+          axis.text.y = element_blank(),
+          legend.position = 0,
+          plot.title = element_text(hjust = 0.5))
+}
+```
+
+### Score_Boxplot
+
+Function used to plot the score box plot of the model.
+
+Needs to receive a dataset containing the predicted and actual values, the actual values vector the score (predicted) values value and a custom title.
+
+``` {r Score_Boxplot, eval = FALSE}
+Score_Boxplot <- function(dataset, predicted, actual, title) {
+  ggplot(data = dataset) +
+    geom_boxplot(aes(y = predicted,
+                     fill = as.factor(actual))) +
+    coord_flip() +
+    scale_fill_manual(values = c("0" = "#16a085", "1" = "#e74c3c")) +
+    scale_y_continuous(limits = c(0, 1)) +
+    theme_economist() +
+    labs(title = title,
+         y = 'Score',
+         fill = 'Defaulter |1 = True|') +
+    theme(panel.grid = element_blank(),
+          axis.ticks.y = element_blank(),
+          axis.text.y = element_blank(),
+          legend.position = 0,
+          plot.title = element_text(hjust = 0.5))
+}
+```
+
+### KS_Plot
+
+Function used to plot the cumulative probability distribution and KS metric of the model.
+
+Needs to receive a vector with scores of Defaulters and a vector f scores of Non-Defaulters and a custom title.
+
+``` {r KS_Plot, eval = FALSE}
+KS_Plot <- function(zeros, ones, title) {
+  group <- c(rep("Non Defaulters", length(zeros)), rep("Defauters", length(ones)))
+  dat <- data.frame(KSD = c(zeros, ones), group = group)
+  cdf1 <- ecdf(zeros) 
+  cdf2 <- ecdf(ones) 
+  minMax <- seq(min(zeros, ones), max(zeros, ones), length.out=length(zeros)) 
+  x0 <- minMax[which( abs(cdf1(minMax) - cdf2(minMax)) == max(abs(cdf1(minMax) - cdf2(minMax))) )][1] 
+  y0 <- cdf1(x0)[1]
+  y1 <- cdf2(x0)[1]
+  ks <- round(y0 - y1, 2)
+  
+  ggplot(dat, aes(x = KSD, group = group, color = group))+
+    stat_ecdf(size=1) +
+    geom_segment(aes(x = x0[1], y = y0[1], xend = x0[1], yend = y1[1]),
+                 linetype = "dashed", color = "blue") +
+    geom_point(aes(x = x0[1] , y = y0[1]), color="blue", size=4) +
+    geom_point(aes(x = x0[1] , y = y1[1]), color="blue", size=4) +
+    geom_label(aes(x = x0[1], y = y1[1] + (y0[1] - y1[1]) / 2, label = ks),
+               color = 'black') +
+    scale_x_continuous(limits = c(0, 1)) +
+    labs(title = title,
+         y = 'Cumulative Probability Distribution',
+         x = 'Score') +
+    theme_economist() +
+    theme(legend.title = element_blank(),
+          panel.grid = element_blank(),
+          legend.position = 0,
+          plot.title = element_text(hjust = 0.5))
+}
+```
+
+### Plot_ROC
+
+Function used to plot the combined ROC curves of each model.
+
+Needs to receive a dataset with actual and predicted scores of each model.
+
+``` {r Plot_ROC, eval = FALSE}
+Plot_ROC <- function(dataset, smooth_opt = FALSE) {
+  roc_logistic      <- roc(logistic.actual ~ logistic.predicted,
+                           dataset,
+                           smooth = smooth_opt)
+  
+  roc_decision.tree <- roc(decision.tree.actual ~ decision.tree.predicted,
+                           dataset,
+                           smooth = smooth_opt)
+  
+  roc_boosting      <- roc(boosting.actual ~ boosting.predicted,
+                           dataset,
+                           smooth = smooth_opt)
+  
+  roc_random.forest <- roc(random.forest.actual ~ random.forest.predicted,
+                           dataset,
+                           smooth = smooth_opt)
+  
+  p <- ggplot() +
+    geom_line(aes(x = 1 - roc_logistic$specificities, 
+                  y = roc_logistic$sensitivities, 
+                  colour = 'Logistic Regression'), # red
+              size = 1,
+              linetype = 1,
+              alpha = 0.7) +
+    geom_line(aes(x = 1 - roc_decision.tree$specificities, 
+                  y = roc_decision.tree$sensitivities,
+                  colour = 'Decision Tree'), # blue
+              size = 1,
+              linetype = 1,
+              alpha = 0.7) +
+    geom_line(aes(x = 1 - roc_boosting$specificities, 
+                  y = roc_boosting$sensitivities,
+                  colour = 'Boosting'), # green
+              size = 1,
+              linetype = 1,
+              alpha = 0.7) +
+    geom_line(aes(x = 1 - roc_random.forest$specificities, 
+                  y = roc_random.forest$sensitivities,
+                  colour = 'Random Forest'), # purple
+              size = 2,
+              linetype = 1,
+              alpha = 1) +
+    geom_abline(aes(intercept = 0, slope = 1),
+                linetype = 2,
+                size = 1) +
+    scale_colour_manual(name = NULL,
+                        breaks = c('Logistic Regression', 
+                                   'Decision Tree',
+                                   'Boosting', 
+                                   'Random Forest'),
+                        labels = c('Logistic Regression', 
+                                   'Decision Tree',
+                                   'Boosting', 
+                                   'Random Forest'),
+                        values = c('#C0392B', 
+                                   '#3498DB', 
+                                   '#28B463', 
+                                   '#9B59B6')) +
+    labs(y = 'True Positive Rate',
+         x = 'False Positive Rate',
+         title = 'Receiver Oerating Characteristic Curve - ROC',
+         subtitle = 'Random Forest is the model that best discriminate Defaulters and Non-Defaulters') +
+    theme_economist() +
+    theme(panel.grid = element_blank())
+  
+  return(p)
+}
+```
+
+### accuracy
+
+Function used to output confusion matrix and basic accuracy metrics of each model.
+
+Needs to receive a vector of actual and predicted values.
+
+``` {r accuracy, eval = FALSE}
+# The objective of this function is to calculate main accuracy metrix of the model performance.
+accuracy <- function(score, actual, threshold = 0.5) {
+  
+  fitted.results <- ifelse(score > threshold ,1 ,0)
+  
+  misClasificError <- mean(fitted.results != actual)
+  
+  misClassCount <- misclassCounts(fitted.results, actual)
+  
+  print(kable(misClassCount$conf.matrix))
+  
+  print('--------------------------------------------------------------')
+  print(paste('Model General Accuracy of: ', 
+              round((1 - misClassCount$metrics['ER']) * 100, 2), '%', 
+              sep = ''))
+  print(paste('True Positive Rate of    : ', 
+              round(misClassCount$metrics['TPR'] * 100, 2), '%',
+              sep = ''))
+}
+```
 
 *******************************************************************************
 
