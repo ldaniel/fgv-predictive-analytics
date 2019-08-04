@@ -299,7 +299,9 @@ KS_plots
 
 ## ROC Curve ----------------------------------------------------------------------
 
-Plot_ROC(prob.test, smooth_opt = FALSE)
+ROC_test <- Plot_ROC(prob.test, smooth_opt = FALSE)
+
+print(ROC_test)
 
 # accuracy metrics ----------------------------------------------------------------
 
