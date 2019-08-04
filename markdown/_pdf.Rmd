@@ -15,8 +15,23 @@ output:
 ```{r child = '02_data_preparation.Rmd'}
 ```
 
-```{r child = '03_logistic_regression_report.Rmd'}
+```{r child = '03_exploration_report.Rmd'}
 ```
 
-```{r child = '04_conclusion.Rmd'}
+```{r child = '04_logistic_regression_report.Rmd'}
+```
+
+```{r child = '05_decision_tree_report.Rmd'}
+```
+
+```{r child = '06_boosting_report.Rmd'}
+```
+
+```{r child = '07_random_forest_report.Rmd'}
+```
+
+```{r child = '08_conclusion.Rmd'}
+```
+
+```{r child = '09_references.Rmd'}
 ```

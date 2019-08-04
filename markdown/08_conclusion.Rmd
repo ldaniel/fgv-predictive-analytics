@@ -60,13 +60,13 @@ source("./scripts/step_06_dataset_preparation.R")
 ```{r model_scripts, include=FALSE}
 # loading required steps before performing the analysis
 
-source('scripts/playground_logistic_regression.R')
+source('./scripts/playground_01_logistic_regression.R')
 
-source('scripts/playground_decision_tree.R')
+source('./scripts/playground_02_decision_tree.R')
 
-source('scripts/playground_boosting.R')
+source('./scripts/playground_03_boosting.R')
 
-source('scripts/playground_random_forest.R')
+source('./scripts/playground_04_random_forest.R')
 
 ```
 

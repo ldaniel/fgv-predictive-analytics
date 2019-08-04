@@ -56,7 +56,7 @@ invisible(gc)
 
 # modeling ---------------------------------------------------------------------------
 
-source('scripts/playground_01_logistic_regression.R')
+source('scripts/model_01_logistic_regression.R')
 rm(clean, clean_dataset, cor_mtx_clean, cor_mtx_full, cor_mtx_high_VIF,
    dummy_variables, high_VIF_dataset, high_VIF_correlogram_before, 
    logistic.full, SplitDataset, vars.quant, VIF, VIF_Table_After, 
@@ -64,15 +64,15 @@ rm(clean, clean_dataset, cor_mtx_clean, cor_mtx_full, cor_mtx_high_VIF,
    dummy_variables_low, high_VIF, low_VIF, prop_variables, reject_variables_vector)
 invisible(gc)
 
-source('scripts/playground_02_decision_tree.R')
+source('scripts/model_02_decision_tree.R')
 rm(SplitDataset)
 invisible(gc)
 
-source('scripts/playground_03_boosting.R')
+source('scripts/model_03_boosting.R')
 rm(SplitDataset, f_full, names, var_importance)
 invisible(gc())
 
-source('scripts/playground_04_random_forest.R')
+source('scripts/model_04_random_forest.R')
 rm(customRF, DistinctCounts, FitResults, metricsByCutoff.full, metricsByCutoff.test,
    metricsByCutoff.train, SplitDataset)
 invisible(gc())
