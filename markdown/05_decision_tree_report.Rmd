@@ -212,7 +212,7 @@ prob.train  <- prob.train %>% as_tibble()
 prob.test   <- prob.test %>% as_tibble()
 ```
 
-## Getting performance measures:
+## Getting performance measures
 
 To calculate the performance measures, derived from the confusion matrix, we need to find the score cut off that best split our test dataset into Defaulters and Non-Defaulters.
 
@@ -256,7 +256,7 @@ Below are the metrics on the train and test dataset:
 kable(measures, row.names = FALSE)
 ```
 
-## Evaluating classification performance:
+## Evaluating classification performance
 
 In general, such as the Logistic Regression model, this model is not delivering good accuracy, we will compare how it performed against other classes of models in the Final Report session
 
