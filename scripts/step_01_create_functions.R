@@ -99,7 +99,6 @@ modelMetrics <- function(realData, predData, stepping = 0.01,
 }
 
 # accuracy ----------------------------------------------------------------
-# The objective of this function is to calculate main accuracy metrix of the model performance.
 accuracy <- function(score, actual, threshold = 0.5) {
   
   fitted.results <- ifelse(score > threshold ,1 ,0)

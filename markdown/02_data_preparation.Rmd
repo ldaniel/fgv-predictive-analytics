@@ -345,7 +345,6 @@ Function used to output confusion matrix and basic accuracy metrics of each mode
 Needs to receive a vector of actual and predicted values.
 
 ``` {r accuracy, eval = FALSE}
-# The objective of this function is to calculate main accuracy metrix of the model performance.
 accuracy <- function(score, actual, threshold = 0.5) {
   
   fitted.results <- ifelse(score > threshold ,1 ,0)

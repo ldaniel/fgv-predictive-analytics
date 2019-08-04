@@ -469,7 +469,7 @@ On the other hand, below variables are associated to a decrease in the likelihoo
 We started this step by making predictions using our model on the X's variables in our Train and Test datasets.
 
 ```{r get_scores, echo=TRUE}
-## making preditions for each model and consilidating in a single data frame
+## making predictions for each model and consolidating in a single data frame
 
 prob.full   = list()
 prob.train  = list()
