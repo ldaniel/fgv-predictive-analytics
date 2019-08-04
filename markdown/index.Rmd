@@ -6,9 +6,9 @@ title: 'FGV MBA: Business Analytics & Big Data'
 
 In the predictive analysis discipline we aim to develop statistical models, based on data, for a particular outcome of interest. From this model, we make sure that behavioral learning and past experiences have a model with good generalization.
 
-In this project, we developed a set of models using a real anonymized Czech bank transactions, account info, and loan records released for PKDD'99 Discovery Challenge.
+In this project, we developed a set of models using a real anonymized Czech bank transactions, account info, and loan records released for [*PKDD'99 Discovery Challenge*](https://raw.githubusercontent.com/ldaniel/Predictive-Analytics/master/enunciation/PKDD'99%C2%A0Discovery%C2%A0Challenge.pdf)
 
-This website intends to present the work analysis for the *"Análise Preditiva"* class.
+This website intends to present the work analysis for the  [*"Análise Preditiva"*](https://raw.githubusercontent.com/ldaniel/Predictive-Analytics/master/enunciation/projeto_final.pdf) class.
 
 Use the menu above to navigate and see the final report.
 
@@ -16,10 +16,12 @@ Use the menu above to navigate and see the final report.
 - João Rafael Dias (magister.analytica@gmail.com)
 
 ## Authors / students
-- Daniel Campos (A57635769 / daniel.ferraz.campos@gmail.com)
-- Leandro Daniel (A57622988 / contato@leandrodaniel.com)
-- Rodrigo Goncalves (A57566093 / rodrigo.goncalves@me.com)
-- Ygor Lima (A57549661 / ygor_redesocial@hotmail.com)
+|Profile|Name|E-mail|Student ID (Matricula)|
+|---|---|---|---|
+|<a href="https://github.com/DanielFCampos"><img src="https://avatars2.githubusercontent.com/u/31582602?s=460&v=4" title="DanielFCampos" width="40" height="40"></a>|Daniel Campos|[daniel.ferraz.campos@gmail.com](daniel.ferraz.campos@gmail.com)|A57635769|
+|<a href="https://github.com/ldaniel"><img src="https://avatars2.githubusercontent.com/u/205534?s=460&v=4" title="ldaniel" width="40" height="40"></a>|Leandro Daniel|[contato@leandrodaniel.com](contato@leandrodaniel.com)|A57622988|
+|<a href="https://github.com/RodriGonca"><img src="https://avatars2.githubusercontent.com/u/50252438?s=460&v=4" title="RodriGonca" width="40" height="40"></a>|Rodrigo Goncalves|[rodrigo.goncalves@me.com](rodrigo.goncalves@me.com)|A57566093|
+|<a href="https://github.com/ygorlima1"><img src="https://avatars2.githubusercontent.com/u/52429828?s=460&v=4" title="ygorlima1" width="40" height="40"></a>|Ygor Lima|[ygor_redesocial@hotmail.com](ygor_redesocial@hotmail.com)|A57549661|
 
 ## Where to find the source code of this project?
 This project can be found and downloaded on GitHub: https://github.com/ldaniel/Predictive-Analytics
