@@ -41,3 +41,25 @@ source("./scripts/step_05_data_enhancement.R")
 # Objective
 
 To-do.
+
+*******************************************************************************
+
+# Modeling
+
+To-do.
+
+*******************************************************************************
+
+# Interpreting model output
+
+To-do.
+
+*******************************************************************************
+
+# Evaluating the model performance
+
+To-do.
+
+## Getting Performance Measures:
+
+To-do.
