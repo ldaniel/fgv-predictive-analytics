@@ -442,6 +442,12 @@ Meaning that it can be used not only in predicting the classification into Defau
 
 In the Logistic Regression the effect of an increase or decrease of a predictor is not linear, but we can see the predictors that have the greater influence and by its coefficient signal the associated with an increase or decrease on the likelihood of default.
 
+The probability of default is given by below equation:
+
+$$P(Y = 1 | X_{n} = x_{n}) = \frac{1}{1 + e^{(-\beta_{0}+\beta_{1}x_{1}+\beta_{2}x_{2}+...+\beta_{n}x_{n} )}}$$
+
+Where each β is the coefficient estimate for each variable in the final model.
+
 In our model we see that below variables are associated to an increase in the likelihood of default:
 
 - **x_loan_amount**
@@ -465,9 +471,9 @@ We started this step by making predictions using our model on the X's variables 
 ```{r get_scores, echo=TRUE}
 ## making preditions for each model and consilidating in a single data frame
 
-prob.full = list()
-prob.train = list()
-prob.test = list()
+prob.full   = list()
+prob.train  = list()
+prob.test   = list()
 
 prob.full$logistic.actual     <- loan_dataset_logistic$y_loan_defaulter
 prob.full$logistic.predicted  <- predict(logistic.step, type = "response", 
@@ -481,9 +487,9 @@ prob.test$logistic.actual     <- data.test_logistic$y_loan_defaulter
 prob.test$logistic.predicted  <- predict(logistic.step, type = "response", 
                                          newdata = data.test_logistic)
 
-prob.full   <- prob.full %>% as_tibble()
+prob.full   <- prob.full  %>% as_tibble()
 prob.train  <- prob.train %>% as_tibble()
-prob.test   <- prob.test %>% as_tibble()
+prob.test   <- prob.test  %>% as_tibble()
 ```
 
 ## Getting Performance Measures:
