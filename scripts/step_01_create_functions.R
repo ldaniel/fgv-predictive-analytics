@@ -156,13 +156,12 @@ SplitTestTrainDataset <- function(dataset) {
 # plot functions --------------------------------------------------------------
 # functions used in the evaluation step to compare the models.
 
-Score_Boxplot <- function(dataset, predicted, actual, title) {
+Score_Histograms <- function(dataset, predicted, actual, title) {
   ggplot(data = dataset) +
-    geom_boxplot(aes(y = predicted,
-                     fill = as.factor(actual))) +
-    coord_flip() +
+    geom_density(aes(x = predicted, fill = as.factor(actual)),
+                 alpha = 0.5) +
     scale_fill_manual(values = c("0" = "#16a085", "1" = "#e74c3c")) +
-    scale_y_continuous(limits = c(0, 1)) +
+    scale_x_continuous(limits = c(0, 1)) +
     theme_economist() +
     labs(title = title,
          y = 'Score',
@@ -174,12 +173,13 @@ Score_Boxplot <- function(dataset, predicted, actual, title) {
           plot.title = element_text(hjust = 0.5))
 }
 
-Score_Histograms <- function(dataset, predicted, actual, title) {
+Score_Boxplot <- function(dataset, predicted, actual, title) {
   ggplot(data = dataset) +
-    geom_density(aes(x = predicted, fill = as.factor(actual)),
-                 alpha = 0.5) +
+    geom_boxplot(aes(y = predicted,
+                     fill = as.factor(actual))) +
+    coord_flip() +
     scale_fill_manual(values = c("0" = "#16a085", "1" = "#e74c3c")) +
-    scale_x_continuous(limits = c(0, 1)) +
+    scale_y_continuous(limits = c(0, 1)) +
     theme_economist() +
     labs(title = title,
          y = 'Score',
@@ -212,7 +212,7 @@ KS_Plot <- function(zeros, ones, title) {
                color = 'black') +
     scale_x_continuous(limits = c(0, 1)) +
     labs(title = title,
-         y = 'Acumulated Probability Distribution',
+         y = 'Cumulative Probability Distribution',
          x = 'Score') +
     theme_economist() +
     theme(legend.title = element_blank(),
@@ -286,5 +286,5 @@ Plot_ROC <- function(dataset, smooth_opt = FALSE) {
     theme_economist() +
     theme(panel.grid = element_blank())
   
-  print(p)
+  return (p)
 }
