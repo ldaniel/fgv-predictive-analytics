@@ -10,7 +10,27 @@ knitr::opts_knit$set(root.dir = "../")
 
 # loading required libraries
 library(rmarkdown)
+library(dplyr)
+library(ggplot2)
+library(ggthemes)
+library(ggalluvial)
+library(tidyr)
+library(lubridate)
+library(stringr)
+library(VIM)
+library(psych)
+library(feather)
+library(tinytex)
 library(knitr)
+library(leaflet)
+library(geojsonio)
+```
+
+```{r include=FALSE}
+# loading required steps before performing the analysis
+source("./scripts/step_01_create_functions.R")
+source("./scripts/step_02_data_ingestion.R")
+source("./scripts/step_03_data_cleaning.R")
 ```
 
 # Using a step by step approach
@@ -192,7 +212,7 @@ sapply(TableName, function(x) sum(is.na(x)))
 
 Solely the **transaction** table has NA values, in the following columns:
 
-```{r echo=FALSE, results = 'asis'}
+```{r transaction_na_cols, echo=FALSE, results = 'asis'}
 kable(transaction_na_cols)
 ```
 
