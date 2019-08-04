@@ -3,6 +3,59 @@ title: "References"
 date: "August, 2019"
 ---
 
-# Objective
+# References used in this class assigment.
 
-To-do.
+## Theory
+
+******************************************************
+
+### Books
+
+******************************************************
+
+[**An Introduction to Statistical Learning**](http://faculty.marshall.usc.edu/gareth-james/ISL/ISLR%20Seventh%20Printing.pdf)
+
+Gareth James, Daniela Witten, Trevor Hastie, Robert Tibshirani
+
+******************************************************
+
+### Wikipedia
+
+******************************************************
+
+[**Akaike Information Criterion**](https://en.wikipedia.org/wiki/Akaike_information_criterion)
+
+[**Kolmogorov–Smirnov Test**](https://en.wikipedia.org/wiki/Kolmogorov%E2%80%93Smirnov_test)
+
+[**Multicollinearity**](https://en.wikipedia.org/wiki/Multicollinearity)
+
+[**Receiver Operating Characteristic**](https://en.wikipedia.org/wiki/Receiver_operating_characteristic)
+
+******************************************************
+
+## R Programing
+******************************************************
+
+[**R for Data Science**](https://r4ds.had.co.nz/)
+
+Garrett Grolemund, Hadley Wickham
+
+******************************************************
+
+[**Top 50 ggplot2 Visualizations - The Master List (With Full R Code)**](http://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.html)
+
+Selva Prabhakaran
+
+******************************************************
+
+## Awesome functions from the community
+
+Some awesome functions we found in ***the internet*** and adapted for this class assignment.
+
+******************************************************
+
+[**KS Plot**](https://stackoverflow.com/questions/39162178/kolmogorov-smirnov-plot-in-r-ggplot)
+
+Stack Overflow: [**@Axeman**](https://stackoverflow.com/users/4341440/axeman)
+
+******************************************************
