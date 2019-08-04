@@ -156,8 +156,8 @@ cutoffs <- plotly::subplot(metricsByCutoff.test_log$Plot,
                    metricsByCutoff.test_DT$Plot,
                    metricsByCutoff.test_boost$Plot,
                    metricsByCutoff.test_rf$Plot,
-                   nrows = 2) %>% hide_legend()
-
+                   nrows = 2) %>% hide_legend() %>%
+                   layout(title="Comparing cut off measures of all models")
 cutoffs
 
 # logistic regression
