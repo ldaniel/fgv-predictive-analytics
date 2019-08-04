@@ -365,7 +365,9 @@ We get this chart by plotting the True positive rate (TPR) against the False Pos
 The bigger the Area Under the Curve (AUC) the better the model is in classifying the observation.
 
 ```{r ROC, echo=FALSE, out.width= '100%', warning=FALSE}
-Plot_ROC(prob.test, smooth_opt = FALSE)
+ROC_test <- Plot_ROC(prob.test, smooth_opt = FALSE)
+
+print(ROC_test)
 ```
 
 ### Acurracy
