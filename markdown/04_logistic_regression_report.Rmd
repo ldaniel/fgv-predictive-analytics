@@ -87,11 +87,9 @@ Starting from this dataset we investigate the presence of redundant or variables
 
 ### Dummy variables
 
-Starting with the dummy variables.
+Starting with the dummy variables. We will keep only dummies that has the event in at least 5% of the observation in the dataset.
 
-We will keep only dummies that has the event in at least 5% of the observation in the dataset.
-
-Below table shows the dummy variables that will be kept in the model:
+The below table shows the dummy variables that will be kept in the model:
 
 ```{r dummies_high, echo=TRUE}
 dummy_variables <- dplyr::select(loan_dataset_logistic, 
@@ -150,11 +148,11 @@ Multicollinearity is the phenomenon in which a given predictor has a strong corr
 
 So before we try to fit a model we ran a multicollinearity test to identify additional variables to drop from the model specification.
 
-The idea here is to identify the variables with high correlation among them and keep just the variables that have no strong correlation to the other predictors. we will do so by preferring to keep the variables that have lowest correlation against the others.
+The idea here is to identify the variables with high correlation among them and keep just the variables that have no strong correlation to the other predictors. We will do so by preferring to keep the variables that have lowest correlation against the others.
 
 Just looking at correlation indexes among pairs of predictors is limited as it is possible that the pairwise correlations are small, and yet a linear dependence exists among three or more variables.
 
-That’s why we will rely on a test called Variance Inflation Factors, VII for short, to detect multicollinearity.
+That’s why we will rely on a test called Variance Inflation Factors, VIF for short, to detect multicollinearity.
 
 Multicollinearity is poison for Regression algorithms!!!
 
@@ -338,9 +336,7 @@ kable(tibble(variables = names(loan_dataset_logistic)))
 
 And what about outliers?
 
-Regression algorithms are known for its sensitivity for outliers.
-
-So, before we go for the modeling juice, we will look for those bastards!!!
+Regression algorithms are known for its sensitivity for outliers. So, before we go for the modeling juice, we will look for those bastards!!!
 
 Looking at the plots we see no significant deviation in the quantitative variables.
 
@@ -492,7 +488,7 @@ prob.train  <- prob.train %>% as_tibble()
 prob.test   <- prob.test  %>% as_tibble()
 ```
 
-## Getting Performance Measures:
+## Getting Performance Measures
 
 To calculate the performance measures, derived from the confusion matrix, we need to find the score cut off that best split our test dataset into Defaulters and Non-Defaulters.
 
@@ -540,7 +536,7 @@ Below are the metrics on the train and test dataset:
 kable(measures, row.names = FALSE)
 ```
 
-## Evaluating classification performance:
+## Evaluating classification performance
 
 In general the Logistic Regression model is not delivering good accuracy, we will compare how it performed against other classes of models in the Final Report session
 
