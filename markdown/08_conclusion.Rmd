@@ -69,7 +69,7 @@ source('./scripts/model_04_random_forest.R')
 
 The goal of this session is to compare the performance of all the models created during this exercise.
 
-Here we will expand the analysis done individual in each model to compare how it is performing against each other.
+Here we will expand the analysis done individually in each model to compare how it is performing against each other.
 
 *******************************************************************************
 
@@ -252,7 +252,7 @@ Here we look back to the score density plot produced by each model side by side.
 
 Interesting to notice here how narrow the scores produced from Decision Tree model compared to the other models.
 
-As discussed in the Decision Tre session this model is extremely limited for this dataset with a huge variance in the tree depending on the train data and hyper parameters tuning.
+As discussed in the Decision Tree session this model is extremely limited for this dataset with a huge variance in the tree depending on the train data and hyper parameters tuning.
 
 We are using our custom function **Score_Histograms** described in the Function topic of Data Preparation session of this site.
 
