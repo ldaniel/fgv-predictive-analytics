@@ -63,3 +63,7 @@ To-do.
 ## Getting Performance Measures:
 
 To-do.
+
+## Evaluating classification performance
+
+To-do.
