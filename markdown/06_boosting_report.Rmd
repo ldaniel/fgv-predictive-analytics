@@ -8,24 +8,43 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(fig.pos =  "h")
 knitr::opts_knit$set(root.dir = "../")
 
-# loading required libraries
-library(rmarkdown)
+# loading required libraries ----------------------------------------------------------
+# libraries for data prep
 library(dplyr)
-library(tidyr)
+library(readr)
+library(magrittr)
 library(forcats)
 library(lubridate)
-library(tinytex)
+library(stringr)
 library(feather)
-library(corrplot)
+library(fastDummies)
+library(reshape2)
+library(knitr)
+
+#libraries for plots
+library(ggplot2)
+library(ggthemes)
+library(ggcorrplot)
+library(ggpubr)
+library(plotly)
+
+# libraries for data clean
+library(VIM)
+library(rms)
 library(mctest)
+
+# libraries for modeling
 library(caret)
+library(gmodels)
+library(MASS)
+library(rpart)
+library(rpart.plot)
+library(adabag)
+library(randomForest)
+
+# libraries for measures
 library(hmeasure)
 library(pROC)
-library(rms)
-library(knitr)
-library(ggplot2)
-library(ggcorrplot)
-library(ggthemes)
 
 ```
 
@@ -36,7 +55,9 @@ source("./scripts/step_02_data_ingestion.R")
 source("./scripts/step_03_data_cleaning.R")
 source("./scripts/step_04_label_translation.R")
 source("./scripts/step_05_data_enhancement.R")
+source("./scripts/step_06_dataset_preparation.R")
 ```
+
 
 # Objective
 
