@@ -194,7 +194,7 @@ prob.train  <- prob.train %>% as_tibble()
 prob.test   <- prob.test %>% as_tibble()
 ```
 
-## Getting Performance Measures:
+## Getting Performance Measures
 
 To calculate the performance measures, derived from the confusion matrix, we need to find the score cut off that best split our test dataset into Defaulters and Non-Defaulters.
 
