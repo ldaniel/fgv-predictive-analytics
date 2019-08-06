@@ -130,7 +130,7 @@ With the final cleaned dataset, we got from above steps fit our Boosting Model f
 
 We made a lot of tests playing with control parameters trying to reduce the errors and we decided to keep **mfinal = 100**, **minbucket = 25** and **maxdepth = 1 **.
 
-```{r fit_boots_model, echo=TRUE, out.width= '100%'}
+```{r fit_boots_model, eval=FALSE}
 
 names  <- names(data.train_boost) # saving the name of all vars to put on formula
 f_full <- as.formula(paste("y_loan_defaulter ~",
@@ -139,6 +139,18 @@ f_full <- as.formula(paste("y_loan_defaulter ~",
 boost <- boosting(f_full, data= data.train_boost, mfinal= 100, 
                    coeflearn = "Freund", 
                    control = rpart.control(minbucket= 25,maxdepth = 1))
+
+saveRDS(boost, "./models/boosting.rds")
+
+```
+
+```{r load_boots_model, include=FALSE}
+
+boost <- readRDS("./models/boosting.rds")
+
+```
+
+```{r plot_boots_model, echo=TRUE, out.width= '100%'}
 
 plot(errorevol(boost, data.train_boost))
 
