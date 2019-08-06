@@ -134,7 +134,7 @@ tree.full <- readRDS('./models/decision_tree_full.rds')
 
 ```{r plot_DT_full, echo=FALSE, out.width= '100%'}
 rpart.plot(tree.full, cex = 1.3, type = 0,
-           extra = 1, box.palette = 'BuRd',
+           extra = 104, box.palette = 'BuRd',
            branch.lty = 3, shadow.col = 'gray', 
            nn = TRUE, main = 'Decision Tree - Full')
 ```
@@ -203,7 +203,7 @@ Our full decision tree model clear shows that below variables are the key featur
 - **x_prop_interest_credited**
 - **x_avg_account_balance**
 - **x_loan_amount**
-- **x_no_of_commited_crimes_1996**
+- **x_no_of_commited_crimes_1995**
 
 The result is similar to the Logistic Regression model we created in the session before.
 

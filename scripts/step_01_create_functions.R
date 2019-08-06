@@ -223,19 +223,23 @@ KS_Plot <- function(zeros, ones, title) {
 Plot_ROC <- function(dataset, smooth_opt = FALSE) {
   roc_logistic      <- roc(logistic.actual ~ logistic.predicted,
                            dataset,
-                           smooth = smooth_opt)
+                           smooth = smooth_opt,
+                           quiet = FALSE)
   
   roc_decision.tree <- roc(decision.tree.actual ~ decision.tree.predicted,
                            dataset,
-                           smooth = smooth_opt)
+                           smooth = smooth_opt,
+                           quiet = FALSE)
   
   roc_boosting      <- roc(boosting.actual ~ boosting.predicted,
                            dataset,
-                           smooth = smooth_opt)
+                           smooth = smooth_opt,
+                           quiet = FALSE)
   
   roc_random.forest <- roc(random.forest.actual ~ random.forest.predicted,
                            dataset,
-                           smooth = smooth_opt)
+                           smooth = smooth_opt,
+                           quiet = FALSE)
   
   p <- ggplot() +
     geom_line(aes(x = 1 - roc_logistic$specificities, 

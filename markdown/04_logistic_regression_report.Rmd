@@ -465,7 +465,7 @@ On the other hand, below variables are associated to a decrease in the likelihoo
 
 - **x_card_type_classic**
 - **x_loan_duration**
-- **x_no_of_commited_crimes_1996**
+- **x_no_of_commited_crimes_1995**
 - **x_loan_amount**
 - **x_region_north_Bohemia**
 
