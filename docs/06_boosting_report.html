@@ -905,8 +905,9 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb5-6" title="6">                   <span class="dt">coeflearn =</span> <span class="st">&quot;Freund&quot;</span>, </a>
 <a class="sourceLine" id="cb5-7" title="7">                   <span class="dt">control =</span> <span class="kw">rpart.control</span>(<span class="dt">minbucket=</span> <span class="dv">25</span>,<span class="dt">maxdepth =</span> <span class="dv">1</span>))</a>
 <a class="sourceLine" id="cb5-8" title="8"></a>
-<a class="sourceLine" id="cb5-9" title="9"><span class="kw">plot</span>(<span class="kw">errorevol</span>(boost, data.train_boost))</a></code></pre></div>
-<p><img src="06_boosting_report_files/figure-html/fit_boots_model-1.png" width="100%" /></p>
+<a class="sourceLine" id="cb5-9" title="9"><span class="kw">saveRDS</span>(boost, <span class="st">&quot;./models/boosting.rds&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw">plot</span>(<span class="kw">errorevol</span>(boost, data.train_boost))</a></code></pre></div>
+<p><img src="06_boosting_report_files/figure-html/plot_boots_model-1.png" width="100%" /></p>
 <hr />
 </div>
 </div>
@@ -927,61 +928,61 @@ $(document).ready(function () {
 <p>Here we will perform basically the same steps we did in the Logistic Regression model.</p>
 <p>A comparison against all the models will be provided in the Final Report session of this exercise.</p>
 <p>We started this step by making predictions using our model on the X’s variables in our Train and Test datasets.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="co">## making preditions for each model and consolidating in a single data frame</span></a>
-<a class="sourceLine" id="cb6-2" title="2"></a>
-<a class="sourceLine" id="cb6-3" title="3">prob.full =<span class="st"> </span><span class="kw">list</span>()</a>
-<a class="sourceLine" id="cb6-4" title="4">prob.train =<span class="st"> </span><span class="kw">list</span>()</a>
-<a class="sourceLine" id="cb6-5" title="5">prob.test =<span class="st"> </span><span class="kw">list</span>()</a>
-<a class="sourceLine" id="cb6-6" title="6"></a>
-<a class="sourceLine" id="cb6-7" title="7">prob.full<span class="op">$</span>boosting.actual         &lt;-<span class="st"> </span>loan_dataset_boost<span class="op">$</span>y_loan_defaulter</a>
-<a class="sourceLine" id="cb6-8" title="8">prob.full<span class="op">$</span>boosting.predicted      &lt;-<span class="st"> </span><span class="kw">predict.boosting</span>(boost, </a>
-<a class="sourceLine" id="cb6-9" title="9">                                                      <span class="dt">newdata =</span> loan_dataset_boost)<span class="op">$</span>prob[, <span class="dv">2</span>]</a>
-<a class="sourceLine" id="cb6-10" title="10"></a>
-<a class="sourceLine" id="cb6-11" title="11">prob.train<span class="op">$</span>boosting.actual         &lt;-<span class="st"> </span>data.train_boost<span class="op">$</span>y_loan_defaulter</a>
-<a class="sourceLine" id="cb6-12" title="12">prob.train<span class="op">$</span>boosting.predicted      &lt;-<span class="st"> </span><span class="kw">predict.boosting</span>(boost, <span class="dt">newdata =</span> </a>
-<a class="sourceLine" id="cb6-13" title="13">                                                          data.train_boost)<span class="op">$</span>prob[, <span class="dv">2</span>]</a>
-<a class="sourceLine" id="cb6-14" title="14"></a>
-<a class="sourceLine" id="cb6-15" title="15">prob.test<span class="op">$</span>boosting.actual         &lt;-<span class="st"> </span>data.test_boost<span class="op">$</span>y_loan_defaulter</a>
-<a class="sourceLine" id="cb6-16" title="16">prob.test<span class="op">$</span>boosting.predicted      &lt;-<span class="st"> </span><span class="kw">predict.boosting</span>(boost, <span class="dt">newdata =</span> </a>
-<a class="sourceLine" id="cb6-17" title="17">                                                         data.test_boost)<span class="op">$</span>prob[, <span class="dv">2</span>]</a>
-<a class="sourceLine" id="cb6-18" title="18"></a>
-<a class="sourceLine" id="cb6-19" title="19">prob.full   &lt;-<span class="st"> </span>prob.full <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a>
-<a class="sourceLine" id="cb6-20" title="20">prob.train  &lt;-<span class="st"> </span>prob.train <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a>
-<a class="sourceLine" id="cb6-21" title="21">prob.test   &lt;-<span class="st"> </span>prob.test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="co">## making preditions for each model and consolidating in a single data frame</span></a>
+<a class="sourceLine" id="cb7-2" title="2"></a>
+<a class="sourceLine" id="cb7-3" title="3">prob.full =<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb7-4" title="4">prob.train =<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb7-5" title="5">prob.test =<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb7-6" title="6"></a>
+<a class="sourceLine" id="cb7-7" title="7">prob.full<span class="op">$</span>boosting.actual         &lt;-<span class="st"> </span>loan_dataset_boost<span class="op">$</span>y_loan_defaulter</a>
+<a class="sourceLine" id="cb7-8" title="8">prob.full<span class="op">$</span>boosting.predicted      &lt;-<span class="st"> </span><span class="kw">predict.boosting</span>(boost, </a>
+<a class="sourceLine" id="cb7-9" title="9">                                                      <span class="dt">newdata =</span> loan_dataset_boost)<span class="op">$</span>prob[, <span class="dv">2</span>]</a>
+<a class="sourceLine" id="cb7-10" title="10"></a>
+<a class="sourceLine" id="cb7-11" title="11">prob.train<span class="op">$</span>boosting.actual         &lt;-<span class="st"> </span>data.train_boost<span class="op">$</span>y_loan_defaulter</a>
+<a class="sourceLine" id="cb7-12" title="12">prob.train<span class="op">$</span>boosting.predicted      &lt;-<span class="st"> </span><span class="kw">predict.boosting</span>(boost, <span class="dt">newdata =</span> </a>
+<a class="sourceLine" id="cb7-13" title="13">                                                          data.train_boost)<span class="op">$</span>prob[, <span class="dv">2</span>]</a>
+<a class="sourceLine" id="cb7-14" title="14"></a>
+<a class="sourceLine" id="cb7-15" title="15">prob.test<span class="op">$</span>boosting.actual         &lt;-<span class="st"> </span>data.test_boost<span class="op">$</span>y_loan_defaulter</a>
+<a class="sourceLine" id="cb7-16" title="16">prob.test<span class="op">$</span>boosting.predicted      &lt;-<span class="st"> </span><span class="kw">predict.boosting</span>(boost, <span class="dt">newdata =</span> </a>
+<a class="sourceLine" id="cb7-17" title="17">                                                         data.test_boost)<span class="op">$</span>prob[, <span class="dv">2</span>]</a>
+<a class="sourceLine" id="cb7-18" title="18"></a>
+<a class="sourceLine" id="cb7-19" title="19">prob.full   &lt;-<span class="st"> </span>prob.full <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a>
+<a class="sourceLine" id="cb7-20" title="20">prob.train  &lt;-<span class="st"> </span>prob.train <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a>
+<a class="sourceLine" id="cb7-21" title="21">prob.test   &lt;-<span class="st"> </span>prob.test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a></code></pre></div>
 <div id="getting-performance-measures" class="section level2">
 <h2><span class="header-section-number">4.1</span> Getting Performance Measures</h2>
 <p>To calculate the performance measures, derived from the confusion matrix, we need to find the score cut off that best split our test dataset into Defaulters and Non-Defaulters.</p>
 <p>In this exercise we decide to not prioritize the accuracy on predicting Defaulters and Non-Defaulters, therefore we are looking for the score cut off that best predict each class equally.</p>
 <p>With the returned object from this function we can plot the comparison between TPR (True Positive Rate) and TNR (True Negative Rate) to find the best cut off.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="co">## getting measures -----------------------------------------------------------------</span></a>
-<a class="sourceLine" id="cb7-2" title="2">metricsByCutoff.test_boost  &lt;-<span class="st"> </span><span class="kw">modelMetrics</span>(prob.test<span class="op">$</span>boosting.actual, </a>
-<a class="sourceLine" id="cb7-3" title="3">                                            prob.test<span class="op">$</span>boosting.predicted, </a>
-<a class="sourceLine" id="cb7-4" title="4">                                            <span class="dt">plot_title =</span> <span class="st">&#39;Boosting&#39;</span>)</a>
-<a class="sourceLine" id="cb7-5" title="5">metricsByCutoff.test_boost<span class="op">$</span>Plot</a></code></pre></div>
-<div id="htmlwidget-4d0f4e7aa16fbcb06345" style="width:100%;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-4d0f4e7aa16fbcb06345">{"x":{"visdat":{"29a0260a3967":["function () ","plotlyVisDat"]},"cur_data":"29a0260a3967","attrs":{"29a0260a3967":{"x":{},"y":{},"opacity":0.3,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"bar"},"29a0260a3967.1":{"x":{},"y":{},"opacity":1,"name":"TPR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"29a0260a3967.2":{"x":{},"y":{},"opacity":1,"name":"TNR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"29a0260a3967.3":{"x":0.4,"y":0.76,"opacity":1,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","text":0.4,"mode":"text","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"title":"Cutoff Value"},"yaxis":{"domain":[0,1],"automargin":true,"title":"True Ratio (%)"},"title":"Boosting","hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57],"y":[0.994413407821229,0.988826815642458,0.983240223463687,0.966480446927374,0.960893854748603,0.949720670391061,0.93854748603352,0.916201117318436,0.837988826815642,0.804469273743017,0.697430167597765,0.669497206703911,0.647150837988827,0.613631284916201,0.585698324022346,0.568938547486034,0.478659217877095,0.388379888268156,0.360446927374302,0.315754189944134,0.259888268156425,0.237541899441341,0.226368715083799,0.141675977653631,0.0681564245810057,0.0221229050279329,0.0444692737430168,0.129162011173184,0.145921787709497,0.16268156424581,0.253854748603352,0.321787709497207,0.412960893854749,0.515307262569833,0.640893854748603,0.686480446927374,0.777653631284916,0.823240223463687,0.874413407821229,0.874413407821229,0.874413407821229,0.88,0.92],"opacity":0.3,"name":"Abs. Diff.","type":"bar","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57],"y":[1,1,1,1,1,1,1,1,1,1,0.96,0.96,0.96,0.96,0.96,0.96,0.92,0.88,0.88,0.88,0.88,0.88,0.88,0.84,0.8,0.76,0.76,0.72,0.72,0.72,0.64,0.6,0.52,0.44,0.32,0.28,0.2,0.16,0.12,0.12,0.12,0.12,0.08],"opacity":1,"name":"TPR","type":"scatter","mode":"lines","marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"line":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57],"y":[0.00558659217877095,0.0111731843575419,0.0167597765363128,0.0335195530726257,0.0391061452513966,0.0502793296089385,0.0614525139664804,0.0837988826815642,0.162011173184358,0.195530726256983,0.262569832402235,0.290502793296089,0.312849162011173,0.346368715083799,0.374301675977654,0.391061452513966,0.441340782122905,0.491620111731844,0.519553072625698,0.564245810055866,0.620111731843575,0.642458100558659,0.653631284916201,0.698324022346369,0.731843575418994,0.782122905027933,0.804469273743017,0.849162011173184,0.865921787709497,0.88268156424581,0.893854748603352,0.921787709497207,0.932960893854749,0.955307262569832,0.960893854748603,0.966480446927374,0.977653631284916,0.983240223463687,0.994413407821229,0.994413407821229,0.994413407821229,1,1],"opacity":1,"name":"TNR","type":"scatter","mode":"lines","marker":{"color":"rgba(44,160,44,1)","line":{"color":"rgba(44,160,44,1)"}},"error_y":{"color":"rgba(44,160,44,1)"},"error_x":{"color":"rgba(44,160,44,1)"},"line":{"color":"rgba(44,160,44,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.4],"y":[0.76],"opacity":1,"name":"Abs. Diff.","type":"scatter","text":0.4,"mode":"text","marker":{"color":"rgba(214,39,40,1)","line":{"color":"rgba(214,39,40,1)"}},"error_y":{"color":"rgba(214,39,40,1)"},"error_x":{"color":"rgba(214,39,40,1)"},"line":{"color":"rgba(214,39,40,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="co">## getting measures -----------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb8-2" title="2">metricsByCutoff.test_boost  &lt;-<span class="st"> </span><span class="kw">modelMetrics</span>(prob.test<span class="op">$</span>boosting.actual, </a>
+<a class="sourceLine" id="cb8-3" title="3">                                            prob.test<span class="op">$</span>boosting.predicted, </a>
+<a class="sourceLine" id="cb8-4" title="4">                                            <span class="dt">plot_title =</span> <span class="st">&#39;Boosting&#39;</span>)</a>
+<a class="sourceLine" id="cb8-5" title="5">metricsByCutoff.test_boost<span class="op">$</span>Plot</a></code></pre></div>
+<div id="htmlwidget-c2e763db06e77e1061c5" style="width:100%;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-c2e763db06e77e1061c5">{"x":{"visdat":{"19ec7a5626e9":["function () ","plotlyVisDat"]},"cur_data":"19ec7a5626e9","attrs":{"19ec7a5626e9":{"x":{},"y":{},"opacity":0.3,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"bar"},"19ec7a5626e9.1":{"x":{},"y":{},"opacity":1,"name":"TPR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"19ec7a5626e9.2":{"x":{},"y":{},"opacity":1,"name":"TNR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"19ec7a5626e9.3":{"x":0.42,"y":0.8,"opacity":1,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","text":0.42,"mode":"text","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"title":"Cutoff Value"},"yaxis":{"domain":[0,1],"automargin":true,"title":"True Ratio (%)"},"title":"Boosting","hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62],"y":[0.994413407821229,0.994413407821229,0.977653631284916,0.966480446927374,0.966480446927374,0.960893854748603,0.94413407821229,0.905027932960894,0.860335195530726,0.815642458100559,0.787709497206704,0.731843575418994,0.687150837988827,0.653631284916201,0.603351955307263,0.518659217877095,0.417206703910615,0.343687150837989,0.326927374301676,0.276648044692737,0.226368715083799,0.152849162011173,0.102569832402235,0.0178770949720671,0.0612290502793296,0.163575418994413,0.180335195530726,0.28268156424581,0.345027932960894,0.430614525139665,0.532960893854749,0.720893854748603,0.737653631284916,0.743240223463687,0.828826815642458,0.834413407821229,0.874413407821229,0.914413407821229,0.96,0.96,0.96,0.96,0.96,0.96],"opacity":0.3,"name":"Abs. Diff.","type":"bar","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62],"y":[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0.96,0.92,0.88,0.88,0.88,0.88,0.84,0.84,0.8,0.76,0.68,0.68,0.6,0.56,0.48,0.4,0.24,0.24,0.24,0.16,0.16,0.12,0.08,0.04,0.04,0.04,0.04,0.04,0.04],"opacity":1,"name":"TPR","type":"scatter","mode":"lines","marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"line":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62],"y":[0.00558659217877095,0.00558659217877095,0.0223463687150838,0.0335195530726257,0.0335195530726257,0.0391061452513966,0.0558659217877095,0.0949720670391061,0.139664804469274,0.184357541899441,0.212290502793296,0.268156424581006,0.312849162011173,0.346368715083799,0.396648044692737,0.441340782122905,0.502793296089385,0.536312849162011,0.553072625698324,0.603351955307263,0.653631284916201,0.687150837988827,0.737430167597765,0.782122905027933,0.82122905027933,0.843575418994413,0.860335195530726,0.88268156424581,0.905027932960894,0.910614525139665,0.932960893854749,0.960893854748603,0.977653631284916,0.983240223463687,0.988826815642458,0.994413407821229,0.994413407821229,0.994413407821229,1,1,1,1,1,1],"opacity":1,"name":"TNR","type":"scatter","mode":"lines","marker":{"color":"rgba(44,160,44,1)","line":{"color":"rgba(44,160,44,1)"}},"error_y":{"color":"rgba(44,160,44,1)"},"error_x":{"color":"rgba(44,160,44,1)"},"line":{"color":"rgba(44,160,44,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.42],"y":[0.8],"opacity":1,"name":"Abs. Diff.","type":"scatter","text":0.42,"mode":"text","marker":{"color":"rgba(214,39,40,1)","line":{"color":"rgba(214,39,40,1)"}},"error_y":{"color":"rgba(214,39,40,1)"},"error_x":{"color":"rgba(214,39,40,1)"},"line":{"color":"rgba(214,39,40,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 <p>With the optimized cut off we calculate the full set of model metrics using the function HMeasure from hmeasure library.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="co"># Boosting</span></a>
-<a class="sourceLine" id="cb8-2" title="2">measures.boosting.train &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.train<span class="op">$</span>boosting.actual, </a>
-<a class="sourceLine" id="cb8-3" title="3">                                    prob.train<span class="op">$</span>boosting.predicted, </a>
-<a class="sourceLine" id="cb8-4" title="4">                                    <span class="dt">threshold =</span> metricsByCutoff.test_boost<span class="op">$</span>BestCut[<span class="st">&#39;Cut&#39;</span>])</a>
-<a class="sourceLine" id="cb8-5" title="5">measures.boosting.test  &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.test<span class="op">$</span>boosting.actual, </a>
-<a class="sourceLine" id="cb8-6" title="6">                                    prob.test<span class="op">$</span>boosting.predicted, </a>
-<a class="sourceLine" id="cb8-7" title="7">                                    <span class="dt">threshold =</span> metricsByCutoff.test_boost<span class="op">$</span>BestCut[<span class="st">&#39;Cut&#39;</span>])</a>
-<a class="sourceLine" id="cb8-8" title="8"></a>
-<a class="sourceLine" id="cb8-9" title="9"></a>
-<a class="sourceLine" id="cb8-10" title="10"><span class="co"># join measures in a single data frame</span></a>
-<a class="sourceLine" id="cb8-11" title="11">measures &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">bind_rows</span>(measures.boosting.train<span class="op">$</span>metrics,</a>
-<a class="sourceLine" id="cb8-12" title="12">                        measures.boosting.test<span class="op">$</span>metrics</a>
-<a class="sourceLine" id="cb8-13" title="13">                        )) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>(., <span class="dt">rownames =</span> <span class="ot">NA</span>)</a>
-<a class="sourceLine" id="cb8-14" title="14"></a>
-<a class="sourceLine" id="cb8-15" title="15"><span class="kw">colnames</span>(measures) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;boosting - train&#39;</span>, <span class="st">&#39;boosting - test&#39;</span>)</a>
-<a class="sourceLine" id="cb8-16" title="16"></a>
-<a class="sourceLine" id="cb8-17" title="17">measures<span class="op">$</span>metric =<span class="st"> </span><span class="kw">rownames</span>(measures)</a>
-<a class="sourceLine" id="cb8-18" title="18"></a>
-<a class="sourceLine" id="cb8-19" title="19">measures &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(measures, metric, <span class="kw">everything</span>())</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="co"># Boosting</span></a>
+<a class="sourceLine" id="cb9-2" title="2">measures.boosting.train &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.train<span class="op">$</span>boosting.actual, </a>
+<a class="sourceLine" id="cb9-3" title="3">                                    prob.train<span class="op">$</span>boosting.predicted, </a>
+<a class="sourceLine" id="cb9-4" title="4">                                    <span class="dt">threshold =</span> metricsByCutoff.test_boost<span class="op">$</span>BestCut[<span class="st">&#39;Cut&#39;</span>])</a>
+<a class="sourceLine" id="cb9-5" title="5">measures.boosting.test  &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.test<span class="op">$</span>boosting.actual, </a>
+<a class="sourceLine" id="cb9-6" title="6">                                    prob.test<span class="op">$</span>boosting.predicted, </a>
+<a class="sourceLine" id="cb9-7" title="7">                                    <span class="dt">threshold =</span> metricsByCutoff.test_boost<span class="op">$</span>BestCut[<span class="st">&#39;Cut&#39;</span>])</a>
+<a class="sourceLine" id="cb9-8" title="8"></a>
+<a class="sourceLine" id="cb9-9" title="9"></a>
+<a class="sourceLine" id="cb9-10" title="10"><span class="co"># join measures in a single data frame</span></a>
+<a class="sourceLine" id="cb9-11" title="11">measures &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">bind_rows</span>(measures.boosting.train<span class="op">$</span>metrics,</a>
+<a class="sourceLine" id="cb9-12" title="12">                        measures.boosting.test<span class="op">$</span>metrics</a>
+<a class="sourceLine" id="cb9-13" title="13">                        )) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>(., <span class="dt">rownames =</span> <span class="ot">NA</span>)</a>
+<a class="sourceLine" id="cb9-14" title="14"></a>
+<a class="sourceLine" id="cb9-15" title="15"><span class="kw">colnames</span>(measures) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;boosting - train&#39;</span>, <span class="st">&#39;boosting - test&#39;</span>)</a>
+<a class="sourceLine" id="cb9-16" title="16"></a>
+<a class="sourceLine" id="cb9-17" title="17">measures<span class="op">$</span>metric =<span class="st"> </span><span class="kw">rownames</span>(measures)</a>
+<a class="sourceLine" id="cb9-18" title="18"></a>
+<a class="sourceLine" id="cb9-19" title="19">measures &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(measures, metric, <span class="kw">everything</span>())</a></code></pre></div>
 <p>Below are the metrics on the train and test dataset:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="kw">kable</span>(measures, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">kable</span>(measures, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -993,113 +994,113 @@ $(document).ready(function () {
 <tbody>
 <tr class="odd">
 <td align="left">H</td>
-<td align="right">0.7631236</td>
-<td align="right">0.4742349</td>
+<td align="right">0.8421192</td>
+<td align="right">0.4343088</td>
 </tr>
 <tr class="even">
 <td align="left">Gini</td>
-<td align="right">0.9375488</td>
-<td align="right">0.7041341</td>
+<td align="right">0.9722643</td>
+<td align="right">0.7032402</td>
 </tr>
 <tr class="odd">
 <td align="left">AUC</td>
-<td align="right">0.9687744</td>
-<td align="right">0.8520670</td>
+<td align="right">0.9861322</td>
+<td align="right">0.8516201</td>
 </tr>
 <tr class="even">
 <td align="left">AUCH</td>
-<td align="right">0.9735042</td>
-<td align="right">0.8788827</td>
+<td align="right">0.9890251</td>
+<td align="right">0.8745251</td>
 </tr>
 <tr class="odd">
 <td align="left">KS</td>
-<td align="right">0.8703219</td>
-<td align="right">0.6026816</td>
+<td align="right">0.8975525</td>
+<td align="right">0.6053631</td>
 </tr>
 <tr class="even">
 <td align="left">MER</td>
-<td align="right">0.0543933</td>
-<td align="right">0.0980392</td>
+<td align="right">0.0355649</td>
+<td align="right">0.1078431</td>
 </tr>
 <tr class="odd">
 <td align="left">MWL</td>
-<td align="right">0.0247195</td>
-<td align="right">0.0854479</td>
+<td align="right">0.0195287</td>
+<td align="right">0.0848712</td>
 </tr>
 <tr class="even">
 <td align="left">Spec.Sens95</td>
-<td align="right">0.8922717</td>
-<td align="right">0.4357542</td>
+<td align="right">0.9367681</td>
+<td align="right">0.4525140</td>
 </tr>
 <tr class="odd">
 <td align="left">Sens.Spec95</td>
-<td align="right">0.7058824</td>
-<td align="right">0.5200000</td>
+<td align="right">0.9019608</td>
+<td align="right">0.2400000</td>
 </tr>
 <tr class="even">
 <td align="left">ER</td>
-<td align="right">0.1757322</td>
-<td align="right">0.2205882</td>
+<td align="right">0.1715481</td>
+<td align="right">0.2156863</td>
 </tr>
 <tr class="odd">
 <td align="left">Sens</td>
 <td align="right">1.0000000</td>
-<td align="right">0.7600000</td>
+<td align="right">0.8000000</td>
 </tr>
 <tr class="even">
 <td align="left">Spec</td>
-<td align="right">0.8032787</td>
+<td align="right">0.8079625</td>
 <td align="right">0.7821229</td>
 </tr>
 <tr class="odd">
 <td align="left">Precision</td>
-<td align="right">0.3777778</td>
-<td align="right">0.3275862</td>
+<td align="right">0.3834586</td>
+<td align="right">0.3389831</td>
 </tr>
 <tr class="even">
 <td align="left">Recall</td>
 <td align="right">1.0000000</td>
-<td align="right">0.7600000</td>
+<td align="right">0.8000000</td>
 </tr>
 <tr class="odd">
 <td align="left">TPR</td>
 <td align="right">1.0000000</td>
-<td align="right">0.7600000</td>
+<td align="right">0.8000000</td>
 </tr>
 <tr class="even">
 <td align="left">FPR</td>
-<td align="right">0.1967213</td>
+<td align="right">0.1920375</td>
 <td align="right">0.2178771</td>
 </tr>
 <tr class="odd">
 <td align="left">F</td>
-<td align="right">0.5483871</td>
-<td align="right">0.4578313</td>
+<td align="right">0.5543478</td>
+<td align="right">0.4761905</td>
 </tr>
 <tr class="even">
 <td align="left">Youden</td>
-<td align="right">0.8032787</td>
-<td align="right">0.5421229</td>
+<td align="right">0.8079625</td>
+<td align="right">0.5821229</td>
 </tr>
 <tr class="odd">
 <td align="left">TP</td>
 <td align="right">51.0000000</td>
-<td align="right">19.0000000</td>
+<td align="right">20.0000000</td>
 </tr>
 <tr class="even">
 <td align="left">FP</td>
-<td align="right">84.0000000</td>
+<td align="right">82.0000000</td>
 <td align="right">39.0000000</td>
 </tr>
 <tr class="odd">
 <td align="left">TN</td>
-<td align="right">343.0000000</td>
+<td align="right">345.0000000</td>
 <td align="right">140.0000000</td>
 </tr>
 <tr class="even">
 <td align="left">FN</td>
 <td align="right">0.0000000</td>
-<td align="right">6.0000000</td>
+<td align="right">5.0000000</td>
 </tr>
 </tbody>
 </table>
