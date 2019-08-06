@@ -396,13 +396,22 @@ This will ensure consistency when comparing the models against each other.
 
 With the final cleaned dataset, we got from above steps we fit our Logistic Regression model for **y_loan_defaulter** on all **x_variables**.
 
-```{r fit_model_full, echo=TRUE}
+```{r fit_model_full, echo=TRUE, eval=FALSE}
+# fit model
 logistic.full <- glm(formula = y_loan_defaulter ~ .,
                      data= data.train_logistic, 
                      family= binomial(link='logit'))
 
 names(logistic.full$coefficients) <- stringr::str_sub(names(logistic.full$coefficients), 1, 25)
 summary(logistic.full)
+
+# save model
+saveRDS(logistic.full, './models/logistic_full.rds')
+```
+
+```{r load_model_full, echo=FALSE, include=FALSE}
+# load model
+logistic.full <- readRDS('./models/logistic_full.rds')
 ```
 
 With the full model fitted we will run the stepwise method to automate the selection of predictors using the **(Akaike Information Criterion)** AIC for short.
@@ -411,17 +420,19 @@ This is a broadly used estimator that evaluates the relative quality of statisti
 
 The lower the AIC the better.
 
-```{r fit_model_step_0, include=FALSE}
+```{r fit_model_step_0, eval=FALSE}
 logistic.step <- step(logistic.full, direction = "both", test = "F")
 
 names(logistic.step$coefficients) <- stringr::str_sub(names(logistic.step$coefficients), 1, 25)
 summary(logistic.step)
+
+# save model
+saveRDS(logistic.step, './models/logistic_step.rds')
 ```
 
-```{r fit_model_step_1, eval=FALSE}
-logistic.step <- step(logistic.full, direction = "both", test = "F")
-
-names(logistic.step$coefficients) <- stringr::str_sub(names(logistic.step$coefficients), 1, 25)
+```{r load_model_step_0, include=FALSE}
+# load model
+logistic.step <- readRDS('./models/logistic_step.rds')
 ```
 
 ```{r fit_model_step_show, echo=FALSE}

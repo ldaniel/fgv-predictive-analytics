@@ -191,15 +191,28 @@ kable(SplitDataset$event.proportion)
 
 # fit the logistic model -------------------------------------------------------------
 
-logistic.full <- glm(formula = y_loan_defaulter ~ .,
-                     data= data.train_logistic, 
-                     family= binomial(link='logit'))
+# run model
+# logistic.full <- glm(formula = y_loan_defaulter ~ .,
+#                      data= data.train_logistic, 
+#                      family= binomial(link='logit'))
+# 
+# names(logistic.full$coefficients) <- stringr::str_sub(names(logistic.full$coefficients), 1, 25)
+# summary(logistic.full)
 
-names(logistic.full$coefficients) <- stringr::str_sub(names(logistic.full$coefficients), 1, 25)
-summary(logistic.full)
+# # save model
+# saveRDS(logistic.full, './models/logistic_full.rds')
 
-#logistic.step <- stepAIC(logistic.full, direction = 'both', trace = TRUE)
-logistic.step <- step(logistic.full, direction = "both", test = "F")
+# load model
+logistic.full <- readRDS('./models/logistic_full.rds')
 
-names(logistic.step$coefficients) <- stringr::str_sub(names(logistic.step$coefficients), 1, 25)
-summary(logistic.step)
+# # run model
+# logistic.step <- step(logistic.full, direction = "both", test = "F")
+# 
+# names(logistic.step$coefficients) <- stringr::str_sub(names(logistic.step$coefficients), 1, 25)
+# summary(logistic.step)
+# 
+# # save model
+# saveRDS(logistic.step, './models/logistic_step.rds')
+
+# load model
+logistic.step <- readRDS('./models/logistic_step.rds')

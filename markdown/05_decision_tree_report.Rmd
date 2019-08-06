@@ -112,7 +112,7 @@ With the final cleaned dataset, we got from above steps we fit our Decision Tree
 
 We choose to change the default parameters **minbucket** and **maxdepth** parameter to **5** to deliberate create a fully-grown tree as the database is not big enough for this model.
 
-```{r fit_DT_full, echo=TRUE, out.width= '100%'}
+```{r fit_DT_full, eval=FALSE}
 tree.full <- rpart(data= data.train_DT, y_loan_defaulter ~ .,
                    control = rpart.control(minbucket = 5,
                                            maxdepth = 5),
@@ -123,6 +123,20 @@ rpart.plot(tree.full, cex = 1.3, type = 0,
            branch.lty = 3, shadow.col = 'gray', 
            nn = TRUE, main = 'Decision Tree - Full')
 
+# save model
+saveRDS(tree.full, './models/decision_tree_full.rds')
+```
+
+```{r load_DT_full, echo=TRUE, include=FALSE}
+# load model
+tree.full <- readRDS('./models/decision_tree_full.rds')
+```
+
+```{r plot_DT_full, echo=FALSE, out.width= '100%'}
+rpart.plot(tree.full, cex = 1.3, type = 0,
+           extra = 1, box.palette = 'BuRd',
+           branch.lty = 3, shadow.col = 'gray', 
+           nn = TRUE, main = 'Decision Tree - Full')
 ```
 
 ## Evaluating necessity of prunning
@@ -141,10 +155,24 @@ cp_prune = tree.full$cptable[which.min(tree.full$cptable[,"xerror"]), "CP"]
 tree.prune <- prune(tree.full, cp = cp_prune)
 
 rpart.plot(tree.prune, cex = 1.3, type = 0,
-           extra = 1, box.palette = 'BuRd',
+           extra = 104, box.palette = 'BuRd',
            branch.lty = 3, shadow.col = 'gray', 
            nn = TRUE, main = 'Decision Tree - Prune')
 
+# save model
+saveRDS(tree.prune, './models/decision_tree_prune.rds')
+```
+
+```{r load_DT_prune, include=FALSE}
+# load model
+tree.prune <- readRDS('./models/decision_tree_prune.rds')
+```
+
+```{r plot_DT_prune, echo=TRUE, out.width= '100%'}
+rpart.plot(tree.prune, cex = 1.3, type = 0,
+           extra = 104, box.palette = 'BuRd',
+           branch.lty = 3, shadow.col = 'gray', 
+           nn = TRUE, main = 'Decision Tree - Prune')
 ```
 
 On performing the pruning process in our decision tree, we end up with a tree with only one node split.
