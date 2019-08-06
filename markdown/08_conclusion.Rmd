@@ -288,9 +288,9 @@ Let's now look at the score boxplots of each model side by side.
 
 This plot is a great way to visualize how well each model discriminate Defaulters and Non-Defaulters.
 
-Here we can see that Random Forest has an edge on the classification power against the other models.
+Here we can see that Random Forest and boosting have an edge on the classification power against the other models.
 
-This is the only model where the box plot interquartile does not overlap.
+Those are the only model where the box plot interquartile does not overlap.
 
 Our Decision Tree is right on the limit.
 
@@ -377,7 +377,7 @@ We finally look at the Confusion Matrix at the best cut off each model to get a 
 
 We will use the custom functions described in Auxiliary metrics functions topic in the Data Preparation session of this site.
 
-Random Forest is the best model we got in this exercise.
+Boosting is the best model we got in this exercise following very closely by Random Forest.
 
 ```{r accuracy, echo=TRUE, out.width= '100%'}
 # logistic regression
