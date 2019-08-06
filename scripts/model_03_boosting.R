@@ -36,9 +36,10 @@ f_full <- as.formula(paste("y_loan_defaulter ~",
 
 # fit the decision tree model with boosting--------------------------------------------------
 
-# boost <- boosting(f_full, data= data.train_boost, mfinal= 100, 
-#                   coeflearn = "Freund", 
-#                   control = rpart.control(minbucket= 25,maxdepth = 1))
+# boost <- boosting(f_full, data= data.train_boost, mfinal = 100,
+#                   coeflearn = "Freund",
+#                   control = rpart.control(minbucket = 25, maxdepth = 1))
+# 
 # saveRDS(boost, "./models/boosting.rds")
 
 boost <- readRDS("./models/boosting.rds")
