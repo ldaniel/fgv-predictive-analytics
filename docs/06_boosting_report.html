@@ -454,7 +454,8 @@ $(document).ready(function () {
 </ul></li>
 <li><a href="#interpreting-model-output"><span class="toc-section-number">3</span> Interpreting model output</a></li>
 <li><a href="#evaluating-the-model-performance"><span class="toc-section-number">4</span> Evaluating the model performance</a><ul>
-<li><a href="#getting-performance-measures"><span class="toc-section-number">4.1</span> Getting Performance Measures:</a></li>
+<li><a href="#getting-performance-measures"><span class="toc-section-number">4.1</span> Getting Performance Measures</a></li>
+<li><a href="#evaluating-classification-performance"><span class="toc-section-number">4.2</span> Evaluating classification performance</a></li>
 </ul></li>
 </ul>
 </div>
@@ -889,23 +890,22 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb4-3" title="3">data.test_boost<span class="op">$</span>y_loan_defaulter    &lt;-<span class="st"> </span><span class="kw">as.factor</span>(data.test_boost<span class="op">$</span>y_loan_defaulter)</a>
 <a class="sourceLine" id="cb4-4" title="4"></a>
 <a class="sourceLine" id="cb4-5" title="5">data.train_boost &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(data.train_boost, <span class="kw">names</span>(loan_dataset_boost))</a>
-<a class="sourceLine" id="cb4-6" title="6">data.test_boost &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(data.test_boost, <span class="kw">names</span>(loan_dataset_boost))</a>
-<a class="sourceLine" id="cb4-7" title="7"></a>
-<a class="sourceLine" id="cb4-8" title="8">names  &lt;-<span class="st"> </span><span class="kw">names</span>(data.train_boost) <span class="co"># saving the name of all vars to put on formula</span></a>
-<a class="sourceLine" id="cb4-9" title="9">f_full &lt;-<span class="st"> </span><span class="kw">as.formula</span>(<span class="kw">paste</span>(<span class="st">&quot;y_loan_defaulter ~&quot;</span>,</a>
-<a class="sourceLine" id="cb4-10" title="10">                           <span class="kw">paste</span>(names[<span class="op">!</span>names <span class="op">%in%</span><span class="st"> &quot;y_loan_defaulter&quot;</span>], <span class="dt">collapse =</span> <span class="st">&quot; + &quot;</span>)))</a></code></pre></div>
+<a class="sourceLine" id="cb4-6" title="6">data.test_boost &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(data.test_boost, <span class="kw">names</span>(loan_dataset_boost))</a></code></pre></div>
 <p>Both datasets keep the same proportion for the explained variable around 11%.</p>
 </div>
 <div id="fiting-the-boosting-model" class="section level2">
 <h2><span class="header-section-number">2.4</span> Fiting the Boosting model</h2>
 <p>With the final cleaned dataset, we got from above steps fit our Boosting Model for y_loan_defaulter on all x variables.</p>
 <p>We made a lot of tests playing with control parameters trying to reduce the errors and we decided to keep <strong>mfinal = 100</strong>, <strong>minbucket = 25</strong> and <strong>maxdepth = 1 </strong>.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">boost &lt;-<span class="st"> </span><span class="kw">boosting</span>(f_full, <span class="dt">data=</span> data.train_boost, <span class="dt">mfinal=</span> <span class="dv">100</span>, </a>
-<a class="sourceLine" id="cb5-2" title="2">                   <span class="dt">coeflearn =</span> <span class="st">&quot;Freund&quot;</span>, </a>
-<a class="sourceLine" id="cb5-3" title="3">                   <span class="dt">control =</span> <span class="kw">rpart.control</span>(<span class="dt">minbucket=</span> <span class="dv">25</span>,<span class="dt">maxdepth =</span> <span class="dv">1</span>))</a>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">names  &lt;-<span class="st"> </span><span class="kw">names</span>(data.train_boost) <span class="co"># saving the name of all vars to put on formula</span></a>
+<a class="sourceLine" id="cb5-2" title="2">f_full &lt;-<span class="st"> </span><span class="kw">as.formula</span>(<span class="kw">paste</span>(<span class="st">&quot;y_loan_defaulter ~&quot;</span>,</a>
+<a class="sourceLine" id="cb5-3" title="3">                           <span class="kw">paste</span>(names[<span class="op">!</span>names <span class="op">%in%</span><span class="st"> &quot;y_loan_defaulter&quot;</span>], <span class="dt">collapse =</span> <span class="st">&quot; + &quot;</span>)))</a>
 <a class="sourceLine" id="cb5-4" title="4"></a>
-<a class="sourceLine" id="cb5-5" title="5"></a>
-<a class="sourceLine" id="cb5-6" title="6"><span class="kw">plot</span>(<span class="kw">errorevol</span>(boost, data.train_boost))</a></code></pre></div>
+<a class="sourceLine" id="cb5-5" title="5">boost &lt;-<span class="st"> </span><span class="kw">boosting</span>(f_full, <span class="dt">data=</span> data.train_boost, <span class="dt">mfinal=</span> <span class="dv">100</span>, </a>
+<a class="sourceLine" id="cb5-6" title="6">                   <span class="dt">coeflearn =</span> <span class="st">&quot;Freund&quot;</span>, </a>
+<a class="sourceLine" id="cb5-7" title="7">                   <span class="dt">control =</span> <span class="kw">rpart.control</span>(<span class="dt">minbucket=</span> <span class="dv">25</span>,<span class="dt">maxdepth =</span> <span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb5-8" title="8"></a>
+<a class="sourceLine" id="cb5-9" title="9"><span class="kw">plot</span>(<span class="kw">errorevol</span>(boost, data.train_boost))</a></code></pre></div>
 <p><img src="06_boosting_report_files/figure-html/fit_boots_model-1.png" width="100%" /></p>
 <hr />
 </div>
@@ -949,7 +949,7 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb6-20" title="20">prob.train  &lt;-<span class="st"> </span>prob.train <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a>
 <a class="sourceLine" id="cb6-21" title="21">prob.test   &lt;-<span class="st"> </span>prob.test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a></code></pre></div>
 <div id="getting-performance-measures" class="section level2">
-<h2><span class="header-section-number">4.1</span> Getting Performance Measures:</h2>
+<h2><span class="header-section-number">4.1</span> Getting Performance Measures</h2>
 <p>To calculate the performance measures, derived from the confusion matrix, we need to find the score cut off that best split our test dataset into Defaulters and Non-Defaulters.</p>
 <p>In this exercise we decide to not prioritize the accuracy on predicting Defaulters and Non-Defaulters, therefore we are looking for the score cut off that best predict each class equally.</p>
 <p>With the returned object from this function we can plot the comparison between TPR (True Positive Rate) and TNR (True Negative Rate) to find the best cut off.</p>
@@ -958,8 +958,8 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb7-3" title="3">                                            prob.test<span class="op">$</span>boosting.predicted, </a>
 <a class="sourceLine" id="cb7-4" title="4">                                            <span class="dt">plot_title =</span> <span class="st">&#39;Boosting&#39;</span>)</a>
 <a class="sourceLine" id="cb7-5" title="5">metricsByCutoff.test_boost<span class="op">$</span>Plot</a></code></pre></div>
-<div id="htmlwidget-38197ce2b61723076116" style="width:100%;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-38197ce2b61723076116">{"x":{"visdat":{"3cc0450d4b05":["function () ","plotlyVisDat"]},"cur_data":"3cc0450d4b05","attrs":{"3cc0450d4b05":{"x":{},"y":{},"opacity":0.3,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"bar"},"3cc0450d4b05.1":{"x":{},"y":{},"opacity":1,"name":"TPR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"3cc0450d4b05.2":{"x":{},"y":{},"opacity":1,"name":"TNR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"3cc0450d4b05.3":{"x":0.41,"y":0.72,"opacity":1,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","text":0.41,"mode":"text","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"title":"Cutoff Value"},"yaxis":{"domain":[0,1],"automargin":true,"title":"True Ratio (%)"},"title":"Boosting","hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59],"y":[0.994413407821229,0.994413407821229,0.994413407821229,0.977653631284916,0.960893854748603,0.955307262569832,0.93854748603352,0.927374301675978,0.899441340782123,0.837988826815642,0.804469273743017,0.759776536312849,0.726256983240223,0.675977653631285,0.625698324022346,0.569832402234637,0.547486033519553,0.457206703910614,0.406033519553073,0.394860335195531,0.344581005586592,0.248715083798883,0.169608938547486,0.101675977653631,0.0681564245810057,0.0621229050279329,0.0956424581005587,0.18122905027933,0.243575418994413,0.333854748603352,0.407374301675978,0.407374301675978,0.452960893854749,0.595307262569832,0.720893854748603,0.766480446927374,0.777653631284916,0.817653631284916,0.868826815642458,0.908826815642458,0.914413407821229,0.954413407821229,0.96,0.96],"opacity":0.3,"name":"Abs. Diff.","type":"bar","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59],"y":[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0.96,0.92,0.92,0.92,0.88,0.84,0.8,0.8,0.72,0.72,0.64,0.6,0.56,0.52,0.52,0.48,0.36,0.24,0.2,0.2,0.16,0.12,0.08,0.08,0.04,0.04,0.04],"opacity":1,"name":"TPR","type":"scatter","mode":"lines","marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"line":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59],"y":[0.00558659217877095,0.00558659217877095,0.00558659217877095,0.0223463687150838,0.0391061452513966,0.0446927374301676,0.0614525139664804,0.0726256983240224,0.100558659217877,0.162011173184358,0.195530726256983,0.240223463687151,0.273743016759777,0.324022346368715,0.374301675977654,0.430167597765363,0.452513966480447,0.502793296089385,0.513966480446927,0.525139664804469,0.575418994413408,0.631284916201117,0.670391061452514,0.698324022346369,0.731843575418994,0.782122905027933,0.815642458100559,0.82122905027933,0.843575418994413,0.893854748603352,0.927374301675978,0.927374301675978,0.932960893854749,0.955307262569832,0.960893854748603,0.966480446927374,0.977653631284916,0.977653631284916,0.988826815642458,0.988826815642458,0.994413407821229,0.994413407821229,1,1],"opacity":1,"name":"TNR","type":"scatter","mode":"lines","marker":{"color":"rgba(44,160,44,1)","line":{"color":"rgba(44,160,44,1)"}},"error_y":{"color":"rgba(44,160,44,1)"},"error_x":{"color":"rgba(44,160,44,1)"},"line":{"color":"rgba(44,160,44,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.41],"y":[0.72],"opacity":1,"name":"Abs. Diff.","type":"scatter","text":0.41,"mode":"text","marker":{"color":"rgba(214,39,40,1)","line":{"color":"rgba(214,39,40,1)"}},"error_y":{"color":"rgba(214,39,40,1)"},"error_x":{"color":"rgba(214,39,40,1)"},"line":{"color":"rgba(214,39,40,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-4d0f4e7aa16fbcb06345" style="width:100%;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-4d0f4e7aa16fbcb06345">{"x":{"visdat":{"29a0260a3967":["function () ","plotlyVisDat"]},"cur_data":"29a0260a3967","attrs":{"29a0260a3967":{"x":{},"y":{},"opacity":0.3,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"bar"},"29a0260a3967.1":{"x":{},"y":{},"opacity":1,"name":"TPR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"29a0260a3967.2":{"x":{},"y":{},"opacity":1,"name":"TNR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"29a0260a3967.3":{"x":0.4,"y":0.76,"opacity":1,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","text":0.4,"mode":"text","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"title":"Cutoff Value"},"yaxis":{"domain":[0,1],"automargin":true,"title":"True Ratio (%)"},"title":"Boosting","hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57],"y":[0.994413407821229,0.988826815642458,0.983240223463687,0.966480446927374,0.960893854748603,0.949720670391061,0.93854748603352,0.916201117318436,0.837988826815642,0.804469273743017,0.697430167597765,0.669497206703911,0.647150837988827,0.613631284916201,0.585698324022346,0.568938547486034,0.478659217877095,0.388379888268156,0.360446927374302,0.315754189944134,0.259888268156425,0.237541899441341,0.226368715083799,0.141675977653631,0.0681564245810057,0.0221229050279329,0.0444692737430168,0.129162011173184,0.145921787709497,0.16268156424581,0.253854748603352,0.321787709497207,0.412960893854749,0.515307262569833,0.640893854748603,0.686480446927374,0.777653631284916,0.823240223463687,0.874413407821229,0.874413407821229,0.874413407821229,0.88,0.92],"opacity":0.3,"name":"Abs. Diff.","type":"bar","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57],"y":[1,1,1,1,1,1,1,1,1,1,0.96,0.96,0.96,0.96,0.96,0.96,0.92,0.88,0.88,0.88,0.88,0.88,0.88,0.84,0.8,0.76,0.76,0.72,0.72,0.72,0.64,0.6,0.52,0.44,0.32,0.28,0.2,0.16,0.12,0.12,0.12,0.12,0.08],"opacity":1,"name":"TPR","type":"scatter","mode":"lines","marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"line":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57],"y":[0.00558659217877095,0.0111731843575419,0.0167597765363128,0.0335195530726257,0.0391061452513966,0.0502793296089385,0.0614525139664804,0.0837988826815642,0.162011173184358,0.195530726256983,0.262569832402235,0.290502793296089,0.312849162011173,0.346368715083799,0.374301675977654,0.391061452513966,0.441340782122905,0.491620111731844,0.519553072625698,0.564245810055866,0.620111731843575,0.642458100558659,0.653631284916201,0.698324022346369,0.731843575418994,0.782122905027933,0.804469273743017,0.849162011173184,0.865921787709497,0.88268156424581,0.893854748603352,0.921787709497207,0.932960893854749,0.955307262569832,0.960893854748603,0.966480446927374,0.977653631284916,0.983240223463687,0.994413407821229,0.994413407821229,0.994413407821229,1,1],"opacity":1,"name":"TNR","type":"scatter","mode":"lines","marker":{"color":"rgba(44,160,44,1)","line":{"color":"rgba(44,160,44,1)"}},"error_y":{"color":"rgba(44,160,44,1)"},"error_x":{"color":"rgba(44,160,44,1)"},"line":{"color":"rgba(44,160,44,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.4],"y":[0.76],"opacity":1,"name":"Abs. Diff.","type":"scatter","text":0.4,"mode":"text","marker":{"color":"rgba(214,39,40,1)","line":{"color":"rgba(214,39,40,1)"}},"error_y":{"color":"rgba(214,39,40,1)"},"error_x":{"color":"rgba(214,39,40,1)"},"line":{"color":"rgba(214,39,40,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 <p>With the optimized cut off we calculate the full set of model metrics using the function HMeasure from hmeasure library.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="co"># Boosting</span></a>
 <a class="sourceLine" id="cb8-2" title="2">measures.boosting.train &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.train<span class="op">$</span>boosting.actual, </a>
@@ -993,116 +993,120 @@ $(document).ready(function () {
 <tbody>
 <tr class="odd">
 <td align="left">H</td>
-<td align="right">0.7859094</td>
-<td align="right">0.4240667</td>
+<td align="right">0.7631236</td>
+<td align="right">0.4742349</td>
 </tr>
 <tr class="even">
 <td align="left">Gini</td>
-<td align="right">0.9475594</td>
-<td align="right">0.7063687</td>
+<td align="right">0.9375488</td>
+<td align="right">0.7041341</td>
 </tr>
 <tr class="odd">
 <td align="left">AUC</td>
-<td align="right">0.9737797</td>
-<td align="right">0.8531844</td>
+<td align="right">0.9687744</td>
+<td align="right">0.8520670</td>
 </tr>
 <tr class="even">
 <td align="left">AUCH</td>
-<td align="right">0.9779125</td>
-<td align="right">0.8724022</td>
+<td align="right">0.9735042</td>
+<td align="right">0.8788827</td>
 </tr>
 <tr class="odd">
 <td align="left">KS</td>
-<td align="right">0.8741333</td>
-<td align="right">0.5486034</td>
+<td align="right">0.8703219</td>
+<td align="right">0.6026816</td>
 </tr>
 <tr class="even">
 <td align="left">MER</td>
-<td align="right">0.0481172</td>
-<td align="right">0.1127451</td>
+<td align="right">0.0543933</td>
+<td align="right">0.0980392</td>
 </tr>
 <tr class="odd">
 <td align="left">MWL</td>
-<td align="right">0.0239929</td>
-<td align="right">0.0970780</td>
+<td align="right">0.0247195</td>
+<td align="right">0.0854479</td>
 </tr>
 <tr class="even">
 <td align="left">Spec.Sens95</td>
-<td align="right">0.9133489</td>
-<td align="right">0.5139665</td>
+<td align="right">0.8922717</td>
+<td align="right">0.4357542</td>
 </tr>
 <tr class="odd">
 <td align="left">Sens.Spec95</td>
-<td align="right">0.7843137</td>
-<td align="right">0.3600000</td>
+<td align="right">0.7058824</td>
+<td align="right">0.5200000</td>
 </tr>
 <tr class="even">
 <td align="left">ER</td>
-<td align="right">0.1736402</td>
-<td align="right">0.2254902</td>
+<td align="right">0.1757322</td>
+<td align="right">0.2205882</td>
 </tr>
 <tr class="odd">
 <td align="left">Sens</td>
 <td align="right">1.0000000</td>
-<td align="right">0.7200000</td>
+<td align="right">0.7600000</td>
 </tr>
 <tr class="even">
 <td align="left">Spec</td>
-<td align="right">0.8056206</td>
+<td align="right">0.8032787</td>
 <td align="right">0.7821229</td>
 </tr>
 <tr class="odd">
 <td align="left">Precision</td>
-<td align="right">0.3805970</td>
-<td align="right">0.3157895</td>
+<td align="right">0.3777778</td>
+<td align="right">0.3275862</td>
 </tr>
 <tr class="even">
 <td align="left">Recall</td>
 <td align="right">1.0000000</td>
-<td align="right">0.7200000</td>
+<td align="right">0.7600000</td>
 </tr>
 <tr class="odd">
 <td align="left">TPR</td>
 <td align="right">1.0000000</td>
-<td align="right">0.7200000</td>
+<td align="right">0.7600000</td>
 </tr>
 <tr class="even">
 <td align="left">FPR</td>
-<td align="right">0.1943794</td>
+<td align="right">0.1967213</td>
 <td align="right">0.2178771</td>
 </tr>
 <tr class="odd">
 <td align="left">F</td>
-<td align="right">0.5513514</td>
-<td align="right">0.4390244</td>
+<td align="right">0.5483871</td>
+<td align="right">0.4578313</td>
 </tr>
 <tr class="even">
 <td align="left">Youden</td>
-<td align="right">0.8056206</td>
-<td align="right">0.5021229</td>
+<td align="right">0.8032787</td>
+<td align="right">0.5421229</td>
 </tr>
 <tr class="odd">
 <td align="left">TP</td>
 <td align="right">51.0000000</td>
-<td align="right">18.0000000</td>
+<td align="right">19.0000000</td>
 </tr>
 <tr class="even">
 <td align="left">FP</td>
-<td align="right">83.0000000</td>
+<td align="right">84.0000000</td>
 <td align="right">39.0000000</td>
 </tr>
 <tr class="odd">
 <td align="left">TN</td>
-<td align="right">344.0000000</td>
+<td align="right">343.0000000</td>
 <td align="right">140.0000000</td>
 </tr>
 <tr class="even">
 <td align="left">FN</td>
 <td align="right">0.0000000</td>
-<td align="right">7.0000000</td>
+<td align="right">6.0000000</td>
 </tr>
 </tbody>
 </table>
+</div>
+<div id="evaluating-classification-performance" class="section level2">
+<h2><span class="header-section-number">4.2</span> Evaluating classification performance</h2>
+<p>To do</p>
 </div>
 </div>
 
