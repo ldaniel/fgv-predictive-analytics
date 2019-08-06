@@ -58,7 +58,6 @@ source("./scripts/step_05_data_enhancement.R")
 source("./scripts/step_06_dataset_preparation.R")
 ```
 
-
 # Objective
 
 The goal of this session is trying to fit a Boosting model on Loan data aiming to predict the probability of delinquency for each contract.
@@ -131,14 +130,14 @@ f_full <- as.formula(paste("y_loan_defaulter ~",
 Both datasets keep the same proportion for the explained variable around 11%.
 
 
-## Fiting the Decision Tree model 
+## Fiting the Boosting model 
 
 With the final cleaned dataset, we got from above steps fit our Boosting Model for y_loan_defaulter on all x variables.
 
 We made a lot of tests playing with control parameters trying to reduce the errors and we decided to keep **mfinal = 100**, **minbucket = 25** and **maxdepth = 1 **.
 
 ```{r fit_boots_model, echo=TRUE, out.width= '100%'}
- boost <- boosting(f_full, data= data.train_boost, mfinal= 100, 
+boost <- boosting(f_full, data= data.train_boost, mfinal= 100, 
                    coeflearn = "Freund", 
                    control = rpart.control(minbucket= 25,maxdepth = 1))
 
@@ -154,10 +153,10 @@ plot(errorevol(boost, data.train_boost))
 Boosting is a black box ensemble method! But the model can tell us the importance of each variable to predict the results.
 For this model the four principal vars are:
 
-**x_prop_interest_credited**
-**x_account_balance**
-**x_avg_account_balance**
-**x_loan_amount**
+- **x_prop_interest_credited**
+- **x_account_balance**
+- **x_avg_account_balance**
+- **x_loan_amount**
 
 The result is similar to the Logistic Regression and Decision Tree models.
 
