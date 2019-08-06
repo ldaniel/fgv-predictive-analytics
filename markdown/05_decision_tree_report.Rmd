@@ -108,7 +108,7 @@ Both datasets keep the same proportion for the explained variable around 11%.
 
 ## Fiting the Decision Tree model 
 
-With the final cleaned dataset, we got from above steps we fit our Decision Tree Model for y_loan_defaulter on all x variables.
+With the final cleaned dataset, we got from above steps we fit our Decision Tree Model for **y_loan_defaulter** on all **x_variables**.
 
 We choose to change the default parameters **minbucket** and **maxdepth** parameter to **5** to deliberate create a fully-grown tree as the database is not big enough for this model.
 
@@ -147,7 +147,7 @@ The idea is reducing the complexity of the decision tree and thereof avoid overf
 
 Pruning process is done by comparing different variations of the fully-grown tree and evaluating the relative error trend comparing to a zero node tree, each node that does not affect the classification power of the tree is replaced by a leaf node.
 
-```{r fit_DT_prune, echo=TRUE, out.width= '100%'}
+```{r fit_DT_prune, echo=TRUE, eval=TRUE, out.width= '100%'}
 printcp(tree.full)
 plotcp(tree.full)
 
@@ -203,7 +203,7 @@ Our full decision tree model clear shows that below variables are the key featur
 - **x_prop_interest_credited**
 - **x_avg_account_balance**
 - **x_loan_amount**
-- **x_no_of_commited_crimes_1995**
+- **x_no_of_commited_crimes_1996**
 
 The result is similar to the Logistic Regression model we created in the session before.
 
