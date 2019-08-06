@@ -61,30 +61,183 @@ source("./scripts/step_06_dataset_preparation.R")
 
 # Objective
 
-To-do.
+The goal of this session is trying to fit a Boosting model on Loan data aiming to predict the probability of delinquency for each contract.
 
 *******************************************************************************
 
 # Modeling
 
-To-do.
+## Dataset preparation
+
+Using the vanilla transaction dataset, we calculated several derived variables for each account as described in the Data Preparation session.
+
+This dataset is joined with Loan, Client, Credit Card, District, Account and Account Balance tables.
+
+We ended up having a data set with **118 variables**.
+
+
+```{r variables, echo=TRUE}
+loan_dataset_boost <- source_dataset
+
+kable(tibble(variables = names(loan_dataset_boost)))
+```
+
+
+## Variable selection
+
+One advantage of Boosting models is that it does not require heavy feature engineering.
+
+We will only remove **x_prop_old_age_pension** that we know beforehand to have no variance in the dataset.
+
+This model is also not sensible to outliers, missing values and multicollinearity.
+
+
+```{r variable_selecion, echo=TRUE}
+loan_dataset_boost <- dplyr::select(loan_dataset_boost, -x_prop_old_age_pension)
+```
+
+
+## Sample split into Test and Training Data
+
+The available data in Loan Dataset is split into Train and Testing data on the following proportion:
+
+- **Train Dataset** (70% 478 obs);
+- **Test Dataset ** (30% 204 obs).
+
+We are selecting exact the same samples for all models to allow comparison between then.
+
+```{r sampling, echo=TRUE}
+
+SplitDataset <- source_train_test_dataset
+data.train_boost <- SplitDataset$data.train
+data.test_boost <- SplitDataset$data.test
+
+kable(SplitDataset$event.proportion)
+
+loan_dataset_boost$y_loan_defaulter <- as.factor(loan_dataset_boost$y_loan_defaulter)
+data.train_boost$y_loan_defaulter   <- as.factor(data.train_boost$y_loan_defaulter)
+data.test_boost$y_loan_defaulter    <- as.factor(data.test_boost$y_loan_defaulter)
+
+data.train_boost <- dplyr::select(data.train_boost, names(loan_dataset_boost))
+data.test_boost <- dplyr::select(data.test_boost, names(loan_dataset_boost))
+
+names  <- names(data.train_boost) # saving the name of all vars to put on formula
+f_full <- as.formula(paste("y_loan_defaulter ~",
+                           paste(names[!names %in% "y_loan_defaulter"], collapse = " + ")))
+
+
+```
+
+Both datasets keep the same proportion for the explained variable around 11%.
+
+
+## Fiting the Decision Tree model 
+
+With the final cleaned dataset, we got from above steps fit our Boosting Model for y_loan_defaulter on all x variables.
+
+We made a lot of tests playing with control parameters trying to reduce the errors and we decided to keep **mfinal = 100**, **minbucket = 25** and **maxdepth = 1 **.
+
+```{r fit_boots_model, echo=TRUE, out.width= '100%'}
+ boost <- boosting(f_full, data= data.train_boost, mfinal= 100, 
+                   coeflearn = "Freund", 
+                   control = rpart.control(minbucket= 25,maxdepth = 1))
+
+
+plot(errorevol(boost, data.train_boost))
+
+```
 
 *******************************************************************************
 
 # Interpreting model output
 
-To-do.
+Boosting is a black box ensemble method! But the model can tell us the importance of each variable to predict the results.
+For this model the four principal vars are:
+
+**x_prop_interest_credited**
+**x_account_balance**
+**x_avg_account_balance**
+**x_loan_amount**
+
+The result is similar to the Logistic Regression and Decision Tree models.
 
 *******************************************************************************
 
 # Evaluating the model performance
 
-To-do.
+Here we will perform basically the same steps we did in the Logistic Regression model.
+
+A comparison against all the models will be provided in the Final Report session of this exercise.
+
+We started this step by making predictions using our model on the X's variables in our Train and Test datasets.
+
+```{r get_scores, echo=TRUE, out.width= '100%'}
+## making preditions for each model and consolidating in a single data frame
+
+prob.full = list()
+prob.train = list()
+prob.test = list()
+
+prob.full$boosting.actual         <- loan_dataset_boost$y_loan_defaulter
+prob.full$boosting.predicted      <- predict.boosting(boost, 
+                                                      newdata = loan_dataset_boost)$prob[, 2]
+
+prob.train$boosting.actual         <- data.train_boost$y_loan_defaulter
+prob.train$boosting.predicted      <- predict.boosting(boost, newdata = 
+                                                          data.train_boost)$prob[, 2]
+
+prob.test$boosting.actual         <- data.test_boost$y_loan_defaulter
+prob.test$boosting.predicted      <- predict.boosting(boost, newdata = 
+                                                         data.test_boost)$prob[, 2]
+
+prob.full   <- prob.full %>% as_tibble()
+prob.train  <- prob.train %>% as_tibble()
+prob.test   <- prob.test %>% as_tibble()
+```
 
 ## Getting Performance Measures:
 
-To-do.
+To calculate the performance measures, derived from the confusion matrix, we need to find the score cut off that best split our test dataset into Defaulters and Non-Defaulters.
 
-## Evaluating classification performance
+In this exercise we decide to not prioritize the accuracy on predicting Defaulters and Non-Defaulters, therefore we are looking for the score cut off that best predict each class equally.
 
-To-do.
+With the returned object from this function we can plot the comparison between TPR (True Positive Rate) and TNR (True Negative Rate) to find the best cut off.
+
+```{r get_measures, echo=TRUE, out.width= '100%'}
+## getting measures -----------------------------------------------------------------
+metricsByCutoff.test_boost  <- modelMetrics(prob.test$boosting.actual, 
+                                            prob.test$boosting.predicted, 
+                                            plot_title = 'Boosting')
+metricsByCutoff.test_boost$Plot
+```
+
+
+With the optimized cut off we calculate the full set of model metrics using the function HMeasure from hmeasure library.
+
+```{r get_measures_full, echo=TRUE, out.width= '100%', warning=FALSE}
+# Boosting
+measures.boosting.train <- HMeasure(prob.train$boosting.actual, 
+                                    prob.train$boosting.predicted, 
+                                    threshold = metricsByCutoff.test_boost$BestCut['Cut'])
+measures.boosting.test  <- HMeasure(prob.test$boosting.actual, 
+                                    prob.test$boosting.predicted, 
+                                    threshold = metricsByCutoff.test_boost$BestCut['Cut'])
+
+
+# join measures in a single data frame
+measures <- t(bind_rows(measures.boosting.train$metrics,
+                        measures.boosting.test$metrics
+                        )) %>% as_tibble(., rownames = NA)
+
+colnames(measures) <- c('boosting - train', 'boosting - test')
+
+measures$metric = rownames(measures)
+
+measures <- dplyr::select(measures, metric, everything())
+```
+
+Below are the metrics on the train and test dataset:
+```{r see_train_measures, echo=TRUE, out.width= '100%'}
+kable(measures, row.names = FALSE)
+```
+

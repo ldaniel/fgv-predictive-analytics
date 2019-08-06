@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>The decision tree on loan’s report</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/htmlwidgets-1.3/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.9.0/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="site_libs/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.0.0/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-1.46.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-1.46.1/plotly-latest.min.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  { background-color: #f8f8f8; }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #c4a000; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #000000; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #000000; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #000000; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">FGV MBA</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fa fa-hand-holding-usd"></span>
+     
+    Business Case
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="01_about_the_data.html">About the Data</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Initial Analysis</li>
+    <li>
+      <a href="02_data_preparation.html">Data Preparation</a>
+    </li>
+    <li>
+      <a href="03_exploration_report.html">Data Exploration</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fa fa-file-invoice"></span>
+     
+    Model's Reports
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-header">Analytical Methods</li>
+    <li>
+      <a href="04_logistic_regression_report.html">Logistic Regression Report</a>
+    </li>
+    <li>
+      <a href="05_decision_tree_report.html">Decision Tree Report</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Ensembe Methods</li>
+    <li>
+      <a href="06_boosting_report.html">Boosting Report</a>
+    </li>
+    <li>
+      <a href="07_random_forest_report.html">Random Forest Report</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fa fa-file-invoice-dollar"></span>
+     
+    Final Report
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="08_conclusion.html">Conclusion</a>
+    </li>
+    <li>
+      <a href="09_references.html">References</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">The decision tree on loan’s report</h1>
+<h4 class="date">August, 2019</h4>
+
+</div>
+
+<div id="TOC">
+<ul>
+<li><a href="#objective"><span class="toc-section-number">1</span> Objective</a></li>
+<li><a href="#modeling"><span class="toc-section-number">2</span> Modeling</a><ul>
+<li><a href="#dataset-preparation"><span class="toc-section-number">2.1</span> Dataset preparation</a></li>
+<li><a href="#variable-selection"><span class="toc-section-number">2.2</span> Variable selection</a></li>
+<li><a href="#sample-split-into-test-and-training-data"><span class="toc-section-number">2.3</span> Sample split into Test and Training Data</a></li>
+<li><a href="#fiting-the-decision-tree-model"><span class="toc-section-number">2.4</span> Fiting the Decision Tree model</a></li>
+<li><a href="#evaluating-necessity-of-prunning"><span class="toc-section-number">2.5</span> Evaluating necessity of prunning</a></li>
+</ul></li>
+<li><a href="#interpreting-model-output"><span class="toc-section-number">3</span> Interpreting model output</a></li>
+<li><a href="#evaluating-the-model-performance"><span class="toc-section-number">4</span> Evaluating the model performance</a><ul>
+<li><a href="#getting-performance-measures"><span class="toc-section-number">4.1</span> Getting performance measures</a></li>
+<li><a href="#evaluating-classification-performance"><span class="toc-section-number">4.2</span> Evaluating classification performance</a></li>
+</ul></li>
+</ul>
+</div>
+
+<div id="objective" class="section level1">
+<h1><span class="header-section-number">1</span> Objective</h1>
+<p>The goal of this session is trying to fit a simple Decision Tree model on Loan data aiming to predict the probability of delinquency for each contract.</p>
+<hr />
+</div>
+<div id="modeling" class="section level1">
+<h1><span class="header-section-number">2</span> Modeling</h1>
+<div id="dataset-preparation" class="section level2">
+<h2><span class="header-section-number">2.1</span> Dataset preparation</h2>
+<p>Using the vanilla transaction dataset, we calculated several derived variables for each account as described in the Data Preparation session.</p>
+<p>This dataset is joined with Loan, Client, Credit Card, District, Account and Account Balance tables.</p>
+<p>We ended up having a data set with <strong>118 variables</strong>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">loan_dataset_logistic &lt;-<span class="st"> </span>source_dataset</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw">kable</span>(<span class="kw">tibble</span>(<span class="dt">variables =</span> <span class="kw">names</span>(loan_dataset_logistic)))</a></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">variables</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">y_loan_defaulter</td>
+</tr>
+<tr class="even">
+<td align="left">x_account_balance</td>
+</tr>
+<tr class="odd">
+<td align="left">x_average_salary</td>
+</tr>
+<tr class="even">
+<td align="left">x_avg_account_balance</td>
+</tr>
+<tr class="odd">
+<td align="left">x_card_age_month</td>
+</tr>
+<tr class="even">
+<td align="left">x_card_type_classic</td>
+</tr>
+<tr class="odd">
+<td align="left">x_card_type_gold</td>
+</tr>
+<tr class="even">
+<td align="left">x_card_type_junior</td>
+</tr>
+<tr class="odd">
+<td align="left">x_client_age</td>
+</tr>
+<tr class="even">
+<td align="left">x_client_gender_male</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Benesov</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Beroun</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Blansko</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Breclav</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Brno_mesto</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Brno_venkov</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Bruntal</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Ceska_Lipa</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Ceske_Budejovice</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Cesky_Krumlov</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Cheb</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Chomutov</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Chrudim</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Decin</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Domazlice</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Frydek_Mistek</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Havlickuv_Brod</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Hl.m._Praha</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Hodonin</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Hradec_Kralove</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Jablonec_n._Nisou</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Jesenik</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Jicin</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Jihlava</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Jindrichuv_Hradec</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Karlovy_Vary</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Karvina</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Kladno</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Klatovy</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Kolin</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Kromeriz</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Kutna_Hora</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Liberec</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Litomerice</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Louny</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Melnik</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Mlada_Boleslav</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Most</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Nachod</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Novy_Jicin</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Nymburk</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Olomouc</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Opava</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Ostrava_mesto</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Pardubice</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Pelhrimov</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Pisek</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Plzen_jih</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Plzen_mesto</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Plzen_sever</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Prachatice</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Praha_vychod</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Praha_zapad</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Prerov</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Pribram</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Prostejov</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Rakovnik</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Rokycany</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Rychnov_nad_Kneznou</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Semily</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Strakonice</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Sumperk</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Svitavy</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Tabor</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Tachov</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Teplice</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Trebic</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Trutnov</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Uherske_Hradiste</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Usti_nad_Labem</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Usti_nad_Orlici</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Vsetin</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Vyskov</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Zdar_nad_Sazavou</td>
+</tr>
+<tr class="odd">
+<td align="left">x_district_name_Zlin</td>
+</tr>
+<tr class="even">
+<td align="left">x_district_name_Znojmo</td>
+</tr>
+<tr class="odd">
+<td align="left">x_last_transaction_age_days</td>
+</tr>
+<tr class="even">
+<td align="left">x_loan_amount</td>
+</tr>
+<tr class="odd">
+<td align="left">x_loan_duration</td>
+</tr>
+<tr class="even">
+<td align="left">x_loan_payments</td>
+</tr>
+<tr class="odd">
+<td align="left">x_no_of_cities</td>
+</tr>
+<tr class="even">
+<td align="left">x_no_of_commited_crimes_1995</td>
+</tr>
+<tr class="odd">
+<td align="left">x_no_of_commited_crimes_1996</td>
+</tr>
+<tr class="even">
+<td align="left">x_no_of_enterpreneurs_per_1000_inhabitants</td>
+</tr>
+<tr class="odd">
+<td align="left">x_no_of_inhabitants</td>
+</tr>
+<tr class="even">
+<td align="left">x_no_of_municip_2000_to_9999</td>
+</tr>
+<tr class="odd">
+<td align="left">x_no_of_municip_500_to_1999</td>
+</tr>
+<tr class="even">
+<td align="left">x_no_of_municip_greater_10000</td>
+</tr>
+<tr class="odd">
+<td align="left">x_no_of_municip_inhabitants_less_499</td>
+</tr>
+<tr class="even">
+<td align="left">x_prop_household</td>
+</tr>
+<tr class="odd">
+<td align="left">x_prop_insurance_payment</td>
+</tr>
+<tr class="even">
+<td align="left">x_prop_interest_credited</td>
+</tr>
+<tr class="odd">
+<td align="left">x_prop_loan_payment</td>
+</tr>
+<tr class="even">
+<td align="left">x_prop_old_age_pension</td>
+</tr>
+<tr class="odd">
+<td align="left">x_prop_other</td>
+</tr>
+<tr class="even">
+<td align="left">x_prop_statement</td>
+</tr>
+<tr class="odd">
+<td align="left">x_ratio_of_urban_inhabitants</td>
+</tr>
+<tr class="even">
+<td align="left">x_region_central_Bohemia</td>
+</tr>
+<tr class="odd">
+<td align="left">x_region_east_Bohemia</td>
+</tr>
+<tr class="even">
+<td align="left">x_region_north_Bohemia</td>
+</tr>
+<tr class="odd">
+<td align="left">x_region_north_Moravia</td>
+</tr>
+<tr class="even">
+<td align="left">x_region_Prague</td>
+</tr>
+<tr class="odd">
+<td align="left">x_region_south_Bohemia</td>
+</tr>
+<tr class="even">
+<td align="left">x_region_south_Moravia</td>
+</tr>
+<tr class="odd">
+<td align="left">x_transaction_amount</td>
+</tr>
+<tr class="even">
+<td align="left">x_transaction_count</td>
+</tr>
+<tr class="odd">
+<td align="left">x_unemploymant_rate_1995</td>
+</tr>
+<tr class="even">
+<td align="left">x_unemploymant_rate_1996</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="variable-selection" class="section level2">
+<h2><span class="header-section-number">2.2</span> Variable selection</h2>
+<p>One advantage of Decision Tree models is that it does not require heavy feature engineering.</p>
+<p>We will only remove <strong>x_prop_old_age_pension</strong> that we know beforehand to have no variance in the dataset.</p>
+<p>This model is also not sensible to outliers, missing values and multicollinearity.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">loan_dataset_DT &lt;-source_dataset</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">loan_dataset_DT &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(loan_dataset_DT, <span class="op">-</span>x_prop_old_age_pension)</a></code></pre></div>
+</div>
+<div id="sample-split-into-test-and-training-data" class="section level2">
+<h2><span class="header-section-number">2.3</span> Sample split into Test and Training Data</h2>
+<p>The available data in Loan Dataset is split into Train and Testing data on the following proportion:</p>
+<ul>
+<li><strong>Train Dataset</strong> (70% 478 obs);</li>
+<li><strong>Test Dataset </strong> (30% 204 obs).</li>
+</ul>
+<p>We are selecting exact the same samples we used for the Logistic Model to allow comparison across models.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">SplitDataset &lt;-<span class="st"> </span>source_train_test_dataset</a>
+<a class="sourceLine" id="cb3-2" data-line-number="2">data.train_DT &lt;-<span class="st"> </span>SplitDataset<span class="op">$</span>data.train</a>
+<a class="sourceLine" id="cb3-3" data-line-number="3">data.test_DT &lt;-<span class="st"> </span>SplitDataset<span class="op">$</span>data.test</a>
+<a class="sourceLine" id="cb3-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb3-5" data-line-number="5">data.train_DT &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(data.train_DT, <span class="kw">names</span>(loan_dataset_DT))</a>
+<a class="sourceLine" id="cb3-6" data-line-number="6">data.test_DT &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(data.test_DT, <span class="kw">names</span>(loan_dataset_DT))</a>
+<a class="sourceLine" id="cb3-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="kw">kable</span>(SplitDataset<span class="op">$</span>event.proportion)</a></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">scope</th>
+<th align="right">0</th>
+<th align="right">1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">full dataset</td>
+<td align="right">0.8885630</td>
+<td align="right">0.1114370</td>
+</tr>
+<tr class="even">
+<td align="left">train dataset</td>
+<td align="right">0.8933054</td>
+<td align="right">0.1066946</td>
+</tr>
+<tr class="odd">
+<td align="left">test dataset</td>
+<td align="right">0.8774510</td>
+<td align="right">0.1225490</td>
+</tr>
+</tbody>
+</table>
+<p>Both datasets keep the same proportion for the explained variable around 11%.</p>
+</div>
+<div id="fiting-the-decision-tree-model" class="section level2">
+<h2><span class="header-section-number">2.4</span> Fiting the Decision Tree model</h2>
+<p>With the final cleaned dataset, we got from above steps we fit our Decision Tree Model for y_loan_defaulter on all x variables.</p>
+<p>We choose to change the default parameters <strong>minbucket</strong> and <strong>maxdepth</strong> parameter to <strong>5</strong> to deliberate create a fully-grown tree as the database is not big enough for this model.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">tree.full &lt;-<span class="st"> </span><span class="kw">rpart</span>(<span class="dt">data=</span> data.train_DT, y_loan_defaulter <span class="op">~</span><span class="st"> </span>.,</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2">                   <span class="dt">control =</span> <span class="kw">rpart.control</span>(<span class="dt">minbucket =</span> <span class="dv">5</span>,</a>
+<a class="sourceLine" id="cb4-3" data-line-number="3">                                           <span class="dt">maxdepth =</span> <span class="dv">5</span>),</a>
+<a class="sourceLine" id="cb4-4" data-line-number="4">                   <span class="dt">method =</span> <span class="st">&quot;class&quot;</span>)</a>
+<a class="sourceLine" id="cb4-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="kw">rpart.plot</span>(tree.full, <span class="dt">cex =</span> <span class="fl">1.3</span>, <span class="dt">type =</span> <span class="dv">0</span>,</a>
+<a class="sourceLine" id="cb4-7" data-line-number="7">           <span class="dt">extra =</span> <span class="dv">1</span>, <span class="dt">box.palette =</span> <span class="st">&#39;BuRd&#39;</span>,</a>
+<a class="sourceLine" id="cb4-8" data-line-number="8">           <span class="dt">branch.lty =</span> <span class="dv">3</span>, <span class="dt">shadow.col =</span> <span class="st">&#39;gray&#39;</span>, </a>
+<a class="sourceLine" id="cb4-9" data-line-number="9">           <span class="dt">nn =</span> <span class="ot">TRUE</span>, <span class="dt">main =</span> <span class="st">&#39;Decision Tree - Full&#39;</span>)</a></code></pre></div>
+<p><img src="05_decision_tree_report_files/figure-html/fit_DT_full-1.png" width="100%" /></p>
+</div>
+<div id="evaluating-necessity-of-prunning" class="section level2">
+<h2><span class="header-section-number">2.5</span> Evaluating necessity of prunning</h2>
+<p>Pruning is a technique in machine learning used to reduce the size of decision trees by removing nodes that provide little power of classification.</p>
+<p>The idea is reducing the complexity of the decision tree and thereof avoid overfit to the train dataset.</p>
+<p>Pruning process is done by comparing different variations of the fully-grown tree and evaluating the relative error trend comparing to a zero node tree, each node that does not affect the classification power of the tree is replaced by a leaf node.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">printcp</span>(tree.full)</a></code></pre></div>
+<pre><code>## 
+## Classification tree:
+## rpart(formula = y_loan_defaulter ~ ., data = data.train_DT, method = &quot;class&quot;, 
+##     control = rpart.control(minbucket = 5, maxdepth = 5))
+## 
+## Variables actually used in tree construction:
+## [1] x_account_balance            x_avg_account_balance       
+## [3] x_loan_amount                x_no_of_commited_crimes_1995
+## [5] x_prop_interest_credited    
+## 
+## Root node error: 51/478 = 0.10669
+## 
+## n= 478 
+## 
+##        CP nsplit rel error xerror    xstd
+## 1 0.11765      0   1.00000 1.0000 0.13235
+## 2 0.04902      1   0.88235 1.0000 0.13235
+## 3 0.01000      5   0.68627 1.1569 0.14101</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">plotcp</span>(tree.full)</a></code></pre></div>
+<p><img src="05_decision_tree_report_files/figure-html/fit_DT_prune-1.png" width="100%" /></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">cp_prune =<span class="st"> </span>tree.full<span class="op">$</span>cptable[<span class="kw">which.min</span>(tree.full<span class="op">$</span>cptable[,<span class="st">&quot;xerror&quot;</span>]), <span class="st">&quot;CP&quot;</span>]</a>
+<a class="sourceLine" id="cb8-2" data-line-number="2">tree.prune &lt;-<span class="st"> </span><span class="kw">prune</span>(tree.full, <span class="dt">cp =</span> cp_prune)</a>
+<a class="sourceLine" id="cb8-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="kw">rpart.plot</span>(tree.prune, <span class="dt">cex =</span> <span class="fl">1.3</span>, <span class="dt">type =</span> <span class="dv">0</span>,</a>
+<a class="sourceLine" id="cb8-5" data-line-number="5">           <span class="dt">extra =</span> <span class="dv">104</span>, <span class="dt">box.palette =</span> <span class="st">&#39;BuRd&#39;</span>,</a>
+<a class="sourceLine" id="cb8-6" data-line-number="6">           <span class="dt">branch.lty =</span> <span class="dv">3</span>, <span class="dt">shadow.col =</span> <span class="st">&#39;gray&#39;</span>, </a>
+<a class="sourceLine" id="cb8-7" data-line-number="7">           <span class="dt">nn =</span> <span class="ot">TRUE</span>, <span class="dt">main =</span> <span class="st">&#39;Decision Tree - Prune&#39;</span>)</a></code></pre></div>
+<p><img src="05_decision_tree_report_files/figure-html/fit_DT_prune-2.png" width="100%" /></p>
+<p>On performing the pruning process in our decision tree, we end up with a tree with only one node split. This is because splitting the train data set of just one node provide an overall accuracy greater than any other combination.</p>
+<p>Here the technique falls short for this dataset, we would be interest in give a greater weight on correctly predict the real defaulters than the general accuracy of the model.</p>
+<p>A Decision Tree is definitely not a good model for this dataset, but as we are just exercising the modeling technique (just having fun here !!!) we will use the full decision tree we got to compare its metrics and see how it perform against the other models we created in this class exercise.</p>
+<p>We tried different parameters for <strong>minbucket</strong> and <strong>maxdepth</strong>, as our dataset is not big enough all of then presented huge differences in performance, the one we chose for this exercise seems to be a reasonable trade-off on overfitting to compare against the other models.</p>
+<p>We can do this by simply feeding back the full tree to our prune tree object and move on to the performance metrics.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">tree.prune &lt;-<span class="st"> </span>tree.full</a></code></pre></div>
+<hr />
+</div>
+</div>
+<div id="interpreting-model-output" class="section level1">
+<h1><span class="header-section-number">3</span> Interpreting model output</h1>
+<p>Decision Trees are known by its very descriptive rules on how it is classifying each observation. It provides a very clear human readable set of rules that can show the importance of each variable on the decision process.</p>
+<p>Our full decision tree model clear shows that below variables are the key features that can be used to decide the likelihood of default in each contract:</p>
+<ul>
+<li><strong>x_account_balance</strong></li>
+<li><strong>x_prop_interest_credited</strong></li>
+<li><strong>x_avg_account_balance</strong></li>
+<li><strong>x_loan_amount</strong></li>
+<li><strong>x_no_of_commited_crimes_1995</strong></li>
+</ul>
+<p>The result is similar to the Logistic Regression model we created in the session before.</p>
+<p>The predictors selected are roughly the same.</p>
+<hr />
+</div>
+<div id="evaluating-the-model-performance" class="section level1">
+<h1><span class="header-section-number">4</span> Evaluating the model performance</h1>
+<p>Here we will perform basically the same steps we did in the Logistic Regression model.</p>
+<p>A comparison against all the models will be provided in the Final Report session of this exercise.</p>
+<p>We started this step by making predictions using our model on the X’s variables in our Train and Test datasets.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="co">## making preditions for each model and consolidating in a single data frame</span></a>
+<a class="sourceLine" id="cb10-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb10-3" data-line-number="3">prob.full =<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb10-4" data-line-number="4">prob.train =<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb10-5" data-line-number="5">prob.test =<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb10-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb10-7" data-line-number="7">prob.full<span class="op">$</span>decision.tree.actual     &lt;-<span class="st"> </span>loan_dataset_DT<span class="op">$</span>y_loan_defaulter</a>
+<a class="sourceLine" id="cb10-8" data-line-number="8">prob.full<span class="op">$</span>decision.tree.predicted  &lt;-<span class="st"> </span><span class="kw">predict</span>(tree.prune, <span class="dt">type =</span> <span class="st">&quot;prob&quot;</span>, <span class="dt">newdata =</span> loan_dataset_DT)[, <span class="dv">2</span>]</a>
+<a class="sourceLine" id="cb10-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb10-10" data-line-number="10">prob.train<span class="op">$</span>decision.tree.actual    &lt;-<span class="st"> </span>data.train_DT<span class="op">$</span>y_loan_defaulter</a>
+<a class="sourceLine" id="cb10-11" data-line-number="11">prob.train<span class="op">$</span>decision.tree.predicted &lt;-<span class="st"> </span><span class="kw">predict</span>(tree.prune, <span class="dt">type =</span> <span class="st">&quot;prob&quot;</span>, <span class="dt">newdata =</span> data.train_DT)[, <span class="dv">2</span>]</a>
+<a class="sourceLine" id="cb10-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb10-13" data-line-number="13">prob.test<span class="op">$</span>decision.tree.actual     &lt;-<span class="st"> </span>data.test_DT<span class="op">$</span>y_loan_defaulter</a>
+<a class="sourceLine" id="cb10-14" data-line-number="14">prob.test<span class="op">$</span>decision.tree.predicted  &lt;-<span class="st"> </span><span class="kw">predict</span>(tree.prune, <span class="dt">type =</span> <span class="st">&quot;prob&quot;</span>, <span class="dt">newdata =</span> data.test_DT)[, <span class="dv">2</span>]</a>
+<a class="sourceLine" id="cb10-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb10-16" data-line-number="16">prob.full   &lt;-<span class="st"> </span>prob.full <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a>
+<a class="sourceLine" id="cb10-17" data-line-number="17">prob.train  &lt;-<span class="st"> </span>prob.train <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a>
+<a class="sourceLine" id="cb10-18" data-line-number="18">prob.test   &lt;-<span class="st"> </span>prob.test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a></code></pre></div>
+<div id="getting-performance-measures" class="section level2">
+<h2><span class="header-section-number">4.1</span> Getting performance measures</h2>
+<p>To calculate the performance measures, derived from the confusion matrix, we need to find the score cut off that best split our test dataset into Defaulters and Non-Defaulters.</p>
+<p>In this exercise we decide to not prioritize the accuracy on predicting Defaulters and Non-Defaulters, therefore we are looking for the score cut off that best predict each class equally.</p>
+<p>With the returned object from this function we can plot the comparison between TPR (True Positive Rate) and TNR (True Negative Rate) to find the best cut off.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="co">## getting measures -----------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb11-2" data-line-number="2">metricsByCutoff.test_DT     &lt;-<span class="st"> </span><span class="kw">modelMetrics</span>(prob.test<span class="op">$</span>decision.tree.actual, </a>
+<a class="sourceLine" id="cb11-3" data-line-number="3">                                            prob.test<span class="op">$</span>decision.tree.predicted, </a>
+<a class="sourceLine" id="cb11-4" data-line-number="4">                                            <span class="dt">plot_title =</span> <span class="st">&#39;Decision Tree&#39;</span>)</a>
+<a class="sourceLine" id="cb11-5" data-line-number="5">metricsByCutoff.test_DT<span class="op">$</span>Plot</a></code></pre></div>
+<div id="htmlwidget-3b7516f7249a1deb10d3" style="width:100%;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-3b7516f7249a1deb10d3">{"x":{"visdat":{"28a2f889c4b":["function () ","plotlyVisDat"]},"cur_data":"28a2f889c4b","attrs":{"28a2f889c4b":{"x":{},"y":{},"opacity":0.3,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"bar"},"28a2f889c4b.1":{"x":{},"y":{},"opacity":1,"name":"TPR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"28a2f889c4b.2":{"x":{},"y":{},"opacity":1,"name":"TNR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"28a2f889c4b.3":{"x":0.02,"y":0.8,"opacity":1,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","text":0.02,"mode":"text","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"title":"Cutoff Value"},"yaxis":{"domain":[0,1],"automargin":true,"title":"True Ratio (%)"},"title":"Decision Tree","hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77,0.78,0.79,0.8,0.81,0.82,0.83,0.84,0.85,0.86,0.87,0.88,0.89,0.9,0.91,0.92,0.93,0.94,0.95,0.96,0.97,0.98,0.99,1],"y":[0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.54413407821229,0.54413407821229,0.54413407821229,0.54413407821229,0.54413407821229,0.54413407821229,0.54413407821229,0.54413407821229,0.54413407821229,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84],"opacity":0.3,"name":"Abs. Diff.","type":"bar","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77,0.78,0.79,0.8,0.81,0.82,0.83,0.84,0.85,0.86,0.87,0.88,0.89,0.9,0.91,0.92,0.93,0.94,0.95,0.96,0.97,0.98,0.99,1],"y":[0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16],"opacity":1,"name":"TPR","type":"scatter","mode":"lines","marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"line":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77,0.78,0.79,0.8,0.81,0.82,0.83,0.84,0.85,0.86,0.87,0.88,0.89,0.9,0.91,0.92,0.93,0.94,0.95,0.96,0.97,0.98,0.99,1],"y":[0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.94413407821229,0.94413407821229,0.94413407821229,0.94413407821229,0.94413407821229,0.94413407821229,0.94413407821229,0.94413407821229,0.94413407821229,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],"opacity":1,"name":"TNR","type":"scatter","mode":"lines","marker":{"color":"rgba(44,160,44,1)","line":{"color":"rgba(44,160,44,1)"}},"error_y":{"color":"rgba(44,160,44,1)"},"error_x":{"color":"rgba(44,160,44,1)"},"line":{"color":"rgba(44,160,44,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.02],"y":[0.8],"opacity":1,"name":"Abs. Diff.","type":"scatter","text":0.02,"mode":"text","marker":{"color":"rgba(214,39,40,1)","line":{"color":"rgba(214,39,40,1)"}},"error_y":{"color":"rgba(214,39,40,1)"},"error_x":{"color":"rgba(214,39,40,1)"},"line":{"color":"rgba(214,39,40,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<p>With the optimized cut off we calculate the full set of model metrics using the function HMeasure from hmeasure library.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="co"># decision tree</span></a>
+<a class="sourceLine" id="cb12-2" data-line-number="2">measures.decision.tree.train &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.train<span class="op">$</span>decision.tree.actual, </a>
+<a class="sourceLine" id="cb12-3" data-line-number="3">                                         prob.train<span class="op">$</span>decision.tree.predicted, </a>
+<a class="sourceLine" id="cb12-4" data-line-number="4">                                         <span class="dt">threshold =</span> metricsByCutoff.test_DT<span class="op">$</span>BestCut[<span class="st">&#39;Cut&#39;</span>])</a>
+<a class="sourceLine" id="cb12-5" data-line-number="5">measures.decision.tree.test &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.test<span class="op">$</span>decision.tree.actual, </a>
+<a class="sourceLine" id="cb12-6" data-line-number="6">                                        prob.test<span class="op">$</span>decision.tree.predicted, </a>
+<a class="sourceLine" id="cb12-7" data-line-number="7">                                        <span class="dt">threshold =</span> metricsByCutoff.test_DT<span class="op">$</span>BestCut[<span class="st">&#39;Cut&#39;</span>])</a>
+<a class="sourceLine" id="cb12-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb12-9" data-line-number="9"><span class="co"># join measures in a single data frame</span></a>
+<a class="sourceLine" id="cb12-10" data-line-number="10">measures &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">bind_rows</span>(measures.decision.tree.train<span class="op">$</span>metrics,</a>
+<a class="sourceLine" id="cb12-11" data-line-number="11">                        measures.decision.tree.test<span class="op">$</span>metrics</a>
+<a class="sourceLine" id="cb12-12" data-line-number="12">                        )) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>(., <span class="dt">rownames =</span> <span class="ot">NA</span>)</a>
+<a class="sourceLine" id="cb12-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb12-14" data-line-number="14"><span class="kw">colnames</span>(measures) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;decision.tree - train&#39;</span>, <span class="st">&#39;decision.tree - test&#39;</span>)</a>
+<a class="sourceLine" id="cb12-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb12-16" data-line-number="16">measures<span class="op">$</span>metric =<span class="st"> </span><span class="kw">rownames</span>(measures)</a>
+<a class="sourceLine" id="cb12-17" data-line-number="17"></a>
+<a class="sourceLine" id="cb12-18" data-line-number="18">measures &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(measures, metric, <span class="kw">everything</span>())</a></code></pre></div>
+<p>Below are the metrics on the train and test dataset:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw">kable</span>(measures, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">metric</th>
+<th align="right">decision.tree - train</th>
+<th align="right">decision.tree - test</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">H</td>
+<td align="right">0.4815174</td>
+<td align="right">0.3299682</td>
+</tr>
+<tr class="even">
+<td align="left">Gini</td>
+<td align="right">0.7575883</td>
+<td align="right">0.5883799</td>
+</tr>
+<tr class="odd">
+<td align="left">AUC</td>
+<td align="right">0.8787941</td>
+<td align="right">0.7941899</td>
+</tr>
+<tr class="even">
+<td align="left">AUCH</td>
+<td align="right">0.8787941</td>
+<td align="right">0.7966480</td>
+</tr>
+<tr class="odd">
+<td align="left">KS</td>
+<td align="right">0.6522478</td>
+<td align="right">0.5150838</td>
+</tr>
+<tr class="even">
+<td align="left">MER</td>
+<td align="right">0.0732218</td>
+<td align="right">0.1029412</td>
+</tr>
+<tr class="odd">
+<td align="left">MWL</td>
+<td align="right">0.0662891</td>
+<td align="right">0.1042868</td>
+</tr>
+<tr class="even">
+<td align="left">Spec.Sens95</td>
+<td align="right">0.0878220</td>
+<td align="right">0.3840782</td>
+</tr>
+<tr class="odd">
+<td align="left">Sens.Spec95</td>
+<td align="right">0.8830450</td>
+<td align="right">0.2736000</td>
+</tr>
+<tr class="even">
+<td align="left">ER</td>
+<td align="right">0.2489540</td>
+<td align="right">0.2745098</td>
+</tr>
+<tr class="odd">
+<td align="left">Sens</td>
+<td align="right">0.9215686</td>
+<td align="right">0.8000000</td>
+</tr>
+<tr class="even">
+<td align="left">Spec</td>
+<td align="right">0.7306792</td>
+<td align="right">0.7150838</td>
+</tr>
+<tr class="odd">
+<td align="left">Precision</td>
+<td align="right">0.2901235</td>
+<td align="right">0.2816901</td>
+</tr>
+<tr class="even">
+<td align="left">Recall</td>
+<td align="right">0.9215686</td>
+<td align="right">0.8000000</td>
+</tr>
+<tr class="odd">
+<td align="left">TPR</td>
+<td align="right">0.9215686</td>
+<td align="right">0.8000000</td>
+</tr>
+<tr class="even">
+<td align="left">FPR</td>
+<td align="right">0.2693208</td>
+<td align="right">0.2849162</td>
+</tr>
+<tr class="odd">
+<td align="left">F</td>
+<td align="right">0.4413146</td>
+<td align="right">0.4166667</td>
+</tr>
+<tr class="even">
+<td align="left">Youden</td>
+<td align="right">0.6522478</td>
+<td align="right">0.5150838</td>
+</tr>
+<tr class="odd">
+<td align="left">TP</td>
+<td align="right">47.0000000</td>
+<td align="right">20.0000000</td>
+</tr>
+<tr class="even">
+<td align="left">FP</td>
+<td align="right">115.0000000</td>
+<td align="right">51.0000000</td>
+</tr>
+<tr class="odd">
+<td align="left">TN</td>
+<td align="right">312.0000000</td>
+<td align="right">128.0000000</td>
+</tr>
+<tr class="even">
+<td align="left">FN</td>
+<td align="right">4.0000000</td>
+<td align="right">5.0000000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="evaluating-classification-performance" class="section level2">
+<h2><span class="header-section-number">4.2</span> Evaluating classification performance</h2>
+<p>In general, such as the Logistic Regression model, this model is not delivering good accuracy, we will compare how it performed against other classes of models in the Final Report session</p>
+<p>Below the confusion matrix and general performance of the model:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="co"># accuracy metrics ---------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb14-2" data-line-number="2"><span class="co"># logistic regression</span></a>
+<a class="sourceLine" id="cb14-3" data-line-number="3"><span class="kw">accuracy</span>(<span class="dt">score =</span> prob.test<span class="op">$</span>decision.tree.predicted, </a>
+<a class="sourceLine" id="cb14-4" data-line-number="4">         <span class="dt">actual =</span> prob.test<span class="op">$</span>decision.tree.actual, </a>
+<a class="sourceLine" id="cb14-5" data-line-number="5">         <span class="dt">threshold =</span> metricsByCutoff.test_DT[[<span class="st">&quot;BestCut&quot;</span>]][[<span class="st">&quot;Cut&quot;</span>]])</a></code></pre></div>
+<pre><code>## 
+## 
+##             pred.1   pred.0
+## ---------  -------  -------
+## actual.1        20        5
+## actual.0        51      128
+## [1] &quot;--------------------------------------------------------------&quot;
+## [1] &quot;Model General Accuracy of: 72.55%&quot;
+## [1] &quot;True Positive Rate of    : 80%&quot;</code></pre>
+<p>We finally look at the score distribution charts to check how well the model is able to discriminate Defaulters and Non-Defaulters.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">p1 &lt;-<span class="st"> </span><span class="kw">Score_Histograms</span>(prob.test, </a>
+<a class="sourceLine" id="cb16-2" data-line-number="2">                 prob.test<span class="op">$</span>decision.tree.predicted,</a>
+<a class="sourceLine" id="cb16-3" data-line-number="3">                 prob.test<span class="op">$</span>decision.tree.actual,</a>
+<a class="sourceLine" id="cb16-4" data-line-number="4">                 <span class="st">&#39;Density Plot&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.title.y =</span> <span class="kw">element_blank</span>())</a>
+<a class="sourceLine" id="cb16-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb16-6" data-line-number="6">p2 &lt;-<span class="st"> </span><span class="kw">Score_Boxplot</span>(prob.test, </a>
+<a class="sourceLine" id="cb16-7" data-line-number="7">              prob.test<span class="op">$</span>decision.tree.predicted, </a>
+<a class="sourceLine" id="cb16-8" data-line-number="8">              prob.test<span class="op">$</span>decision.tree.actual,</a>
+<a class="sourceLine" id="cb16-9" data-line-number="9">              <span class="st">&#39;Score Boxplot&#39;</span>)</a>
+<a class="sourceLine" id="cb16-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb16-11" data-line-number="11">p3 &lt;-<span class="st"> </span><span class="kw">KS_Plot</span>(prob.test<span class="op">$</span>decision.tree.predicted[prob.test<span class="op">$</span>decision.tree.actual <span class="op">==</span><span class="st"> </span><span class="dv">0</span>],</a>
+<a class="sourceLine" id="cb16-12" data-line-number="12">        prob.test<span class="op">$</span>decision.tree.predicted[prob.test<span class="op">$</span>decision.tree.actual <span class="op">==</span><span class="st"> </span><span class="dv">1</span>],</a>
+<a class="sourceLine" id="cb16-13" data-line-number="13">        <span class="st">&#39;KS Plot&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.title.y =</span> <span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb16-14" data-line-number="14">                           <span class="dt">axis.text.y =</span> <span class="kw">element_blank</span>())</a>
+<a class="sourceLine" id="cb16-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb16-16" data-line-number="16"><span class="kw">ggarrange</span>(p1, p2, <span class="dt">nrow =</span> <span class="dv">2</span>)</a></code></pre></div>
+<p><img src="05_decision_tree_report_files/figure-html/model_plots-1.png" width="100%" /></p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1">p3</a></code></pre></div>
+<p><img src="05_decision_tree_report_files/figure-html/model_plots-2.png" width="100%" /></p>
+<p>By the score density we see that our Decision Tree is very narrow on the scores it assigns to the observations.</p>
+<p>This is expected from single Decision Trees.</p>
+<p>The box plot also does not show a clear discrimination between Defaulters and Non-Defaulters.</p>
+<p>Finally, the KS metric is far from what is expected for a reasonable classification model.</p>
+<p>In the Final Report session, we will look more closely on the AUC and Gini metrics by plotting the ROC curve and comparing against other models.</p>
+<p>Stay tuned!!!</p>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

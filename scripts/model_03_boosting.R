@@ -36,9 +36,9 @@ f_full <- as.formula(paste("y_loan_defaulter ~",
 
 # fit the decision tree model with boosting--------------------------------------------------
 
-# boost <- boosting(f_full, data= data.train_boost, mfinal= 250, 
+# boost <- boosting(f_full, data= data.train_boost, mfinal= 100, 
 #                   coeflearn = "Freund", 
-#                   control = rpart.control(minbucket= 50,maxdepth = 1))
+#                   control = rpart.control(minbucket= 25,maxdepth = 1))
 # saveRDS(boost, "./models/boosting.rds")
 
 boost <- readRDS("./models/boosting.rds")
@@ -50,3 +50,11 @@ plot(errorevol(boost, data.train_boost))
 var_importance <- boost$importance[order(boost$importance,decreasing = T)]
 var_importance
 importanceplot(boost)
+
+
+
+
+
+
+
+
