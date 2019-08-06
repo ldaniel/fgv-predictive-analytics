@@ -238,3 +238,6 @@ Below are the metrics on the train and test dataset:
 kable(measures, row.names = FALSE)
 ```
 
+## Evaluating classification performance
+
+To do
