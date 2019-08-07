@@ -9,13 +9,19 @@ date: "August, 2019"
 
 ******************************************************
 
-### Books
+### Books and articles
 
 ******************************************************
 
 [**An Introduction to Statistical Learning**](http://faculty.marshall.usc.edu/gareth-james/ISL/ISLR%20Seventh%20Printing.pdf)
 
 Gareth James, Daniela Witten, Trevor Hastie, Robert Tibshirani
+
+******************************************************
+
+[**Understanding Random Forest: How the Algorithm Works and Why it Is So Effective**](https://towardsdatascience.com/understanding-random-forest-58381e0602d2)
+
+Tony Yiu
 
 ******************************************************
 
