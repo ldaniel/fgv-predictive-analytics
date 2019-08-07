@@ -920,7 +920,7 @@ The fundamental concept behind random forest is a simple but powerful one — th
 <a class="sourceLine" id="cb5-19" title="19">customRF<span class="op">$</span>sort &lt;-<span class="st"> </span><span class="cf">function</span>(x) x[<span class="kw">order</span>(x[,<span class="dv">1</span>]),]</a>
 <a class="sourceLine" id="cb5-20" title="20"></a>
 <a class="sourceLine" id="cb5-21" title="21">customRF<span class="op">$</span>levels &lt;-<span class="st"> </span><span class="cf">function</span>(x) x<span class="op">$</span>classes</a></code></pre></div>
-<p>The following code is able to fit the random forest model using the caret customized train function above. Then, we just have to give some parameters values to be tested and after running this pretty code we can benefits from the results by having which parameters performed best.</p>
+<p>The following code is able to fit the random forest model using the caret customized train function above. Then, we just have to give some parameters values to be tested and after running this pretty code we can benefits from its results by having which parameters performed best.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">control &lt;-<span class="st"> </span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;repeatedcv&quot;</span>, </a>
 <a class="sourceLine" id="cb6-2" title="2">                        <span class="dt">number=</span><span class="dv">5</span>, </a>
 <a class="sourceLine" id="cb6-3" title="3">                        <span class="dt">repeats=</span><span class="dv">3</span>, </a>
