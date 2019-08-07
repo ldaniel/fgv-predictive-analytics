@@ -159,7 +159,7 @@ customRF$sort <- function(x) x[order(x[,1]),]
 customRF$levels <- function(x) x$classes
 ```
 
-The following code is able to fit the random forest model using the caret customized train function above. Then, we just have to give some parameters values to be tested and after running this pretty code we can benefits from the results by having which parameters performed best.
+The following code is able to fit the random forest model using the caret customized train function above. Then, we just have to give some parameters values to be tested and after running this pretty code we can benefits from its results by having which parameters performed best.
 
 ```{r select_best_parameters, echo=TRUE, eval=FALSE}
 control <- trainControl(method="repeatedcv", 
