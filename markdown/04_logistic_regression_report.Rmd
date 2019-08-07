@@ -451,7 +451,7 @@ In the Logistic Regression the effect of an increase or decrease of a predictor 
 
 The probability of default is given by below equation:
 
-$$P(Y = 1 | X_{n} = x_{n}) = \frac{1}{1 + e^{(-\beta_{0}+\beta_{1}x_{1}+\beta_{2}x_{2}+...+\beta_{n}x_{n} )}}$$
+$$P(Y = 1 | X_{n} = x_{n}) = \frac{1}{1 + e^{-(\beta_{0}+\beta_{1}x_{1}+\beta_{2}x_{2}+...+\beta_{n}x_{n} )}}$$
 
 Where each β is the coefficient estimate for each variable in the final model.
 
