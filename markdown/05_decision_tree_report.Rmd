@@ -168,7 +168,7 @@ saveRDS(tree.prune, './models/decision_tree_prune.rds')
 tree.prune <- readRDS('./models/decision_tree_prune.rds')
 ```
 
-```{r plot_DT_prune, echo=TRUE, out.width= '100%'}
+```{r plot_DT_prune, echo=FALSE, out.width= '100%'}
 rpart.plot(tree.prune, cex = 1.3, type = 0,
            extra = 104, box.palette = 'BuRd',
            branch.lty = 3, shadow.col = 'gray', 

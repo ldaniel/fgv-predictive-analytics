@@ -62,8 +62,8 @@ customRF$levels <- function(x) x$classes
 # 
 # summary(rf.full)
 # plot(rf.full)
-# 
-# # Best selected parameters: mtry = 85 and ntree = 3000 (time taken: ~5 hours)
+
+# Best selected parameters: mtry = 85 and ntree = 3000 (time taken: ~5 hours)
 # 
 # saveRDS(rf.full, "./models/random_forest.rds")
 
