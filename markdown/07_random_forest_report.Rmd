@@ -3,7 +3,7 @@ title: "The random forest on loan's report"
 date: "August, 2019"
 ---
 
-```{r setup_logit, include=FALSE}
+```{r setup_rf, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(fig.pos =  "h")
 knitr::opts_knit$set(root.dir = "../")
@@ -20,6 +20,7 @@ library(feather)
 library(fastDummies)
 library(reshape2)
 library(knitr)
+library(tufte)
 
 #libraries for plots
 library(ggplot2)
@@ -61,13 +62,153 @@ source("./scripts/step_06_dataset_preparation.R")
 
 # Objective
 
-To-do.
+The goal of this session is trying to fit a Random Forest model on Loan data aiming to predict the probability of delinquency for each contract.
+
+Random forest, in essence, consists of a large set of individual decision trees operating as an ensemble. Therefore, each individual tree in the random forest spits out a class prediction and the class with the most votes becomes our model’s prediction.
+
+> The fundamental concept behind random forest is a simple but powerful one — the wisdom of crowds. In data science speak, the reason that the random forest model works so well is: A large number of relatively uncorrelated models (trees) operating as a committee will outperform any of the individual constituent models.
+> `r tufte::quote_footer('--- Tony Yiu')`
 
 *******************************************************************************
 
 # Modeling
 
-To-do.
+## Dataset preparation
+
+Using the vanilla transaction dataset, we calculated several derived variables for each account as described in the Data Preparation session.
+
+This dataset is joined with Loan, Client, Credit Card, District, Account and Account Balance tables.
+
+We ended up having a data set with **118 variables**.
+
+
+```{r variables, echo=TRUE}
+loan_dataset_rf <- source_dataset
+
+kable(tibble(variables = names(loan_dataset_rf)))
+```
+
+## Variable selection
+
+One advantage of Boosting models is that it does not require heavy feature engineering.
+
+We will only remove **x_prop_old_age_pension** that we know beforehand to have no variance in the dataset.
+
+This model is also not sensible to outliers, missing values and multicollinearity.
+
+
+```{r variable_selecion, echo=TRUE}
+loan_dataset_rf <- dplyr::select(loan_dataset_rf, -x_prop_old_age_pension)
+```
+
+## Sample split into Test and Training Data
+
+The available data in Loan Dataset is split into Train and Testing data on the following proportion:
+
+- **Train Dataset** (70% 478 obs);
+- **Test Dataset ** (30% 204 obs).
+
+We are selecting exact the same samples for all models to allow comparison between then.
+
+```{r sampling, echo=TRUE}
+SplitDataset <- source_train_test_dataset
+data.train_rf <- SplitDataset$data.train
+data.test_rf <- SplitDataset$data.test
+
+kable(SplitDataset$event.proportion)
+
+loan_dataset_rf$y_loan_defaulter <- as.factor(loan_dataset_rf$y_loan_defaulter)
+data.train_rf$y_loan_defaulter   <- as.factor(data.train_rf$y_loan_defaulter)
+data.test_rf$y_loan_defaulter    <- as.factor(data.test_rf$y_loan_defaulter)
+
+data.train_rf <- dplyr::select(data.train_rf, names(loan_dataset_rf))
+data.test_rf <- dplyr::select(data.test_rf, names(loan_dataset_rf))
+```
+
+Both datasets keep the same proportion for the explained variable around 11%.
+
+*******************************************************************************
+
+# Selecting the best parameters values for the Random Forest
+
+The R community is a one of R's best features. There are many community members doing awesome improvements on the existent libraries. 
+
+Todo: incluir explicação do código abaixo, referência para o autor no markdown de Referências e repetir o nome do cara aqui.
+
+```{r extent_caret, echo=TRUE, eval=FALSE}
+customRF <- list(type = "Classification", library = "randomForest", loop = NULL)
+
+customRF$parameters <- data.frame(parameter = c("mtry", "ntree"), 
+                                  class = rep("numeric", 2), 
+                                  label = c("mtry", "ntree"))
+
+customRF$grid <- function(x, y, len = NULL, search = "grid") {}
+
+customRF$fit <- function(x, y, wts, param, lev, last, weights, classProbs, ...) {
+  randomForest(x, y, mtry = param$mtry, ntree=param$ntree, ...)
+}
+
+customRF$predict <- function(modelFit, newdata, preProc = NULL, submodels = NULL)
+  predict(modelFit, newdata)
+
+customRF$prob <- function(modelFit, newdata, preProc = NULL, submodels = NULL)
+  predict(modelFit, newdata, type = "prob")
+
+customRF$sort <- function(x) x[order(x[,1]),]
+
+customRF$levels <- function(x) x$classes
+```
+
+The following code is able to fit the random forest model using the caret customized train function above. Then, we just have to give some parameters values to be tested and after running this pretty code we can benefits from its results by having which parameters performed best.
+
+```{r select_best_parameters, echo=TRUE, eval=FALSE}
+control <- trainControl(method="repeatedcv", 
+                        number=5, 
+                        repeats=3, 
+                        verboseIter = TRUE, 
+                        allowParallel = TRUE)
+
+tuneparam <- expand.grid(.mtry=c(5, 25, 50, 75, 85, 100, 115, 125, 150, 175, 200),
+                         .ntree=c(1000, 3000, 5000, 7000, 9000, 10000))
+
+evalmetric <- "Accuracy"
+
+set.seed(12345)
+
+ini <- Sys.time()
+cat(paste0("\nStarted RF training at: ", ini, " ...\n\n"))
+
+rf.full <- train(y_loan_defaulter ~ .,
+                 data=data.train_rf,
+                 method=customRF,
+                 metric=evalmetric,
+                 tuneGrid=tuneparam,
+                 trControl=control,
+                 importance=TRUE)
+
+elapsedTime <- difftime(Sys.time(), ini, units = "auto")
+cat(paste0("\n\nFinished RF training. Total time taken: ", round(elapsedTime, 2), " ", units(elapsedTime)))
+
+summary(rf.full)
+plot(rf.full)
+```
+
+After some time waiting for the results, about 5 hours, we ended up selecting the best parameters, as following: 
+
+- **mtry = 85** 
+- **ntree = 3000**
+
+Last but not least, we saved the final model results on disk to be quickly consumed when necessary.
+
+```{r save_rds_file, echo=TRUE, eval=FALSE}
+saveRDS(rf.full, "./models/random_forest.rds")
+```
+
+So, to save time, we only have to load the fitted model saved on disk.
+
+```{r read_rds_file, echo=TRUE}
+rf.full <- readRDS("./models/random_forest.rds")
+```
 
 *******************************************************************************
 
