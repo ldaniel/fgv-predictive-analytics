@@ -7,7 +7,6 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
-<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 
@@ -51,7 +50,7 @@ a.sourceLine { text-indent: -1em; padding-left: 1em; }
 pre.numberSource a.sourceLine
   { position: relative; left: -4em; }
 pre.numberSource a.sourceLine::before
-  { content: attr(title);
+  { content: attr(data-line-number);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
     border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
@@ -109,7 +108,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
       if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -327,6 +326,18 @@ $(document).ready(function () {
 }
 </style>
 
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
 <!-- code folding -->
 
 
@@ -473,9 +484,9 @@ $(document).ready(function () {
 <p>Using the vanilla transaction dataset, we calculated several derived variables for each account as described in the Data Preparation session.</p>
 <p>This dataset is joined with Loan, Client, Credit Card, District, Account and Account Balance tables.</p>
 <p>We ended up having a data set with <strong>118 variables</strong>.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">loan_dataset_logistic &lt;-<span class="st"> </span>source_dataset</a>
-<a class="sourceLine" id="cb1-2" title="2"></a>
-<a class="sourceLine" id="cb1-3" title="3"><span class="kw">kable</span>(<span class="kw">tibble</span>(<span class="dt">variables =</span> <span class="kw">names</span>(loan_dataset_logistic)))</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">loan_dataset_logistic &lt;-<span class="st"> </span>source_dataset</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw">kable</span>(<span class="kw">tibble</span>(<span class="dt">variables =</span> <span class="kw">names</span>(loan_dataset_logistic)))</a></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -845,8 +856,8 @@ $(document).ready(function () {
 <p>One advantage of Decision Tree models is that it does not require heavy feature engineering.</p>
 <p>We will only remove <strong>x_prop_old_age_pension</strong> that we know beforehand to have no variance in the dataset.</p>
 <p>This model is also not sensible to outliers, missing values and multicollinearity.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">loan_dataset_DT &lt;-source_dataset</a>
-<a class="sourceLine" id="cb2-2" title="2">loan_dataset_DT &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(loan_dataset_DT, <span class="op">-</span>x_prop_old_age_pension)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">loan_dataset_DT &lt;-source_dataset</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">loan_dataset_DT &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(loan_dataset_DT, <span class="op">-</span>x_prop_old_age_pension)</a></code></pre></div>
 </div>
 <div id="sample-split-into-test-and-training-data" class="section level2">
 <h2><span class="header-section-number">2.3</span> Sample split into Test and Training Data</h2>
@@ -856,14 +867,14 @@ $(document).ready(function () {
 <li><strong>Test Dataset </strong> (30% 204 obs).</li>
 </ul>
 <p>We are selecting exact the same samples we used for the Logistic Model to allow comparison across models.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">SplitDataset &lt;-<span class="st"> </span>source_train_test_dataset</a>
-<a class="sourceLine" id="cb3-2" title="2">data.train_DT &lt;-<span class="st"> </span>SplitDataset<span class="op">$</span>data.train</a>
-<a class="sourceLine" id="cb3-3" title="3">data.test_DT &lt;-<span class="st"> </span>SplitDataset<span class="op">$</span>data.test</a>
-<a class="sourceLine" id="cb3-4" title="4"></a>
-<a class="sourceLine" id="cb3-5" title="5">data.train_DT &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(data.train_DT, <span class="kw">names</span>(loan_dataset_DT))</a>
-<a class="sourceLine" id="cb3-6" title="6">data.test_DT &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(data.test_DT, <span class="kw">names</span>(loan_dataset_DT))</a>
-<a class="sourceLine" id="cb3-7" title="7"></a>
-<a class="sourceLine" id="cb3-8" title="8"><span class="kw">kable</span>(SplitDataset<span class="op">$</span>event.proportion)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">SplitDataset &lt;-<span class="st"> </span>source_train_test_dataset</a>
+<a class="sourceLine" id="cb3-2" data-line-number="2">data.train_DT &lt;-<span class="st"> </span>SplitDataset<span class="op">$</span>data.train</a>
+<a class="sourceLine" id="cb3-3" data-line-number="3">data.test_DT &lt;-<span class="st"> </span>SplitDataset<span class="op">$</span>data.test</a>
+<a class="sourceLine" id="cb3-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb3-5" data-line-number="5">data.train_DT &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(data.train_DT, <span class="kw">names</span>(loan_dataset_DT))</a>
+<a class="sourceLine" id="cb3-6" data-line-number="6">data.test_DT &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(data.test_DT, <span class="kw">names</span>(loan_dataset_DT))</a>
+<a class="sourceLine" id="cb3-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="kw">kable</span>(SplitDataset<span class="op">$</span>event.proportion)</a></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -896,18 +907,18 @@ $(document).ready(function () {
 <h2><span class="header-section-number">2.4</span> Fiting the Decision Tree model</h2>
 <p>With the final cleaned dataset, we got from above steps we fit our Decision Tree Model for <strong>y_loan_defaulter</strong> on all <strong>x_variables</strong>.</p>
 <p>We choose to change the default parameters <strong>minbucket</strong> and <strong>maxdepth</strong> parameter to <strong>5</strong> to deliberate create a fully-grown tree as the database is not big enough for this model.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">tree.full &lt;-<span class="st"> </span><span class="kw">rpart</span>(<span class="dt">data=</span> data.train_DT, y_loan_defaulter <span class="op">~</span><span class="st"> </span>.,</a>
-<a class="sourceLine" id="cb4-2" title="2">                   <span class="dt">control =</span> <span class="kw">rpart.control</span>(<span class="dt">minbucket =</span> <span class="dv">5</span>,</a>
-<a class="sourceLine" id="cb4-3" title="3">                                           <span class="dt">maxdepth =</span> <span class="dv">5</span>),</a>
-<a class="sourceLine" id="cb4-4" title="4">                   <span class="dt">method =</span> <span class="st">&quot;class&quot;</span>)</a>
-<a class="sourceLine" id="cb4-5" title="5"></a>
-<a class="sourceLine" id="cb4-6" title="6"><span class="kw">rpart.plot</span>(tree.full, <span class="dt">cex =</span> <span class="fl">1.3</span>, <span class="dt">type =</span> <span class="dv">0</span>,</a>
-<a class="sourceLine" id="cb4-7" title="7">           <span class="dt">extra =</span> <span class="dv">1</span>, <span class="dt">box.palette =</span> <span class="st">&#39;BuRd&#39;</span>,</a>
-<a class="sourceLine" id="cb4-8" title="8">           <span class="dt">branch.lty =</span> <span class="dv">3</span>, <span class="dt">shadow.col =</span> <span class="st">&#39;gray&#39;</span>, </a>
-<a class="sourceLine" id="cb4-9" title="9">           <span class="dt">nn =</span> <span class="ot">TRUE</span>, <span class="dt">main =</span> <span class="st">&#39;Decision Tree - Full&#39;</span>)</a>
-<a class="sourceLine" id="cb4-10" title="10"></a>
-<a class="sourceLine" id="cb4-11" title="11"><span class="co"># save model</span></a>
-<a class="sourceLine" id="cb4-12" title="12"><span class="kw">saveRDS</span>(tree.full, <span class="st">&#39;./models/decision_tree_full.rds&#39;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">tree.full &lt;-<span class="st"> </span><span class="kw">rpart</span>(<span class="dt">data=</span> data.train_DT, y_loan_defaulter <span class="op">~</span><span class="st"> </span>.,</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2">                   <span class="dt">control =</span> <span class="kw">rpart.control</span>(<span class="dt">minbucket =</span> <span class="dv">5</span>,</a>
+<a class="sourceLine" id="cb4-3" data-line-number="3">                                           <span class="dt">maxdepth =</span> <span class="dv">5</span>),</a>
+<a class="sourceLine" id="cb4-4" data-line-number="4">                   <span class="dt">method =</span> <span class="st">&quot;class&quot;</span>)</a>
+<a class="sourceLine" id="cb4-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="kw">rpart.plot</span>(tree.full, <span class="dt">cex =</span> <span class="fl">1.3</span>, <span class="dt">type =</span> <span class="dv">0</span>,</a>
+<a class="sourceLine" id="cb4-7" data-line-number="7">           <span class="dt">extra =</span> <span class="dv">1</span>, <span class="dt">box.palette =</span> <span class="st">&#39;BuRd&#39;</span>,</a>
+<a class="sourceLine" id="cb4-8" data-line-number="8">           <span class="dt">branch.lty =</span> <span class="dv">3</span>, <span class="dt">shadow.col =</span> <span class="st">&#39;gray&#39;</span>, </a>
+<a class="sourceLine" id="cb4-9" data-line-number="9">           <span class="dt">nn =</span> <span class="ot">TRUE</span>, <span class="dt">main =</span> <span class="st">&#39;Decision Tree - Full&#39;</span>)</a>
+<a class="sourceLine" id="cb4-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co"># save model</span></a>
+<a class="sourceLine" id="cb4-12" data-line-number="12"><span class="kw">saveRDS</span>(tree.full, <span class="st">&#39;./models/decision_tree_full.rds&#39;</span>)</a></code></pre></div>
 <p><img src="05_decision_tree_report_files/figure-html/plot_DT_full-1.png" width="100%" /></p>
 </div>
 <div id="evaluating-necessity-of-prunning" class="section level2">
@@ -915,26 +926,26 @@ $(document).ready(function () {
 <p>Pruning is a technique in machine learning used to reduce the size of decision trees by removing nodes that provide little power of classification.</p>
 <p>The idea is reducing the complexity of the decision tree and thereof avoid overfit to the train dataset.</p>
 <p>Pruning process is done by comparing different variations of the fully-grown tree and evaluating the relative error trend comparing to a zero node tree, each node that does not affect the classification power of the tree is replaced by a leaf node.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">printcp</span>(tree.full)</a>
-<a class="sourceLine" id="cb5-2" title="2"><span class="kw">plotcp</span>(tree.full)</a>
-<a class="sourceLine" id="cb5-3" title="3"></a>
-<a class="sourceLine" id="cb5-4" title="4">cp_prune =<span class="st"> </span>tree.full<span class="op">$</span>cptable[<span class="kw">which.min</span>(tree.full<span class="op">$</span>cptable[,<span class="st">&quot;xerror&quot;</span>]), <span class="st">&quot;CP&quot;</span>]</a>
-<a class="sourceLine" id="cb5-5" title="5">tree.prune &lt;-<span class="st"> </span><span class="kw">prune</span>(tree.full, <span class="dt">cp =</span> cp_prune)</a>
-<a class="sourceLine" id="cb5-6" title="6"></a>
-<a class="sourceLine" id="cb5-7" title="7"><span class="kw">rpart.plot</span>(tree.prune, <span class="dt">cex =</span> <span class="fl">1.3</span>, <span class="dt">type =</span> <span class="dv">0</span>,</a>
-<a class="sourceLine" id="cb5-8" title="8">           <span class="dt">extra =</span> <span class="dv">104</span>, <span class="dt">box.palette =</span> <span class="st">&#39;BuRd&#39;</span>,</a>
-<a class="sourceLine" id="cb5-9" title="9">           <span class="dt">branch.lty =</span> <span class="dv">3</span>, <span class="dt">shadow.col =</span> <span class="st">&#39;gray&#39;</span>, </a>
-<a class="sourceLine" id="cb5-10" title="10">           <span class="dt">nn =</span> <span class="ot">TRUE</span>, <span class="dt">main =</span> <span class="st">&#39;Decision Tree - Prune&#39;</span>)</a>
-<a class="sourceLine" id="cb5-11" title="11"></a>
-<a class="sourceLine" id="cb5-12" title="12"><span class="co"># save model</span></a>
-<a class="sourceLine" id="cb5-13" title="13"><span class="kw">saveRDS</span>(tree.prune, <span class="st">&#39;./models/decision_tree_prune.rds&#39;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">printcp</span>(tree.full)</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="kw">plotcp</span>(tree.full)</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb5-4" data-line-number="4">cp_prune =<span class="st"> </span>tree.full<span class="op">$</span>cptable[<span class="kw">which.min</span>(tree.full<span class="op">$</span>cptable[,<span class="st">&quot;xerror&quot;</span>]), <span class="st">&quot;CP&quot;</span>]</a>
+<a class="sourceLine" id="cb5-5" data-line-number="5">tree.prune &lt;-<span class="st"> </span><span class="kw">prune</span>(tree.full, <span class="dt">cp =</span> cp_prune)</a>
+<a class="sourceLine" id="cb5-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb5-7" data-line-number="7"><span class="kw">rpart.plot</span>(tree.prune, <span class="dt">cex =</span> <span class="fl">1.3</span>, <span class="dt">type =</span> <span class="dv">0</span>,</a>
+<a class="sourceLine" id="cb5-8" data-line-number="8">           <span class="dt">extra =</span> <span class="dv">104</span>, <span class="dt">box.palette =</span> <span class="st">&#39;BuRd&#39;</span>,</a>
+<a class="sourceLine" id="cb5-9" data-line-number="9">           <span class="dt">branch.lty =</span> <span class="dv">3</span>, <span class="dt">shadow.col =</span> <span class="st">&#39;gray&#39;</span>, </a>
+<a class="sourceLine" id="cb5-10" data-line-number="10">           <span class="dt">nn =</span> <span class="ot">TRUE</span>, <span class="dt">main =</span> <span class="st">&#39;Decision Tree - Prune&#39;</span>)</a>
+<a class="sourceLine" id="cb5-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb5-12" data-line-number="12"><span class="co"># save model</span></a>
+<a class="sourceLine" id="cb5-13" data-line-number="13"><span class="kw">saveRDS</span>(tree.prune, <span class="st">&#39;./models/decision_tree_prune.rds&#39;</span>)</a></code></pre></div>
 <p><img src="05_decision_tree_report_files/figure-html/plot_DT_prune-1.png" width="100%" /></p>
 <p>On performing the pruning process in our decision tree, we end up with a tree with only one node split. This is because splitting the train data set of just one node provide an overall accuracy greater than any other combination.</p>
 <p>Here the technique falls short for this dataset, we would be interest in give a greater weight on correctly predict the real defaulters than the general accuracy of the model.</p>
 <p>A Decision Tree is definitely not a good model for this dataset, but as we are just exercising the modeling technique (just having fun here !!!) we will use the full decision tree we got to compare its metrics and see how it perform against the other models we created in this class exercise.</p>
 <p>We tried different parameters for <strong>minbucket</strong> and <strong>maxdepth</strong>, as our dataset is not big enough all of then presented huge differences in performance, the one we chose for this exercise seems to be a reasonable trade-off on overfitting to compare against the other models.</p>
 <p>We can do this by simply feeding back the full tree to our prune tree object and move on to the performance metrics.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">tree.prune &lt;-<span class="st"> </span>tree.full</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">tree.prune &lt;-<span class="st"> </span>tree.full</a></code></pre></div>
 <hr />
 </div>
 </div>
@@ -958,57 +969,57 @@ $(document).ready(function () {
 <p>Here we will perform basically the same steps we did in the Logistic Regression model.</p>
 <p>A comparison against all the models will be provided in the Final Report session of this exercise.</p>
 <p>We started this step by making predictions using our model on the X’s variables in our Train and Test datasets.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="co">## making preditions for each model and consolidating in a single data frame</span></a>
-<a class="sourceLine" id="cb7-2" title="2"></a>
-<a class="sourceLine" id="cb7-3" title="3">prob.full =<span class="st"> </span><span class="kw">list</span>()</a>
-<a class="sourceLine" id="cb7-4" title="4">prob.train =<span class="st"> </span><span class="kw">list</span>()</a>
-<a class="sourceLine" id="cb7-5" title="5">prob.test =<span class="st"> </span><span class="kw">list</span>()</a>
-<a class="sourceLine" id="cb7-6" title="6"></a>
-<a class="sourceLine" id="cb7-7" title="7">prob.full<span class="op">$</span>decision.tree.actual     &lt;-<span class="st"> </span>loan_dataset_DT<span class="op">$</span>y_loan_defaulter</a>
-<a class="sourceLine" id="cb7-8" title="8">prob.full<span class="op">$</span>decision.tree.predicted  &lt;-<span class="st"> </span><span class="kw">predict</span>(tree.prune, <span class="dt">type =</span> <span class="st">&quot;prob&quot;</span>, <span class="dt">newdata =</span> loan_dataset_DT)[, <span class="dv">2</span>]</a>
-<a class="sourceLine" id="cb7-9" title="9"></a>
-<a class="sourceLine" id="cb7-10" title="10">prob.train<span class="op">$</span>decision.tree.actual    &lt;-<span class="st"> </span>data.train_DT<span class="op">$</span>y_loan_defaulter</a>
-<a class="sourceLine" id="cb7-11" title="11">prob.train<span class="op">$</span>decision.tree.predicted &lt;-<span class="st"> </span><span class="kw">predict</span>(tree.prune, <span class="dt">type =</span> <span class="st">&quot;prob&quot;</span>, <span class="dt">newdata =</span> data.train_DT)[, <span class="dv">2</span>]</a>
-<a class="sourceLine" id="cb7-12" title="12"></a>
-<a class="sourceLine" id="cb7-13" title="13">prob.test<span class="op">$</span>decision.tree.actual     &lt;-<span class="st"> </span>data.test_DT<span class="op">$</span>y_loan_defaulter</a>
-<a class="sourceLine" id="cb7-14" title="14">prob.test<span class="op">$</span>decision.tree.predicted  &lt;-<span class="st"> </span><span class="kw">predict</span>(tree.prune, <span class="dt">type =</span> <span class="st">&quot;prob&quot;</span>, <span class="dt">newdata =</span> data.test_DT)[, <span class="dv">2</span>]</a>
-<a class="sourceLine" id="cb7-15" title="15"></a>
-<a class="sourceLine" id="cb7-16" title="16">prob.full   &lt;-<span class="st"> </span>prob.full <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a>
-<a class="sourceLine" id="cb7-17" title="17">prob.train  &lt;-<span class="st"> </span>prob.train <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a>
-<a class="sourceLine" id="cb7-18" title="18">prob.test   &lt;-<span class="st"> </span>prob.test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="co">## making preditions for each model and consolidating in a single data frame</span></a>
+<a class="sourceLine" id="cb7-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3">prob.full =<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb7-4" data-line-number="4">prob.train =<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb7-5" data-line-number="5">prob.test =<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb7-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb7-7" data-line-number="7">prob.full<span class="op">$</span>decision.tree.actual     &lt;-<span class="st"> </span>loan_dataset_DT<span class="op">$</span>y_loan_defaulter</a>
+<a class="sourceLine" id="cb7-8" data-line-number="8">prob.full<span class="op">$</span>decision.tree.predicted  &lt;-<span class="st"> </span><span class="kw">predict</span>(tree.prune, <span class="dt">type =</span> <span class="st">&quot;prob&quot;</span>, <span class="dt">newdata =</span> loan_dataset_DT)[, <span class="dv">2</span>]</a>
+<a class="sourceLine" id="cb7-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb7-10" data-line-number="10">prob.train<span class="op">$</span>decision.tree.actual    &lt;-<span class="st"> </span>data.train_DT<span class="op">$</span>y_loan_defaulter</a>
+<a class="sourceLine" id="cb7-11" data-line-number="11">prob.train<span class="op">$</span>decision.tree.predicted &lt;-<span class="st"> </span><span class="kw">predict</span>(tree.prune, <span class="dt">type =</span> <span class="st">&quot;prob&quot;</span>, <span class="dt">newdata =</span> data.train_DT)[, <span class="dv">2</span>]</a>
+<a class="sourceLine" id="cb7-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb7-13" data-line-number="13">prob.test<span class="op">$</span>decision.tree.actual     &lt;-<span class="st"> </span>data.test_DT<span class="op">$</span>y_loan_defaulter</a>
+<a class="sourceLine" id="cb7-14" data-line-number="14">prob.test<span class="op">$</span>decision.tree.predicted  &lt;-<span class="st"> </span><span class="kw">predict</span>(tree.prune, <span class="dt">type =</span> <span class="st">&quot;prob&quot;</span>, <span class="dt">newdata =</span> data.test_DT)[, <span class="dv">2</span>]</a>
+<a class="sourceLine" id="cb7-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb7-16" data-line-number="16">prob.full   &lt;-<span class="st"> </span>prob.full <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a>
+<a class="sourceLine" id="cb7-17" data-line-number="17">prob.train  &lt;-<span class="st"> </span>prob.train <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a>
+<a class="sourceLine" id="cb7-18" data-line-number="18">prob.test   &lt;-<span class="st"> </span>prob.test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a></code></pre></div>
 <div id="getting-performance-measures" class="section level2">
 <h2><span class="header-section-number">4.1</span> Getting performance measures</h2>
 <p>To calculate the performance measures, derived from the confusion matrix, we need to find the score cut off that best split our test dataset into Defaulters and Non-Defaulters.</p>
 <p>In this exercise we decide to not prioritize the accuracy on predicting Defaulters and Non-Defaulters, therefore we are looking for the score cut off that best predict each class equally.</p>
 <p>With the returned object from this function we can plot the comparison between TPR (True Positive Rate) and TNR (True Negative Rate) to find the best cut off.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="co">## getting measures -----------------------------------------------------------------</span></a>
-<a class="sourceLine" id="cb8-2" title="2">metricsByCutoff.test_DT     &lt;-<span class="st"> </span><span class="kw">modelMetrics</span>(prob.test<span class="op">$</span>decision.tree.actual, </a>
-<a class="sourceLine" id="cb8-3" title="3">                                            prob.test<span class="op">$</span>decision.tree.predicted, </a>
-<a class="sourceLine" id="cb8-4" title="4">                                            <span class="dt">plot_title =</span> <span class="st">&#39;Decision Tree&#39;</span>)</a>
-<a class="sourceLine" id="cb8-5" title="5">metricsByCutoff.test_DT<span class="op">$</span>Plot</a></code></pre></div>
-<div id="htmlwidget-3007ea74879c2ccbc09b" style="width:100%;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-3007ea74879c2ccbc09b">{"x":{"visdat":{"28bc5cbd5181":["function () ","plotlyVisDat"]},"cur_data":"28bc5cbd5181","attrs":{"28bc5cbd5181":{"x":{},"y":{},"opacity":0.3,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"bar"},"28bc5cbd5181.1":{"x":{},"y":{},"opacity":1,"name":"TPR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"28bc5cbd5181.2":{"x":{},"y":{},"opacity":1,"name":"TNR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"28bc5cbd5181.3":{"x":0.02,"y":0.8,"opacity":1,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","text":0.02,"mode":"text","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"title":"Cutoff Value"},"yaxis":{"domain":[0,1],"automargin":true,"title":"True Ratio (%)"},"title":"Decision Tree","hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77,0.78,0.79,0.8,0.81,0.82,0.83,0.84,0.85,0.86,0.87,0.88,0.89,0.9,0.91,0.92,0.93,0.94,0.95,0.96,0.97,0.98,0.99,1],"y":[0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.54413407821229,0.54413407821229,0.54413407821229,0.54413407821229,0.54413407821229,0.54413407821229,0.54413407821229,0.54413407821229,0.54413407821229,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84],"opacity":0.3,"name":"Abs. Diff.","type":"bar","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77,0.78,0.79,0.8,0.81,0.82,0.83,0.84,0.85,0.86,0.87,0.88,0.89,0.9,0.91,0.92,0.93,0.94,0.95,0.96,0.97,0.98,0.99,1],"y":[0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16],"opacity":1,"name":"TPR","type":"scatter","mode":"lines","marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"line":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77,0.78,0.79,0.8,0.81,0.82,0.83,0.84,0.85,0.86,0.87,0.88,0.89,0.9,0.91,0.92,0.93,0.94,0.95,0.96,0.97,0.98,0.99,1],"y":[0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.94413407821229,0.94413407821229,0.94413407821229,0.94413407821229,0.94413407821229,0.94413407821229,0.94413407821229,0.94413407821229,0.94413407821229,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],"opacity":1,"name":"TNR","type":"scatter","mode":"lines","marker":{"color":"rgba(44,160,44,1)","line":{"color":"rgba(44,160,44,1)"}},"error_y":{"color":"rgba(44,160,44,1)"},"error_x":{"color":"rgba(44,160,44,1)"},"line":{"color":"rgba(44,160,44,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.02],"y":[0.8],"opacity":1,"name":"Abs. Diff.","type":"scatter","text":0.02,"mode":"text","marker":{"color":"rgba(214,39,40,1)","line":{"color":"rgba(214,39,40,1)"}},"error_y":{"color":"rgba(214,39,40,1)"},"error_x":{"color":"rgba(214,39,40,1)"},"line":{"color":"rgba(214,39,40,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="co">## getting measures -----------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb8-2" data-line-number="2">metricsByCutoff.test_DT     &lt;-<span class="st"> </span><span class="kw">modelMetrics</span>(prob.test<span class="op">$</span>decision.tree.actual, </a>
+<a class="sourceLine" id="cb8-3" data-line-number="3">                                            prob.test<span class="op">$</span>decision.tree.predicted, </a>
+<a class="sourceLine" id="cb8-4" data-line-number="4">                                            <span class="dt">plot_title =</span> <span class="st">&#39;Decision Tree&#39;</span>)</a>
+<a class="sourceLine" id="cb8-5" data-line-number="5">metricsByCutoff.test_DT<span class="op">$</span>Plot</a></code></pre></div>
+<div id="htmlwidget-2d618280352a9454a68f" style="width:100%;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2d618280352a9454a68f">{"x":{"visdat":{"2c714473108":["function () ","plotlyVisDat"]},"cur_data":"2c714473108","attrs":{"2c714473108":{"x":{},"y":{},"opacity":0.3,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"bar"},"2c714473108.1":{"x":{},"y":{},"opacity":1,"name":"TPR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"2c714473108.2":{"x":{},"y":{},"opacity":1,"name":"TNR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"2c714473108.3":{"x":0.02,"y":0.8,"opacity":1,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","text":0.02,"mode":"text","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"title":"Cutoff Value"},"yaxis":{"domain":[0,1],"automargin":true,"title":"True Ratio (%)"},"title":"Decision Tree","hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77,0.78,0.79,0.8,0.81,0.82,0.83,0.84,0.85,0.86,0.87,0.88,0.89,0.9,0.91,0.92,0.93,0.94,0.95,0.96,0.97,0.98,0.99,1],"y":[0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.0849162011173185,0.54413407821229,0.54413407821229,0.54413407821229,0.54413407821229,0.54413407821229,0.54413407821229,0.54413407821229,0.54413407821229,0.54413407821229,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.732067039106145,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84],"opacity":0.3,"name":"Abs. Diff.","type":"bar","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77,0.78,0.79,0.8,0.81,0.82,0.83,0.84,0.85,0.86,0.87,0.88,0.89,0.9,0.91,0.92,0.93,0.94,0.95,0.96,0.97,0.98,0.99,1],"y":[0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.24,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16],"opacity":1,"name":"TPR","type":"scatter","mode":"lines","marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"line":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77,0.78,0.79,0.8,0.81,0.82,0.83,0.84,0.85,0.86,0.87,0.88,0.89,0.9,0.91,0.92,0.93,0.94,0.95,0.96,0.97,0.98,0.99,1],"y":[0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.715083798882682,0.94413407821229,0.94413407821229,0.94413407821229,0.94413407821229,0.94413407821229,0.94413407821229,0.94413407821229,0.94413407821229,0.94413407821229,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],"opacity":1,"name":"TNR","type":"scatter","mode":"lines","marker":{"color":"rgba(44,160,44,1)","line":{"color":"rgba(44,160,44,1)"}},"error_y":{"color":"rgba(44,160,44,1)"},"error_x":{"color":"rgba(44,160,44,1)"},"line":{"color":"rgba(44,160,44,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.02],"y":[0.8],"opacity":1,"name":"Abs. Diff.","type":"scatter","text":0.02,"mode":"text","marker":{"color":"rgba(214,39,40,1)","line":{"color":"rgba(214,39,40,1)"}},"error_y":{"color":"rgba(214,39,40,1)"},"error_x":{"color":"rgba(214,39,40,1)"},"line":{"color":"rgba(214,39,40,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 <p>With the optimized cut off we calculate the full set of model metrics using the function HMeasure from hmeasure library.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="co"># decision tree</span></a>
-<a class="sourceLine" id="cb9-2" title="2">measures.decision.tree.train &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.train<span class="op">$</span>decision.tree.actual, </a>
-<a class="sourceLine" id="cb9-3" title="3">                                         prob.train<span class="op">$</span>decision.tree.predicted, </a>
-<a class="sourceLine" id="cb9-4" title="4">                                         <span class="dt">threshold =</span> metricsByCutoff.test_DT<span class="op">$</span>BestCut[<span class="st">&#39;Cut&#39;</span>])</a>
-<a class="sourceLine" id="cb9-5" title="5">measures.decision.tree.test &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.test<span class="op">$</span>decision.tree.actual, </a>
-<a class="sourceLine" id="cb9-6" title="6">                                        prob.test<span class="op">$</span>decision.tree.predicted, </a>
-<a class="sourceLine" id="cb9-7" title="7">                                        <span class="dt">threshold =</span> metricsByCutoff.test_DT<span class="op">$</span>BestCut[<span class="st">&#39;Cut&#39;</span>])</a>
-<a class="sourceLine" id="cb9-8" title="8"></a>
-<a class="sourceLine" id="cb9-9" title="9"><span class="co"># join measures in a single data frame</span></a>
-<a class="sourceLine" id="cb9-10" title="10">measures &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">bind_rows</span>(measures.decision.tree.train<span class="op">$</span>metrics,</a>
-<a class="sourceLine" id="cb9-11" title="11">                        measures.decision.tree.test<span class="op">$</span>metrics</a>
-<a class="sourceLine" id="cb9-12" title="12">                        )) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>(., <span class="dt">rownames =</span> <span class="ot">NA</span>)</a>
-<a class="sourceLine" id="cb9-13" title="13"></a>
-<a class="sourceLine" id="cb9-14" title="14"><span class="kw">colnames</span>(measures) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;decision.tree - train&#39;</span>, <span class="st">&#39;decision.tree - test&#39;</span>)</a>
-<a class="sourceLine" id="cb9-15" title="15"></a>
-<a class="sourceLine" id="cb9-16" title="16">measures<span class="op">$</span>metric =<span class="st"> </span><span class="kw">rownames</span>(measures)</a>
-<a class="sourceLine" id="cb9-17" title="17"></a>
-<a class="sourceLine" id="cb9-18" title="18">measures &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(measures, metric, <span class="kw">everything</span>())</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="co"># decision tree</span></a>
+<a class="sourceLine" id="cb9-2" data-line-number="2">measures.decision.tree.train &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.train<span class="op">$</span>decision.tree.actual, </a>
+<a class="sourceLine" id="cb9-3" data-line-number="3">                                         prob.train<span class="op">$</span>decision.tree.predicted, </a>
+<a class="sourceLine" id="cb9-4" data-line-number="4">                                         <span class="dt">threshold =</span> metricsByCutoff.test_DT<span class="op">$</span>BestCut[<span class="st">&#39;Cut&#39;</span>])</a>
+<a class="sourceLine" id="cb9-5" data-line-number="5">measures.decision.tree.test &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.test<span class="op">$</span>decision.tree.actual, </a>
+<a class="sourceLine" id="cb9-6" data-line-number="6">                                        prob.test<span class="op">$</span>decision.tree.predicted, </a>
+<a class="sourceLine" id="cb9-7" data-line-number="7">                                        <span class="dt">threshold =</span> metricsByCutoff.test_DT<span class="op">$</span>BestCut[<span class="st">&#39;Cut&#39;</span>])</a>
+<a class="sourceLine" id="cb9-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb9-9" data-line-number="9"><span class="co"># join measures in a single data frame</span></a>
+<a class="sourceLine" id="cb9-10" data-line-number="10">measures &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">bind_rows</span>(measures.decision.tree.train<span class="op">$</span>metrics,</a>
+<a class="sourceLine" id="cb9-11" data-line-number="11">                        measures.decision.tree.test<span class="op">$</span>metrics</a>
+<a class="sourceLine" id="cb9-12" data-line-number="12">                        )) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>(., <span class="dt">rownames =</span> <span class="ot">NA</span>)</a>
+<a class="sourceLine" id="cb9-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb9-14" data-line-number="14"><span class="kw">colnames</span>(measures) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;decision.tree - train&#39;</span>, <span class="st">&#39;decision.tree - test&#39;</span>)</a>
+<a class="sourceLine" id="cb9-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb9-16" data-line-number="16">measures<span class="op">$</span>metric =<span class="st"> </span><span class="kw">rownames</span>(measures)</a>
+<a class="sourceLine" id="cb9-17" data-line-number="17"></a>
+<a class="sourceLine" id="cb9-18" data-line-number="18">measures &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(measures, metric, <span class="kw">everything</span>())</a></code></pre></div>
 <p>Below are the metrics on the train and test dataset:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">kable</span>(measures, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw">kable</span>(measures, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1135,11 +1146,11 @@ $(document).ready(function () {
 <h2><span class="header-section-number">4.2</span> Evaluating classification performance</h2>
 <p>In general, such as the Logistic Regression model, this model is not delivering good accuracy, we will compare how it performed against other classes of models in the Final Report session</p>
 <p>Below the confusion matrix and general performance of the model:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="co"># accuracy metrics ---------------------------------------------------------------</span></a>
-<a class="sourceLine" id="cb11-2" title="2"><span class="co"># logistic regression</span></a>
-<a class="sourceLine" id="cb11-3" title="3"><span class="kw">accuracy</span>(<span class="dt">score =</span> prob.test<span class="op">$</span>decision.tree.predicted, </a>
-<a class="sourceLine" id="cb11-4" title="4">         <span class="dt">actual =</span> prob.test<span class="op">$</span>decision.tree.actual, </a>
-<a class="sourceLine" id="cb11-5" title="5">         <span class="dt">threshold =</span> metricsByCutoff.test_DT[[<span class="st">&quot;BestCut&quot;</span>]][[<span class="st">&quot;Cut&quot;</span>]])</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="co"># accuracy metrics ---------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="co"># logistic regression</span></a>
+<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="kw">accuracy</span>(<span class="dt">score =</span> prob.test<span class="op">$</span>decision.tree.predicted, </a>
+<a class="sourceLine" id="cb11-4" data-line-number="4">         <span class="dt">actual =</span> prob.test<span class="op">$</span>decision.tree.actual, </a>
+<a class="sourceLine" id="cb11-5" data-line-number="5">         <span class="dt">threshold =</span> metricsByCutoff.test_DT[[<span class="st">&quot;BestCut&quot;</span>]][[<span class="st">&quot;Cut&quot;</span>]])</a></code></pre></div>
 <pre><code>## 
 ## 
 ##             pred.1   pred.0
@@ -1150,24 +1161,24 @@ $(document).ready(function () {
 ## [1] &quot;Model General Accuracy of: 72.55%&quot;
 ## [1] &quot;True Positive Rate of    : 80%&quot;</code></pre>
 <p>We finally look at the score distribution charts to check how well the model is able to discriminate Defaulters and Non-Defaulters.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1">p1 &lt;-<span class="st"> </span><span class="kw">Score_Histograms</span>(prob.test, </a>
-<a class="sourceLine" id="cb13-2" title="2">                 prob.test<span class="op">$</span>decision.tree.predicted,</a>
-<a class="sourceLine" id="cb13-3" title="3">                 prob.test<span class="op">$</span>decision.tree.actual,</a>
-<a class="sourceLine" id="cb13-4" title="4">                 <span class="st">&#39;Density Plot&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.title.y =</span> <span class="kw">element_blank</span>())</a>
-<a class="sourceLine" id="cb13-5" title="5"></a>
-<a class="sourceLine" id="cb13-6" title="6">p2 &lt;-<span class="st"> </span><span class="kw">Score_Boxplot</span>(prob.test, </a>
-<a class="sourceLine" id="cb13-7" title="7">              prob.test<span class="op">$</span>decision.tree.predicted, </a>
-<a class="sourceLine" id="cb13-8" title="8">              prob.test<span class="op">$</span>decision.tree.actual,</a>
-<a class="sourceLine" id="cb13-9" title="9">              <span class="st">&#39;Score Boxplot&#39;</span>)</a>
-<a class="sourceLine" id="cb13-10" title="10"></a>
-<a class="sourceLine" id="cb13-11" title="11">p3 &lt;-<span class="st"> </span><span class="kw">KS_Plot</span>(prob.test<span class="op">$</span>decision.tree.predicted[prob.test<span class="op">$</span>decision.tree.actual <span class="op">==</span><span class="st"> </span><span class="dv">0</span>],</a>
-<a class="sourceLine" id="cb13-12" title="12">        prob.test<span class="op">$</span>decision.tree.predicted[prob.test<span class="op">$</span>decision.tree.actual <span class="op">==</span><span class="st"> </span><span class="dv">1</span>],</a>
-<a class="sourceLine" id="cb13-13" title="13">        <span class="st">&#39;KS Plot&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.title.y =</span> <span class="kw">element_blank</span>(),</a>
-<a class="sourceLine" id="cb13-14" title="14">                           <span class="dt">axis.text.y =</span> <span class="kw">element_blank</span>())</a>
-<a class="sourceLine" id="cb13-15" title="15"></a>
-<a class="sourceLine" id="cb13-16" title="16"><span class="kw">ggarrange</span>(p1, p2, <span class="dt">nrow =</span> <span class="dv">2</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">p1 &lt;-<span class="st"> </span><span class="kw">Score_Histograms</span>(prob.test, </a>
+<a class="sourceLine" id="cb13-2" data-line-number="2">                 prob.test<span class="op">$</span>decision.tree.predicted,</a>
+<a class="sourceLine" id="cb13-3" data-line-number="3">                 prob.test<span class="op">$</span>decision.tree.actual,</a>
+<a class="sourceLine" id="cb13-4" data-line-number="4">                 <span class="st">&#39;Density Plot&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.title.y =</span> <span class="kw">element_blank</span>())</a>
+<a class="sourceLine" id="cb13-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb13-6" data-line-number="6">p2 &lt;-<span class="st"> </span><span class="kw">Score_Boxplot</span>(prob.test, </a>
+<a class="sourceLine" id="cb13-7" data-line-number="7">              prob.test<span class="op">$</span>decision.tree.predicted, </a>
+<a class="sourceLine" id="cb13-8" data-line-number="8">              prob.test<span class="op">$</span>decision.tree.actual,</a>
+<a class="sourceLine" id="cb13-9" data-line-number="9">              <span class="st">&#39;Score Boxplot&#39;</span>)</a>
+<a class="sourceLine" id="cb13-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb13-11" data-line-number="11">p3 &lt;-<span class="st"> </span><span class="kw">KS_Plot</span>(prob.test<span class="op">$</span>decision.tree.predicted[prob.test<span class="op">$</span>decision.tree.actual <span class="op">==</span><span class="st"> </span><span class="dv">0</span>],</a>
+<a class="sourceLine" id="cb13-12" data-line-number="12">        prob.test<span class="op">$</span>decision.tree.predicted[prob.test<span class="op">$</span>decision.tree.actual <span class="op">==</span><span class="st"> </span><span class="dv">1</span>],</a>
+<a class="sourceLine" id="cb13-13" data-line-number="13">        <span class="st">&#39;KS Plot&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.title.y =</span> <span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb13-14" data-line-number="14">                           <span class="dt">axis.text.y =</span> <span class="kw">element_blank</span>())</a>
+<a class="sourceLine" id="cb13-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb13-16" data-line-number="16"><span class="kw">ggarrange</span>(p1, p2, <span class="dt">nrow =</span> <span class="dv">2</span>)</a></code></pre></div>
 <p><img src="05_decision_tree_report_files/figure-html/model_plots-1.png" width="100%" /></p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1">p3</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">p3</a></code></pre></div>
 <p><img src="05_decision_tree_report_files/figure-html/model_plots-2.png" width="100%" /></p>
 <p>By the score density we see that our Decision Tree is very narrow on the scores it assigns to the observations.</p>
 <p>This is expected from single Decision Trees.</p>
@@ -1195,23 +1206,6 @@ $(document).ready(function () {
 
 
 </script>
-
-<!-- tabsets -->
-
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
-});
-</script>
-
-<!-- code folding -->
-
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>

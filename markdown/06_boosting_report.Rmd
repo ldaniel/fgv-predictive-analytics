@@ -256,4 +256,47 @@ kable(measures, row.names = FALSE)
 
 ## Evaluating classification performance
 
-To do
+This model delivered the better accuracy of all models done here (76.96%)! We will compare how it performed against other classes of models in the Final Report session.
+
+Below the confusion matrix and general performance of the model:
+
+```{r see_accuracy_1, echo=TRUE, out.width= '100%'}
+# accuracy metrics ---------------------------------------------------------------
+# boosting
+accuracy(score = prob.test$boosting.predicted, 
+         actual = prob.test$boosting.actual, 
+         threshold = metricsByCutoff.test_boost[["BestCut"]][["Cut"]])
+```
+
+We finally look at the score distribution charts to check how well the model is able to discriminate Defaulters and Non-Defaulters.
+
+```{r model_plots, echo=TRUE, out.width= '100%'}
+p1 <- Score_Histograms(prob.test, 
+              prob.test$boosting.predicted,
+              prob.test$boosting.actual,
+             'Density Plot') + theme(axis.title.y = element_blank())
+
+p2 <- Score_Boxplot(prob.test, 
+              prob.test$boosting.predicted, 
+              prob.test$boosting.actual,
+              'Score Boxplot')
+
+p3 <- KS_Plot(prob.test$boosting.predicted[prob.test$boosting.actual == 0],
+          prob.test$boosting.predicted[prob.test$boosting.actual == 1],
+        'KS Plot') + theme(axis.title.y = element_blank(),
+                           axis.text.y = element_blank())
+
+ggarrange(p1, p2, nrow = 2)
+
+p3
+```
+
+By the score density we can see that the boosting model is not as narrow as the decision tree on the scores it assigns to the observations.
+
+The box plot can show us a clear discrimination between Defaulters and Non-Defaulters.
+
+The KS metric .63 is considered good for this classification model.
+
+In the Final Report session, we will look more closely on the AUC and Gini metrics by plotting the ROC curve and comparing against other models.
+
+Stay tuned!!!
