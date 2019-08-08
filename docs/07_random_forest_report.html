@@ -21,6 +21,13 @@
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/htmlwidgets-1.3/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.9.0/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="site_libs/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.0.0/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-1.46.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-1.46.1/plotly-latest.min.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
@@ -841,7 +848,7 @@ The fundamental concept behind random forest is a simple but powerful one — th
 </div>
 <div id="variable-selection" class="section level2">
 <h2><span class="header-section-number">2.2</span> Variable selection</h2>
-<p>One advantage of Boosting models is that it does not require heavy feature engineering.</p>
+<p>One advantage of Random Forest models is that it does not require heavy feature engineering.</p>
 <p>We will only remove <strong>x_prop_old_age_pension</strong> that we know beforehand to have no variance in the dataset.</p>
 <p>This model is also not sensible to outliers, missing values and multicollinearity.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">loan_dataset_rf &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(loan_dataset_rf, <span class="op">-</span>x_prop_old_age_pension)</a></code></pre></div>
@@ -898,7 +905,8 @@ The fundamental concept behind random forest is a simple but powerful one — th
 <div id="selecting-the-best-parameters-values-for-the-random-forest" class="section level1">
 <h1><span class="header-section-number">3</span> Selecting the best parameters values for the Random Forest</h1>
 <p>The R community is a one of R’s best features. There are many community members doing awesome improvements on the existent libraries.</p>
-<p>Todo: incluir explicação do código abaixo, referência para o autor no markdown de Referências e repetir o nome do cara aqui.</p>
+<p>A good example is Jason Brownlee, who extended <strong>Caret</strong> library by adding a new approach that supports multiple tuning of multiple parameters. Please, see <a href="https://ldaniel.github.io/Predictive-Analytics/09_references.html"><strong>References</strong></a> page for further details and links.</p>
+<p>He defined his own algorithm to use in caret by defining a list that contains a number of custom named elements that the caret package looks for, such as how to fit and how to predict. See below for a definition of a custom random forest algorithm for use with caret that takes both an mtry and ntree parameters.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">customRF &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">type =</span> <span class="st">&quot;Classification&quot;</span>, <span class="dt">library =</span> <span class="st">&quot;randomForest&quot;</span>, <span class="dt">loop =</span> <span class="ot">NULL</span>)</a>
 <a class="sourceLine" id="cb5-2" title="2"></a>
 <a class="sourceLine" id="cb5-3" title="3">customRF<span class="op">$</span>parameters &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">parameter =</span> <span class="kw">c</span>(<span class="st">&quot;mtry&quot;</span>, <span class="st">&quot;ntree&quot;</span>), </a>
@@ -963,15 +971,197 @@ The fundamental concept behind random forest is a simple but powerful one — th
 </div>
 <div id="interpreting-model-output" class="section level1">
 <h1><span class="header-section-number">4</span> Interpreting model output</h1>
-<p>To-do.</p>
+<p>For this model the four principal vars are:</p>
+<ul>
+<li><strong>x_prop_interest_credited</strong></li>
+<li><strong>x_account_balance</strong></li>
+<li><strong>x_avg_account_balance</strong></li>
+<li><strong>x_loan_amount</strong></li>
+</ul>
+<p>The result is similar to the Logistic Regression, Decision Tree and Boosting models.</p>
 <hr />
 </div>
 <div id="evaluating-the-model-performance" class="section level1">
 <h1><span class="header-section-number">5</span> Evaluating the model performance</h1>
-<p>To-do.</p>
+<p>Here we will perform basically the same steps we did in the Logistic Regression, Decision Tree and Boosting models.</p>
+<p>A comparison against all the models will be provided in the Final Report session of this exercise.</p>
+<p>We started this step by making predictions using our model on the X’s variables in our Train and Test datasets.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="co">## making preditions for each model and consolidating in a single data frame</span></a>
+<a class="sourceLine" id="cb9-2" title="2"></a>
+<a class="sourceLine" id="cb9-3" title="3">prob.full  =<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb9-4" title="4">prob.train =<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb9-5" title="5">prob.test  =<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb9-6" title="6"></a>
+<a class="sourceLine" id="cb9-7" title="7">prob.full<span class="op">$</span>randomforest.actual     &lt;-<span class="st"> </span>loan_dataset_rf<span class="op">$</span>y_loan_defaulter</a>
+<a class="sourceLine" id="cb9-8" title="8">prob.full<span class="op">$</span>randomforest.predicted  &lt;-<span class="st"> </span><span class="kw">predict</span>(rf.full, <span class="dt">newdata =</span> loan_dataset_rf, </a>
+<a class="sourceLine" id="cb9-9" title="9">                                             <span class="dt">type =</span> <span class="st">&quot;prob&quot;</span>)[,<span class="dv">2</span>]</a>
+<a class="sourceLine" id="cb9-10" title="10"></a>
+<a class="sourceLine" id="cb9-11" title="11">prob.train<span class="op">$</span>randomforest.actual    &lt;-<span class="st"> </span>data.train_rf<span class="op">$</span>y_loan_defaulter</a>
+<a class="sourceLine" id="cb9-12" title="12">prob.train<span class="op">$</span>randomforest.predicted &lt;-<span class="st"> </span><span class="kw">predict</span>(rf.full, <span class="dt">newdata =</span> data.train_rf, </a>
+<a class="sourceLine" id="cb9-13" title="13">                                             <span class="dt">type =</span> <span class="st">&quot;prob&quot;</span>)[,<span class="dv">2</span>]</a>
+<a class="sourceLine" id="cb9-14" title="14"></a>
+<a class="sourceLine" id="cb9-15" title="15">prob.test<span class="op">$</span>randomforest.actual     &lt;-<span class="st"> </span>data.test_rf<span class="op">$</span>y_loan_defaulter</a>
+<a class="sourceLine" id="cb9-16" title="16">prob.test<span class="op">$</span>randomforest.predicted  &lt;-<span class="st"> </span><span class="kw">predict</span>(rf.full, <span class="dt">newdata =</span> data.test_rf, </a>
+<a class="sourceLine" id="cb9-17" title="17">                                             <span class="dt">type =</span> <span class="st">&quot;prob&quot;</span>)[,<span class="dv">2</span>]</a>
+<a class="sourceLine" id="cb9-18" title="18"></a>
+<a class="sourceLine" id="cb9-19" title="19">prob.full  &lt;-<span class="st"> </span>prob.full <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a>
+<a class="sourceLine" id="cb9-20" title="20">prob.train &lt;-<span class="st"> </span>prob.train <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a>
+<a class="sourceLine" id="cb9-21" title="21">prob.test  &lt;-<span class="st"> </span>prob.test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a></code></pre></div>
 <div id="getting-performance-measures" class="section level2">
 <h2><span class="header-section-number">5.1</span> Getting Performance Measures</h2>
-<p>To-do.</p>
+<p>To calculate the performance measures, derived from the confusion matrix, we need to find the score cut off that best split our test dataset into Defaulters and Non-Defaulters.</p>
+<p>In this exercise we decide to not prioritize the accuracy on predicting Defaulters and Non-Defaulters, therefore we are looking for the score cut off that best predict each class equally.</p>
+<p>With the returned object from this function we can plot the comparison between TPR (True Positive Rate) and TNR (True Negative Rate) to find the best cut off.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="co">## getting measures -----------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb10-2" title="2">metricsByCutoff.test_randomforest  &lt;-<span class="st"> </span><span class="kw">modelMetrics</span>(prob.test<span class="op">$</span>randomforest.actual, </a>
+<a class="sourceLine" id="cb10-3" title="3">                                                   prob.test<span class="op">$</span>randomforest.predicted, </a>
+<a class="sourceLine" id="cb10-4" title="4">                                                   <span class="dt">plot_title =</span> <span class="st">&#39;Random Forest&#39;</span>)</a>
+<a class="sourceLine" id="cb10-5" title="5">metricsByCutoff.test_randomforest<span class="op">$</span>Plot</a></code></pre></div>
+<div id="htmlwidget-3ddf1aa08b4b86261921" style="width:100%;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-3ddf1aa08b4b86261921">{"x":{"visdat":{"28bc64c223a":["function () ","plotlyVisDat"]},"cur_data":"28bc64c223a","attrs":{"28bc64c223a":{"x":{},"y":{},"opacity":0.3,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"bar"},"28bc64c223a.1":{"x":{},"y":{},"opacity":1,"name":"TPR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"28bc64c223a.2":{"x":{},"y":{},"opacity":1,"name":"TNR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"28bc64c223a.3":{"x":0.12,"y":0.76,"opacity":1,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","text":0.12,"mode":"text","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"title":"Cutoff Value"},"yaxis":{"domain":[0,1],"automargin":true,"title":"True Ratio (%)"},"title":"Random Forest","hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77,0.78],"y":[0.747709497206704,0.647150837988827,0.529832402234637,0.462793296089385,0.361340782122905,0.33340782122905,0.288715083798883,0.255195530726257,0.227262569832402,0.0969832402234636,0.0858100558659217,0.010949720670391,0.016536312849162,0.0621229050279329,0.153296089385475,0.18122905027933,0.249162011173184,0.260335195530726,0.305921787709497,0.317094972067039,0.36268156424581,0.368268156424581,0.430614525139665,0.436201117318436,0.476201117318436,0.527374301675978,0.532960893854749,0.572960893854749,0.62413407821229,0.62413407821229,0.629720670391061,0.629720670391061,0.686480446927374,0.686480446927374,0.686480446927374,0.697653631284916,0.703240223463687,0.708826815642458,0.708826815642458,0.748826815642458,0.754413407821229,0.754413407821229,0.794413407821229,0.794413407821229,0.794413407821229,0.834413407821229,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.88,0.88,0.88,0.88,0.88,0.88,0.88,0.88,0.88,0.88,0.88,0.92,0.96,0.96,0.96,0.96,0.96],"opacity":0.3,"name":"Abs. Diff.","type":"bar","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77,0.78],"y":[0.96,0.96,0.96,0.96,0.92,0.92,0.92,0.92,0.92,0.84,0.84,0.76,0.76,0.72,0.64,0.64,0.6,0.6,0.56,0.56,0.52,0.52,0.48,0.48,0.44,0.4,0.4,0.36,0.32,0.32,0.32,0.32,0.28,0.28,0.28,0.28,0.28,0.28,0.28,0.24,0.24,0.24,0.2,0.2,0.2,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.08,0.04,0.04,0.04,0.04,0.04],"opacity":1,"name":"TPR","type":"scatter","mode":"lines","marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"line":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77,0.78],"y":[0.212290502793296,0.312849162011173,0.430167597765363,0.497206703910615,0.558659217877095,0.58659217877095,0.631284916201117,0.664804469273743,0.692737430167598,0.743016759776536,0.754189944134078,0.770949720670391,0.776536312849162,0.782122905027933,0.793296089385475,0.82122905027933,0.849162011173184,0.860335195530726,0.865921787709497,0.877094972067039,0.88268156424581,0.888268156424581,0.910614525139665,0.916201117318436,0.916201117318436,0.927374301675978,0.932960893854749,0.932960893854749,0.94413407821229,0.94413407821229,0.949720670391061,0.949720670391061,0.966480446927374,0.966480446927374,0.966480446927374,0.977653631284916,0.983240223463687,0.988826815642458,0.988826815642458,0.988826815642458,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],"opacity":1,"name":"TNR","type":"scatter","mode":"lines","marker":{"color":"rgba(44,160,44,1)","line":{"color":"rgba(44,160,44,1)"}},"error_y":{"color":"rgba(44,160,44,1)"},"error_x":{"color":"rgba(44,160,44,1)"},"line":{"color":"rgba(44,160,44,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.12],"y":[0.76],"opacity":1,"name":"Abs. Diff.","type":"scatter","text":0.12,"mode":"text","marker":{"color":"rgba(214,39,40,1)","line":{"color":"rgba(214,39,40,1)"}},"error_y":{"color":"rgba(214,39,40,1)"},"error_x":{"color":"rgba(214,39,40,1)"},"line":{"color":"rgba(214,39,40,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<p>With the optimized cut off we calculate the full set of model metrics using the function HMeasure from hmeasure library.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="co"># Random Forest</span></a>
+<a class="sourceLine" id="cb11-2" title="2">measures.randomforest.train &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.train<span class="op">$</span>randomforest.actual, </a>
+<a class="sourceLine" id="cb11-3" title="3">                                        prob.train<span class="op">$</span>randomforest.predicted, </a>
+<a class="sourceLine" id="cb11-4" title="4">                                        <span class="dt">threshold =</span> metricsByCutoff.test_randomforest<span class="op">$</span>BestCut[<span class="st">&#39;Cut&#39;</span>])</a>
+<a class="sourceLine" id="cb11-5" title="5">measures.randomforest.test  &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.test<span class="op">$</span>randomforest.actual, </a>
+<a class="sourceLine" id="cb11-6" title="6">                                        prob.test<span class="op">$</span>randomforest.predicted, </a>
+<a class="sourceLine" id="cb11-7" title="7">                                        <span class="dt">threshold =</span> metricsByCutoff.test_randomforest<span class="op">$</span>BestCut[<span class="st">&#39;Cut&#39;</span>])</a>
+<a class="sourceLine" id="cb11-8" title="8"></a>
+<a class="sourceLine" id="cb11-9" title="9"></a>
+<a class="sourceLine" id="cb11-10" title="10"><span class="co"># join measures in a single data frame</span></a>
+<a class="sourceLine" id="cb11-11" title="11">measures &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">bind_rows</span>(measures.randomforest.train<span class="op">$</span>metrics,</a>
+<a class="sourceLine" id="cb11-12" title="12">                        measures.randomforest.test<span class="op">$</span>metrics</a>
+<a class="sourceLine" id="cb11-13" title="13">                        )) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>(., <span class="dt">rownames =</span> <span class="ot">NA</span>)</a>
+<a class="sourceLine" id="cb11-14" title="14"></a>
+<a class="sourceLine" id="cb11-15" title="15"><span class="kw">colnames</span>(measures) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;random forest - train&#39;</span>, <span class="st">&#39;random forest - test&#39;</span>)</a>
+<a class="sourceLine" id="cb11-16" title="16"></a>
+<a class="sourceLine" id="cb11-17" title="17">measures<span class="op">$</span>metric =<span class="st"> </span><span class="kw">rownames</span>(measures)</a>
+<a class="sourceLine" id="cb11-18" title="18"></a>
+<a class="sourceLine" id="cb11-19" title="19">measures &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(measures, metric, <span class="kw">everything</span>())</a></code></pre></div>
+<p>Below are the metrics on the train and test dataset:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="kw">kable</span>(measures, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">metric</th>
+<th align="right">random forest - train</th>
+<th align="right">random forest - test</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">H</td>
+<td align="right">1.0000000</td>
+<td align="right">0.4248541</td>
+</tr>
+<tr class="even">
+<td align="left">Gini</td>
+<td align="right">1.0000000</td>
+<td align="right">0.6808939</td>
+</tr>
+<tr class="odd">
+<td align="left">AUC</td>
+<td align="right">1.0000000</td>
+<td align="right">0.8404469</td>
+</tr>
+<tr class="even">
+<td align="left">AUCH</td>
+<td align="right">1.0000000</td>
+<td align="right">0.8654749</td>
+</tr>
+<tr class="odd">
+<td align="left">KS</td>
+<td align="right">1.0000000</td>
+<td align="right">0.6239106</td>
+</tr>
+<tr class="even">
+<td align="left">MER</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0980392</td>
+</tr>
+<tr class="odd">
+<td align="left">MWL</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0808824</td>
+</tr>
+<tr class="even">
+<td align="left">Spec.Sens95</td>
+<td align="right">1.0000000</td>
+<td align="right">0.5139665</td>
+</tr>
+<tr class="odd">
+<td align="left">Sens.Spec95</td>
+<td align="right">1.0000000</td>
+<td align="right">0.3200000</td>
+</tr>
+<tr class="even">
+<td align="left">ER</td>
+<td align="right">0.0460251</td>
+<td align="right">0.2303922</td>
+</tr>
+<tr class="odd">
+<td align="left">Sens</td>
+<td align="right">1.0000000</td>
+<td align="right">0.7600000</td>
+</tr>
+<tr class="even">
+<td align="left">Spec</td>
+<td align="right">0.9484778</td>
+<td align="right">0.7709497</td>
+</tr>
+<tr class="odd">
+<td align="left">Precision</td>
+<td align="right">0.6986301</td>
+<td align="right">0.3166667</td>
+</tr>
+<tr class="even">
+<td align="left">Recall</td>
+<td align="right">1.0000000</td>
+<td align="right">0.7600000</td>
+</tr>
+<tr class="odd">
+<td align="left">TPR</td>
+<td align="right">1.0000000</td>
+<td align="right">0.7600000</td>
+</tr>
+<tr class="even">
+<td align="left">FPR</td>
+<td align="right">0.0515222</td>
+<td align="right">0.2290503</td>
+</tr>
+<tr class="odd">
+<td align="left">F</td>
+<td align="right">0.8225806</td>
+<td align="right">0.4470588</td>
+</tr>
+<tr class="even">
+<td align="left">Youden</td>
+<td align="right">0.9484778</td>
+<td align="right">0.5309497</td>
+</tr>
+<tr class="odd">
+<td align="left">TP</td>
+<td align="right">51.0000000</td>
+<td align="right">19.0000000</td>
+</tr>
+<tr class="even">
+<td align="left">FP</td>
+<td align="right">22.0000000</td>
+<td align="right">41.0000000</td>
+</tr>
+<tr class="odd">
+<td align="left">TN</td>
+<td align="right">405.0000000</td>
+<td align="right">138.0000000</td>
+</tr>
+<tr class="even">
+<td align="left">FN</td>
+<td align="right">0.0000000</td>
+<td align="right">6.0000000</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="evaluating-classification-performance" class="section level2">
 <h2><span class="header-section-number">5.2</span> Evaluating classification performance</h2>
