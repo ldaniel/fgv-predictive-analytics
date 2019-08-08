@@ -25,6 +25,12 @@ Tony Yiu
 
 ******************************************************
 
+[**Tune Machine Learning Algorithms in R (random forest case study)**](https://machinelearningmastery.com/tune-machine-learning-algorithms-in-r/)
+
+Jason Brownlee
+
+******************************************************
+
 ### Wikipedia
 
 ******************************************************
