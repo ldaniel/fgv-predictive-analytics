@@ -506,7 +506,7 @@ account_balance <- arrange(transaction, desc(date), account_id) %>%
 colnames(account_balance) <- c("account_id", "last_transaction_date", 'account_balance', 'avg_balance')
 ```
 
-The code below calculate an additional table with the proportion of each transaction type (k_symbol) on total transaction amount of each account. That data will be used to fit a logistic model on loan dataset.
+The code below calculate an additional table with the proportion of each transaction type (k_symbol) on total transaction amount of each account. That data will be used to fit various different predictive models.
 
 ``` {r account_transaction_pattern, eval = FALSE}
 account_transaction_pattern <- select(transaction, c(trans_id, account_id, date, amount, k_symbol)) %>% 
