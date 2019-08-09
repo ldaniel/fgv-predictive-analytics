@@ -182,7 +182,7 @@ Here the technique falls short for this dataset, we would be interest in give a 
 
 A Decision Tree is definitely not a good model for this dataset, but as we are just exercising the modeling technique (just having fun here !!!) we will use the full decision tree we got to compare its metrics and see how it perform against the other models we created in this class exercise.
 
-We tried different parameters for **minbucket** and **maxdepth**, as our dataset is not big enough all of then presented huge differences in performance, the one we chose for this exercise seems to be a reasonable trade-off on overfitting to compare against the other models.
+We tried different parameters for **minbucket** and **maxdepth**, as our dataset is not big enough all of them presented huge differences in performance, the one we chose for this exercise seems to be a reasonable trade-off on overfitting to compare against the other models.
 
 We can do this by simply feeding back the full tree to our prune tree object and move on to the performance metrics.
 
