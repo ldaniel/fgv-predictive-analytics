@@ -141,7 +141,7 @@ In this exercise we decide to not prioritize the accuracy on predicting Defaulte
 
 We will use the custom functions described in Auxiliary metrics functions topic in the Data Preparation session of this site.
 
-With the returned object from these functions we can plot the comparison between TPR (True Positive Rate) and FPR (False Positive Rate) to find the best cut off.
+With the returned object from these functions we can plot the comparison between TPR (True Positive Rate) and TNR (True Negative Rate) to find the best cut off.
 
 ```{r get_measures, echo=TRUE, out.width= '100%'}
 ## getting cut off measures -----------------------------------------------------------------
@@ -170,7 +170,7 @@ cutoffs
 
 ```
 
-Having the best score cut off of each model we use **HMeasure()** function from **hmeasure** library to calculate the full set of metrics for classification methods.
+Having the best score cut off out of each model we use **HMeasure()** function from **hmeasure** library to calculate the full set of metrics for classification methods.
 
 ```{r get_measures_full, echo=TRUE, out.width= '100%', warning=FALSE}
 # logistic regression
@@ -250,7 +250,7 @@ In this session we interpret the set of metrics we got from above steps.
 
 Here we look back to the score density plot produced by each model side by side.
 
-Interesting to notice here how narrow the scores produced from Decision Tree model compared to the other models.
+Interesting enough to notice here how narrow the scores produced from Decision Tree model compared to the other models.
 
 As discussed in the Decision Tree session this model is extremely limited for this dataset with a huge variance in the tree depending on the train data and hyper parameters tuning.
 
@@ -288,9 +288,7 @@ Let's now look at the score boxplots of each model side by side.
 
 This plot is a great way to visualize how well each model discriminate Defaulters and Non-Defaulters.
 
-Here we can see that Random Forest and boosting have an edge on the classification power against the other models.
-
-Those are the only model where the box plot interquartile does not overlap.
+Here we can see that Random Forest and boosting have an edge on the classification power against the other models. Both of them have not presented interquartile overlap in their box plot, another important sign of discrimination power of the models.
 
 Our Decision Tree is right on the limit.
 
@@ -400,6 +398,8 @@ accuracy(score = prob.test$random.forest.predicted,
          actual = prob.test$random.forest.actual, 
          threshold = metricsByCutoff.test_rf[["BestCut"]][["Cut"]])
 ```
+
+# Final considerations and project limitations
 
 Unfortunately, this is not a real dataset with really interest variables such as client income, credit rate, and so on.
 
