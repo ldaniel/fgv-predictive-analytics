@@ -195,7 +195,7 @@ print(high_VIF_correlogram_before)
 
 We will now exclude the variables with High VIF maintaining only the variables that are not correlated.
 
-We will use the pairwise correlation indexes to choose the variable to reject, code below will exclude the variable in the pair that have the greater correlation index sum against the other predictor not in the pair.
+We will use the pairwise correlation indexes to choose the variable to reject, code below will exclude the variable in the pair that have the greater correlation index sum against the other predictors not in the pair beeing evaluated.
 
 At the end we will have only variables that have a correlation index smaller than our selected **threshold (0.6)**.
 
