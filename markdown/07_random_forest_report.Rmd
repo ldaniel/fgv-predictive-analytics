@@ -373,4 +373,4 @@ Finally, the KS metric is also presented a good result for a reliable classifica
 
 In the Final Report session, we will look more closely on the AUC and Gini metrics by plotting the ROC curve and comparing against other models.
 
-Stay tuned!!!
+More to come in the final report!!!
