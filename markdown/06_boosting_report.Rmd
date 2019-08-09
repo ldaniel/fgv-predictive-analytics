@@ -131,7 +131,7 @@ Both datasets keep the same proportion for the explained variable around 11%.
 
 ## Fiting the Boosting model 
 
-With the final cleaned dataset, we got from above steps fit our Boosting Model for y_loan_defaulter on all x variables.
+With the final cleaned dataset, we got from above steps fit our Boosting Model for **y_loan_defaulter** on all **x_variables**.
 
 We made a lot of tests playing with control parameters trying to reduce the errors and we decided to keep **mfinal = 100**, **minbucket = 25** and **maxdepth = 1 **.
 
