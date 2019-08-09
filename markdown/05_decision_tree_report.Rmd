@@ -110,7 +110,7 @@ Both datasets keep the same proportion for the explained variable around 11%.
 
 With the final cleaned dataset, we got from above steps we fit our Decision Tree Model for **y_loan_defaulter** on all **x_variables**.
 
-We choose to change the default parameters **minbucket** and **maxdepth** parameter to **5** to deliberate create a fully-grown tree as the database is not big enough for this model.
+We choose to change the default parameters **minbucket** and **maxdepth** to **5** to deliberate create a fully-grown tree as the database is not big enough for this model.
 
 ```{r fit_DT_full, eval=FALSE}
 tree.full <- rpart(data= data.train_DT, y_loan_defaulter ~ .,
