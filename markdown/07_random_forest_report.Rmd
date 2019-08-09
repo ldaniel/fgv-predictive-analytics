@@ -71,7 +71,7 @@ Random forest, in essence, consists of a large set of individual decision trees 
 
 The Random Forest algorithm is a supervised algorithm that, even though it can be used for regression purposes, it was initially conceived as a classification tool.
 
-The method follows the same concept as a decision tree but with the power of the crowd. So, basically, instead of using one big, deep and complex tree, the method relies on multiple randomly different (in multiple ways) trees voting for a class. This method usually perform better better than one very well trained tree even if, individually, the trees are not as good classifiers, thus refering to the forementioned wisdom of the crowds.
+The method follows the same concept as a decision tree but with the power of the crowd. So, basically, instead of using one big, deep and complex tree, the method relies on multiple randomly different (in multiple ways) trees voting for a class. This method usually perform better than one very well trained tree even if, individually, the trees are not as good classifiers, thus refering to the forementioned wisdom of the crowds.
 
 >Random forest thrives even in scenarios, when there is an abundance of chaos, i.e. many predictors. It’s hard to know which predictor is important and which is not. All the other traditional statistical techniques might fail or struggle when we have an incredibly high number of independent variables.
 > `r tufte::quote_footer('--- Pranov Mishra')`
