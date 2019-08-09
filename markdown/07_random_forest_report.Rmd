@@ -69,7 +69,7 @@ Random forest, in essence, consists of a large set of individual decision trees 
 > The fundamental concept behind random forest is a simple but powerful one — the wisdom of crowds. In data science speak, the reason that the random forest model works so well is: A large number of relatively uncorrelated models (trees) operating as a committee will outperform any of the individual constituent models.
 > `r tufte::quote_footer('--- Tony Yiu')`
 
-The RF algorithm is a supervised algorithm that, even though it can be used for regression purposes, it was initially conceived as a classification tool.
+The Random Forest algorithm is a supervised algorithm that, even though it can be used for regression purposes, it was initially conceived as a classification tool.
 
 The method follows the same concept as a decision tree but with the power of the crowd. So, basically, instead of using one big, deep and complex tree, the method relies on multiple randomly different (in multiple ways) trees voting for a class. This method usually perform better better than one very well trained tree even if, individually, the trees are not as good classifiers, thus refering to the forementioned wisdom of the crowds.
 
