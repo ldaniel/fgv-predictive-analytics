@@ -327,7 +327,7 @@ Below are the metrics on the train and test dataset:
 kable(measures, row.names = FALSE)
 ```
 
-Our RF model clearly overfitted (as we can see by most of metrics, AUC of 1.0 in train set and 0.84 in test set, for example). This happened mainly because of the size of our dataset.
+Our Random Forest model clearly overfitted (as we can see by most of metrics, AUC of 1.0 in train set and 0.84 in test set, for example). This happened mainly because of the size of our dataset.
 
 ## Evaluating classification performance
 
