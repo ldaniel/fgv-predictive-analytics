@@ -256,7 +256,7 @@ kable(measures, row.names = FALSE)
 
 ## Evaluating classification performance
 
-This model delivered the better accuracy of all models done here (76.96%)! We will compare how it performed against other classes of models in the Final Report session.
+This model delivered the best discrimination f all models done here (KS = 0.63)! We will compare how it performed against other classes of models in the Final Report session.
 
 Below the confusion matrix and general performance of the model:
 
