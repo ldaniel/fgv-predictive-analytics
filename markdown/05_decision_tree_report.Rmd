@@ -3,7 +3,7 @@ title: "The decision tree on loan's report"
 date: "August, 2019"
 ---
 
-```{r setup_logit, include=FALSE}
+```{r setup_dt, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(fig.pos =  "h")
 knitr::opts_knit$set(root.dir = "../")
@@ -39,7 +39,7 @@ library(pROC)
 
 ```
 
-```{r scripts, include=FALSE}
+```{r scripts_dt, include=FALSE}
 # loading required steps before performing the analysis
 source("./scripts/step_01_create_functions.R")
 source("./scripts/step_02_data_ingestion.R")
@@ -65,7 +65,7 @@ This dataset is joined with Loan, Client, Credit Card, District, Account and Acc
 
 We ended up having a data set with **118 variables**.
 
-```{r variables, echo=TRUE}
+```{r variables_dt, echo=TRUE}
 loan_dataset_DT <- source_dataset
 
 kable(tibble(variables = names(loan_dataset_DT)))
@@ -79,7 +79,7 @@ We will only remove **x_prop_old_age_pension** that we know beforehand to have n
 
 This model is also not sensible to outliers, missing values and multicollinearity.
 
-```{r variable_selecion, echo=TRUE}
+```{r variable_selecion_dt, echo=TRUE}
 loan_dataset_DT <-source_dataset
 loan_dataset_DT <- dplyr::select(loan_dataset_DT, -x_prop_old_age_pension)
 ```
@@ -93,7 +93,7 @@ The available data in Loan Dataset is split into Train and Testing data on the f
 
 We are selecting exact the same samples we used for the Logistic Model to allow comparison across models.
 
-```{r sampling, echo=TRUE}
+```{r sampling_dt, echo=TRUE}
 SplitDataset <- source_train_test_dataset
 data.train_DT <- SplitDataset$data.train
 data.test_DT <- SplitDataset$data.test
@@ -112,7 +112,7 @@ With the final cleaned dataset, we got from above steps we fit our Decision Tree
 
 We choose to change the default parameters **minbucket** and **maxdepth** to **5** to deliberate create a fully-grown tree as the database is not big enough for this model.
 
-```{r fit_DT_full, eval=FALSE}
+```{r fit_DT_full_dt, eval=FALSE}
 tree.full <- rpart(data= data.train_DT, y_loan_defaulter ~ .,
                    control = rpart.control(minbucket = 5,
                                            maxdepth = 5),
@@ -127,12 +127,12 @@ rpart.plot(tree.full, cex = 1.3, type = 0,
 saveRDS(tree.full, './models/decision_tree_full.rds')
 ```
 
-```{r load_DT_full, echo=TRUE, include=FALSE}
+```{r load_DT_full_dt, echo=TRUE, include=FALSE}
 # load model
 tree.full <- readRDS('./models/decision_tree_full.rds')
 ```
 
-```{r plot_DT_full, echo=FALSE, out.width= '100%'}
+```{r plot_DT_full_dt, echo=FALSE, out.width= '100%'}
 rpart.plot(tree.full, cex = 1.3, type = 0,
            extra = 104, box.palette = 'BuRd',
            branch.lty = 3, shadow.col = 'gray', 
@@ -147,7 +147,7 @@ The idea is reducing the complexity of the decision tree and thereof avoid overf
 
 Pruning process is done by comparing different variations of the fully-grown tree and evaluating the relative error trend comparing to a zero node tree, each node that does not affect the classification power of the tree is replaced by a leaf node.
 
-```{r fit_DT_prune, eval=FALSE}
+```{r fit_DT_prune_dt, eval=FALSE}
 printcp(tree.full)
 plotcp(tree.full)
 
@@ -163,12 +163,12 @@ rpart.plot(tree.prune, cex = 1.3, type = 0,
 saveRDS(tree.prune, './models/decision_tree_prune.rds')
 ```
 
-```{r load_DT_prune, include=FALSE}
+```{r load_DT_prune_dt, include=FALSE}
 # load model
 tree.prune <- readRDS('./models/decision_tree_prune.rds')
 ```
 
-```{r plot_DT_prune, echo=FALSE, out.width= '100%'}
+```{r plot_DT_prune_dt, echo=FALSE, out.width= '100%'}
 rpart.plot(tree.prune, cex = 1.3, type = 0,
            extra = 104, box.palette = 'BuRd',
            branch.lty = 3, shadow.col = 'gray', 
@@ -186,7 +186,7 @@ We tried different parameters for **minbucket** and **maxdepth**, as our dataset
 
 We can do this by simply feeding back the full tree to our prune tree object and move on to the performance metrics.
 
-```{r fit_DT_prune_1, echo=TRUE, out.width= '100%'}
+```{r fit_DT_prune_1_dt, echo=TRUE, out.width= '100%'}
 tree.prune <- tree.full
 ```
 
@@ -219,7 +219,7 @@ A comparison against all the models will be provided in the Final Report session
 
 We started this step by making predictions using our model on the X's variables in our Train and Test datasets.
 
-```{r get_scores, echo=TRUE, out.width= '100%'}
+```{r get_scores_dt, echo=TRUE, out.width= '100%'}
 ## making preditions for each model and consolidating in a single data frame
 
 prob.full = list()
@@ -248,7 +248,7 @@ In this exercise we decide to not prioritize the accuracy on predicting Defaulte
 
 With the returned object from this function we can plot the comparison between TPR (True Positive Rate) and TNR (True Negative Rate) to find the best cut off.
 
-```{r get_measures, echo=TRUE, out.width= '100%'}
+```{r get_measures_dt, echo=TRUE, out.width= '100%'}
 ## getting measures -----------------------------------------------------------------
 metricsByCutoff.test_DT     <- modelMetrics(prob.test$decision.tree.actual, 
                                             prob.test$decision.tree.predicted, 
@@ -258,7 +258,7 @@ metricsByCutoff.test_DT$Plot
 
 With the optimized cut off we calculate the full set of model metrics using the function HMeasure from hmeasure library.
 
-```{r get_measures_full, echo=TRUE, out.width= '100%', warning=FALSE}
+```{r get_measures_full_dt, echo=TRUE, out.width= '100%', warning=FALSE}
 # decision tree
 measures.decision.tree.train <- HMeasure(prob.train$decision.tree.actual, 
                                          prob.train$decision.tree.predicted, 
@@ -280,7 +280,7 @@ measures <- dplyr::select(measures, metric, everything())
 ```
 
 Below are the metrics on the train and test dataset:
-```{r see_train_measures, echo=TRUE, out.width= '100%'}
+```{r see_train_measures_dt, echo=TRUE, out.width= '100%'}
 kable(measures, row.names = FALSE)
 ```
 
@@ -290,7 +290,7 @@ In general, such as the Logistic Regression model, this model is not delivering 
 
 Below the confusion matrix and general performance of the model:
 
-```{r see_accuracy_1, echo=TRUE, out.width= '100%'}
+```{r see_accuracy_1_dt, echo=TRUE, out.width= '100%'}
 # accuracy metrics ---------------------------------------------------------------
 # decision tree
 accuracy(score = prob.test$decision.tree.predicted, 
@@ -300,7 +300,7 @@ accuracy(score = prob.test$decision.tree.predicted,
 
 We finally look at the score distribution charts to check how well the model is able to discriminate Defaulters and Non-Defaulters.
 
-```{r model_plots, echo=TRUE, out.width= '100%'}
+```{r model_plots_dt, echo=TRUE, out.width= '100%'}
 p1 <- Score_Histograms(prob.test, 
                  prob.test$decision.tree.predicted,
                  prob.test$decision.tree.actual,

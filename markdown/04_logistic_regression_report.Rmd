@@ -48,7 +48,7 @@ library(pROC)
 
 ```
 
-```{r scripts, include=FALSE}
+```{r scripts_logit, include=FALSE}
 # loading required steps before performing the analysis
 source("./scripts/step_01_create_functions.R")
 source("./scripts/step_02_data_ingestion.R")
@@ -75,7 +75,7 @@ This dataset is joined with Loan, Client, Credit Card, District, Account and Acc
 We ended up having a data set with **118 variables**.
 
 
-```{r variables, echo=TRUE}
+```{r variables_logit, echo=TRUE}
 loan_dataset_logistic <- source_dataset
 
 kable(tibble(variables = names(loan_dataset_logistic)))
@@ -91,7 +91,7 @@ Starting with the dummy variables. We will keep only dummies that has the event 
 
 The below table shows the dummy variables that will be kept in the model:
 
-```{r dummies_high, echo=TRUE}
+```{r dummies_high_logit, echo=TRUE}
 dummy_variables <- dplyr::select(loan_dataset_logistic, 
                                  starts_with('x_client_gender'), 
                                  starts_with('x_district_name'),
@@ -112,7 +112,7 @@ kable(dummy_variables_high)
 
 The remaining dummies will be excluded from the dataset as they do not have enough variability to fit a logistic model on them.
 
-```{r dummies_reject, echo=FALSE}
+```{r dummies_reject_logit, echo=FALSE}
 dummy_variables_high <- dummy_variables_high$variables
 dummy_variables_low <- names(dplyr::select(dummy_variables, -dummy_variables_high))
 
@@ -123,7 +123,7 @@ loan_dataset_logistic <- dplyr::select(loan_dataset_logistic, -dummy_variables_l
 
 After we investigated the low variability in the dummies, we take care of the calculated variables on the transaction type proportion we calculated during the data enhancement process.
 
-```{r prop, echo=TRUE}
+```{r prop_logit, echo=TRUE}
 prop_variables <- dplyr::select(loan_dataset_logistic, 
                                 starts_with('x_prop'))
 
@@ -138,7 +138,7 @@ The variable **x_prop_old_age_pension** is also excluded from the dataset as it 
 
 We ended up having a data set with **40 variables**.
 
-```{r variables_2, echo=FALSE}
+```{r variables_2_logit, echo=FALSE}
 kable(tibble(variables = names(loan_dataset_logistic)))
 ```
 
@@ -156,7 +156,7 @@ That’s why we will rely on a test called Variance Inflation Factors, VIF for s
 
 Multicollinearity is poison for Regression algorithms!!!
 
-```{r check_correl, out.width = '100%', warning=FALSE}
+```{r check_correl_logit, out.width = '100%', warning=FALSE}
 vars.quant <- select_if(loan_dataset_logistic, is.numeric)
 VIF <- imcdiag(vars.quant, loan_dataset_logistic$y_loan_defaulter)
 
@@ -171,7 +171,7 @@ Having identified the predictors with high VIF we look at the correlogram on tho
 
 Here we are hiding the variable names for readability.
 
-```{r check_correl_2, out.width = '100%'}
+```{r check_correl_2_logit, out.width = '100%'}
 low_VIF <- filter(VIF_Table_Before, VIF <= 5)$variable
 high_VIF <- filter(VIF_Table_Before, VIF > 5)$variable
 
@@ -199,7 +199,7 @@ We will use the pairwise correlation indexes to choose the variable to reject, c
 
 At the end we will have only variables that have a correlation index smaller than our selected **threshold (0.6)**.
 
-```{r check_correl_3, out.width = '100%'}
+```{r check_correl_3_logit, out.width = '100%'}
 correl_threshold <- 0.6
 
 reject_variables_vector <- tibble(var_1 = row.names(cor_mtx_high_VIF)) %>% 
@@ -229,7 +229,7 @@ After the high VIF predictors exclusion we reevaluate the correlation matrix of 
 Variable names are hidden for readability.
 Trust us, there is no correlation greater than 0.6 here.
 
-```{r check_correl_4, out.width = '100%'}
+```{r check_correl_4_logit, out.width = '100%'}
 cor_mtx_full <- cor(loan_dataset_logistic)
 cor_mtx_clean <- cor(clean_dataset,)
 
@@ -258,7 +258,7 @@ loan_dataset_logistic <- clean_dataset
 
 Once again let’s look on the VIF estimates.
 
-```{r check_correl_5, out.width = '100%'}
+```{r check_correl_5_logit, out.width = '100%'}
 vars.quant <- select_if(loan_dataset_logistic, is.numeric)
 
 VIF <- imcdiag(vars.quant, loan_dataset_logistic$y_loan_defaulter)
@@ -295,7 +295,7 @@ Although **x_average_salary** have no correlation index greater than our defined
 
 We did try to keep it, but it had no real difference.
 
-```{r check_correl_6, echo=FALSE, out.width = '100%'}
+```{r check_correl_6_logit, echo=FALSE, out.width = '100%'}
 vars.quant <- select_if(loan_dataset_logistic, is.numeric)
 
 VIF <- imcdiag(vars.quant, loan_dataset_logistic$y_loan_defaulter)
@@ -328,7 +328,7 @@ ggplot(VIF_Table_After, aes(x = fct_reorder(variable, VIF),
 
 After all this work we end up having **28 variables** in the dataset.
 
-```{r variables_final, echo=TRUE}
+```{r variables_final_logit, echo=TRUE}
 kable(tibble(variables = names(loan_dataset_logistic)))
 ```
 
@@ -342,7 +342,7 @@ Looking at the plots we see no significant deviation in the quantitative variabl
 
 **x_last_transaction_age_days** looks to have a discrepancy, but it is ranging from 0 to 30 days, so it is not real outliers.
 
-```{r outliers, echo=TRUE, out.width = '100%'}
+```{r outliers_logit, echo=TRUE, out.width = '100%'}
 # outliers ----------------------------------------------------------------------------
   attach(loan_dataset_logistic)
 
@@ -375,7 +375,7 @@ The available data in Loan Dataset is split into Train and Testing data on the f
 - **Train Dataset** (70% 478 obs);
 - **Test Dataset ** (30% 204 obs).
 
-```{r split_sample}
+```{r split_sample_logit}
 SplitDataset <- source_train_test_dataset
 data.train_logistic <- SplitDataset$data.train
 data.test_logistic <- SplitDataset$data.test
@@ -396,7 +396,7 @@ This will ensure consistency when comparing the models against each other.
 
 With the final cleaned dataset, we got from above steps we fit our Logistic Regression model for **y_loan_defaulter** on all **x_variables**.
 
-```{r fit_model_full, echo=TRUE, eval=FALSE}
+```{r fit_model_full_logit, echo=TRUE, eval=FALSE}
 # fit model
 logistic.full <- glm(formula = y_loan_defaulter ~ .,
                      data= data.train_logistic, 
@@ -409,7 +409,7 @@ summary(logistic.full)
 saveRDS(logistic.full, './models/logistic_full.rds')
 ```
 
-```{r load_model_full, echo=FALSE, include=FALSE}
+```{r load_model_full_logit, echo=FALSE, include=FALSE}
 # load model
 logistic.full <- readRDS('./models/logistic_full.rds')
 ```
@@ -420,7 +420,7 @@ This is a broadly used estimator that evaluates the relative quality of statisti
 
 The lower the AIC the better.
 
-```{r fit_model_step_0, eval=FALSE}
+```{r fit_model_step_0_logit, eval=FALSE}
 logistic.step <- step(logistic.full, direction = "both", test = "F")
 
 names(logistic.step$coefficients) <- stringr::str_sub(names(logistic.step$coefficients), 1, 25)
@@ -430,12 +430,12 @@ summary(logistic.step)
 saveRDS(logistic.step, './models/logistic_step.rds')
 ```
 
-```{r load_model_step_0, include=FALSE}
+```{r load_model_step_0_logit, include=FALSE}
 # load model
 logistic.step <- readRDS('./models/logistic_step.rds')
 ```
 
-```{r fit_model_step_show, echo=FALSE}
+```{r fit_model_step_show_logit, echo=FALSE}
 summary(logistic.step)
 ```
 
@@ -475,7 +475,7 @@ On the other hand, below variables are associated to a decrease in the likelihoo
 
 We started this step by making predictions using our model on the X's variables in our Train and Test datasets.
 
-```{r get_scores, echo=TRUE}
+```{r get_scores_logit, echo=TRUE}
 ## making predictions for each model and consolidating in a single data frame
 
 prob.full   = list()
@@ -509,7 +509,7 @@ We will use the custom functions described in Auxiliary metrics functions topic 
 
 With the returned object from this function we can plot the comparison between TPR (True Positive Rate) and TNR (True Negative Rate) to find the best cut off.
 
-```{r get_measures, echo=TRUE, out.width= '100%'}
+```{r get_measures_logit, echo=TRUE, out.width= '100%'}
 ## getting measures -----------------------------------------------------------------
 
 metricsByCutoff.test_log    <- modelMetrics(prob.test$logistic.actual, 
@@ -520,7 +520,7 @@ metricsByCutoff.test_log$Plot
 
 With the optimized cut off we calculate the full set of model metrics using the function HMeasure from hmeasure library.
 
-```{r get_measures_full, echo=TRUE, out.width= '100%', warning=FALSE}
+```{r get_measures_full_logit, echo=TRUE, out.width= '100%', warning=FALSE}
 # logistic regression
 measures.logistic.train <- HMeasure(prob.train$logistic.actual, 
                                     prob.train$logistic.predicted, 
@@ -543,7 +543,7 @@ measures <- dplyr::select(measures, metric, everything())
 ```
 
 Below are the metrics on the train and test dataset:
-```{r see_train_measures, echo=TRUE, out.width= '100%'}
+```{r see_train_measures_logit, echo=TRUE, out.width= '100%'}
 kable(measures, row.names = FALSE)
 ```
 
@@ -553,7 +553,7 @@ In general the Logistic Regression model is not delivering good accuracy, we wil
 
 Below the confusion matrix and general performance of the model using our custom function **accuracy** described in Auxiliary metrics functions topic in the Data Preparation session of this site.
 
-```{r see_accuracy_1, echo=TRUE, out.width= '100%'}
+```{r see_accuracy_1_logit, echo=TRUE, out.width= '100%'}
 # accuracy metrics ---------------------------------------------------------------
 # logistic regression
 accuracy(score = prob.test$logistic.predicted, 
@@ -563,7 +563,7 @@ accuracy(score = prob.test$logistic.predicted,
 
 We finally look at the score distribution charts to check how well the model is able to discriminate Defaulters and Non-Defaulters.
 
-```{r model_plots, echo=TRUE, out.width= '100%'}
+```{r model_plots_logit, echo=TRUE, out.width= '100%'}
 p1 <- Score_Histograms(prob.test, 
                  prob.test$logistic.predicted,
                  prob.test$logistic.actual,

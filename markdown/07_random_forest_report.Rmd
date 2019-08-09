@@ -49,7 +49,7 @@ library(pROC)
 
 ```
 
-```{r scripts, include=FALSE}
+```{r scripts_rf, include=FALSE}
 # loading required steps before performing the analysis
 source("./scripts/step_01_create_functions.R")
 source("./scripts/step_02_data_ingestion.R")
@@ -95,7 +95,7 @@ This dataset is joined with Loan, Client, Credit Card, District, Account and Acc
 We ended up having a dataset with **118 variables**.
 
 
-```{r variables, echo=TRUE}
+```{r variables_rf, echo=TRUE}
 loan_dataset_rf <- source_dataset
 
 kable(tibble(variables = names(loan_dataset_rf)))
@@ -110,7 +110,7 @@ We will only remove **x_prop_old_age_pension** that we know beforehand to have n
 Mainly beacause of the ramdomness in variable selection of random forest algorithm, this model is not sensible to outliers, missing values and multicollinearity.
 
 
-```{r variable_selecion, echo=TRUE}
+```{r variable_selecion_rf, echo=TRUE}
 loan_dataset_rf <- dplyr::select(loan_dataset_rf, -x_prop_old_age_pension)
 ```
 
@@ -123,7 +123,7 @@ The available data in Loan Dataset is split into Train and Testing data on the f
 
 We are selecting exact the same samples for all models to allow comparison between then.
 
-```{r sampling, echo=TRUE}
+```{r sampling_rf, echo=TRUE}
 SplitDataset <- source_train_test_dataset
 data.train_rf <- SplitDataset$data.train
 data.test_rf <- SplitDataset$data.test
@@ -156,7 +156,7 @@ There are a lot of implementations accross the internet, however, a good example
 
 Below is his implementation to be further used in our RF training.
 
-```{r extent_caret, echo=TRUE, eval=FALSE}
+```{r extent_caret_rf, echo=TRUE, eval=FALSE}
 customRF <- list(type = "Classification", library = "randomForest", loop = NULL)
 
 customRF$parameters <- data.frame(parameter = c("mtry", "ntree"), 
@@ -183,7 +183,7 @@ customRF$levels <- function(x) x$classes
 Moving further, we can now set up our expanded grid search using our customized RF train method to test multiple parameters and its different combinations. After that, caret's method will automatically select best model according to the metric we defined (in our case, accuracy).
 Moreover, to provide a reliable method of training to avoid (as well as we can) overfitting, we used repeated k-fold cross validation as train control - also provided by caret's package (we warned you, this is, indeed, an amazing package!).
 
-```{r select_best_parameters, echo=TRUE, eval=FALSE}
+```{r select_best_parameters_rf, echo=TRUE, eval=FALSE}
 control <- trainControl(method="repeatedcv", 
                         number=5, 
                         repeats=3, 
@@ -222,13 +222,13 @@ After some cups of coffee (and maybe some time spent on your preferred streaming
 
 Last but not least, we saved the final model results on disk to be quickly consumed when necessary.
 
-```{r save_rds_file, echo=TRUE, eval=FALSE}
+```{r save_rds_file_rf, echo=TRUE, eval=FALSE}
 saveRDS(rf.full, "./models/random_forest.rds")
 ```
 
 So, to save time, we only have to load the fitted model saved on disk.
 
-```{r read_rds_file, echo=TRUE}
+```{r read_rds_file_rf, echo=TRUE}
 rf.full <- readRDS("./models/random_forest.rds")
 ```
 
@@ -256,7 +256,7 @@ A comparison against all the models will be provided in the Final Report session
 We started this step by making predictions using our model on the X's variables in our Train and Test datasets.
 
 
-```{r get_scores, echo=TRUE, out.width= '100%'}
+```{r get_scores_rf, echo=TRUE, out.width= '100%'}
 ## making preditions for each model and consolidating in a single data frame
 
 prob.full  = list()
@@ -289,7 +289,7 @@ In this exercise we decide to not prioritize the accuracy on predicting Defaulte
 
 With the returned object from this function we can plot the comparison between TPR (True Positive Rate) and TNR (True Negative Rate) to find the best cut off.
 
-```{r get_measures, echo=TRUE, out.width= '100%'}
+```{r get_measures_rf, echo=TRUE, out.width= '100%'}
 ## getting measures -----------------------------------------------------------------
 metricsByCutoff.test_randomforest  <- modelMetrics(prob.test$randomforest.actual, 
                                                    prob.test$randomforest.predicted, 
@@ -299,7 +299,7 @@ metricsByCutoff.test_randomforest$Plot
 
 With the optimized cut off we calculate the full set of model metrics using the function HMeasure from hmeasure library (another very good package! Don't forget to check for our [**references**](https://ldaniel.github.io/Predictive-Analytics/09_references.html)).
 
-```{r get_measures_full, echo=TRUE, out.width= '100%', warning=FALSE}
+```{r get_measures_full_rf, echo=TRUE, out.width= '100%', warning=FALSE}
 # Random Forest
 measures.randomforest.train <- HMeasure(prob.train$randomforest.actual, 
                                         prob.train$randomforest.predicted, 
@@ -323,7 +323,7 @@ measures <- dplyr::select(measures, metric, everything())
 
 Below are the metrics on the train and test dataset:
 
-```{r see_train_measures, echo=TRUE, out.width= '100%'}
+```{r see_train_measures_rf, echo=TRUE, out.width= '100%'}
 kable(measures, row.names = FALSE)
 ```
 
@@ -335,7 +335,7 @@ This model delivered an amazing result but not the best one (beaten by the boost
 
 Below the confusion matrix and general performance of the model:
 
-```{r see_accuracy_1, echo=TRUE, out.width= '100%'}
+```{r see_accuracy_1_rf, echo=TRUE, out.width= '100%'}
 # accuracy metrics ---------------------------------------------------------------
 # random forest
 accuracy(score = prob.test$randomforest.predicted, 
@@ -345,7 +345,7 @@ accuracy(score = prob.test$randomforest.predicted,
 
 We finally look at the score distribution charts to check how well the model is able to discriminate Defaulters and Non-Defaulters.
 
-```{r model_plots, echo=TRUE, out.width= '100%'}
+```{r model_plots_rf, echo=TRUE, out.width= '100%'}
 p1 <- Score_Histograms(prob.test, 
                  prob.test$randomforest.predicted,
                  prob.test$randomforest.actual,

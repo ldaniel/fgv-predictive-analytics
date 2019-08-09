@@ -1,8 +1,11 @@
 ---  
-title: "FGV MBA: Business Analytics & Big Data"  
-output: 
-  pdf_document: 
+title: 'FGV MBA: Business Analytics & Big Data'
+output:
+  pdf_document:
     keep_tex: yes
+    toc: yes
+  html_document:
+    df_print: paged
     toc: yes
 ---
 

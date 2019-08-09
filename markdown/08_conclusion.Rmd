@@ -47,7 +47,7 @@ library(hmeasure)
 library(pROC)
 ```
 
-```{r scripts, include=FALSE}
+```{r scripts_evaluation, include=FALSE}
 # loading required steps before performing the analysis
 source("./scripts/step_01_create_functions.R")
 source("./scripts/step_02_data_ingestion.R")
@@ -57,7 +57,7 @@ source("./scripts/step_05_data_enhancement.R")
 source("./scripts/step_06_dataset_preparation.R")
 ```
 
-```{r model_scripts, include=FALSE}
+```{r model_scripts_evaluation, include=FALSE}
 # loading required models before performing the analysis
 source('./scripts/model_01_logistic_regression.R')
 source('./scripts/model_02_decision_tree.R')
@@ -79,7 +79,7 @@ Here we will expand the analysis done individually in each model to compare how 
 
 We will start this task by consolidating all the actual and predicted score for all models in a single data frame for the full, train and test datasets.
 
-```{r get_scores, echo=TRUE}
+```{r get_scores_evaluation, echo=TRUE}
 ## making preditions for each model and consilidating in a single data frame
 prob.full   <-  list()
 prob.train  <-  list()
@@ -143,7 +143,7 @@ We will use the custom functions described in Auxiliary metrics functions topic 
 
 With the returned object from these functions we can plot the comparison between TPR (True Positive Rate) and TNR (True Negative Rate) to find the best cut off.
 
-```{r get_measures, echo=TRUE, out.width= '100%'}
+```{r get_measures_evaluation, echo=TRUE, out.width= '100%'}
 ## getting cut off measures -----------------------------------------------------------------
 
 metricsByCutoff.test_log    <- modelMetrics(prob.test$logistic.actual, 
@@ -172,7 +172,7 @@ cutoffs
 
 Having the best score cut off for each model we use **HMeasure()** function from **hmeasure** library to calculate the full set of metrics for classification methods.
 
-```{r get_measures_full, echo=TRUE, out.width= '100%', warning=FALSE}
+```{r get_measures_full_evaluation, echo=TRUE, out.width= '100%', warning=FALSE}
 # logistic regression
 measures.logistic.train <- HMeasure(prob.train$logistic.actual, 
                                     prob.train$logistic.predicted, 
@@ -227,12 +227,12 @@ measures <- dplyr::select(measures, metric, everything())
 ```
 
 Below are the metrics on the train dataset:
-```{r see_train_measures, echo=TRUE, out.width= '100%'}
+```{r see_train_measures_evaluation, echo=TRUE, out.width= '100%'}
 kable(dplyr::select(measures, contains('train')), row.names = TRUE)
 ```
 
 Below are the metrics on the test dataset:
-```{r see_score_measures, echo=TRUE, out.width= '100%'}
+```{r see_score_measures_evaluation, echo=TRUE, out.width= '100%'}
 kable(dplyr::select(measures, contains('test')), row.names = TRUE)
 ```
 
@@ -256,7 +256,7 @@ As discussed in the Decision Tree session this model is extremely limited for th
 
 We are using our custom function **Score_Histograms** described in the Function topic of Data Preparation session of this site.
 
-```{r density_plots, echo=TRUE, out.width= '100%'}
+```{r density_plots_evaluation, echo=TRUE, out.width= '100%'}
 density_plots <- ggarrange(Score_Histograms(prob.test, 
                                             prob.test$logistic.predicted,
                                             prob.test$logistic.actual,
@@ -292,7 +292,7 @@ Here we can see that Random Forest and Boosting have an edge on the classificati
 
 Our Decision Tree is right on the limit.
 
-```{r boxplots_plots, echo=TRUE, out.width= '100%'}
+```{r boxplots_plots_evaluation, echo=TRUE, out.width= '100%'}
 boxplots <- ggarrange(Score_Boxplot(prob.test, 
                         prob.test$logistic.predicted, 
                         prob.test$logistic.actual,
@@ -330,7 +330,7 @@ In this case we are comparing the cumulative distribution sample of Defaulters a
 
 The bigger the KS metric the better the model are to discriminate Defaulters to Non-Defaulters.
 
-```{r KS_plots, echo=TRUE, out.width= '100%'}
+```{r KS_plots_evaluation, echo=TRUE, out.width= '100%'}
 KS_plots <- ggarrange(
   KS_Plot(prob.test$logistic.predicted[prob.test$logistic.actual == 0],
           prob.test$logistic.predicted[prob.test$logistic.actual == 1],
@@ -363,7 +363,7 @@ We get this chart by plotting the **True Positive Rate (TPR)** against the **Fal
 
 The bigger the Area Under the Curve (AUC) the better the model is in classifying the observation.
 
-```{r ROC, echo=TRUE, out.width= '100%', warning=FALSE}
+```{r ROC_evaluation, echo=TRUE, out.width= '100%', warning=FALSE}
 ROC_test <- Plot_ROC(prob.test, smooth_opt = FALSE)
 
 print(ROC_test)
@@ -377,7 +377,7 @@ We will use the custom functions described in Auxiliary metrics functions topic 
 
 Boosting is the best model we got in this exercise following very closely by Random Forest.
 
-```{r accuracy, echo=TRUE, out.width= '100%'}
+```{r accuracy_evaluation, echo=TRUE, out.width= '100%'}
 # logistic regression
 accuracy(score = prob.test$logistic.predicted, 
          actual = prob.test$logistic.actual, 

@@ -3,7 +3,7 @@ title: "The boosting on loan's report"
 date: "August, 2019"
 ---
 
-```{r setup_logit, include=FALSE}
+```{r setup_boosting, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(fig.pos =  "h")
 knitr::opts_knit$set(root.dir = "../")
@@ -48,7 +48,7 @@ library(pROC)
 
 ```
 
-```{r scripts, include=FALSE}
+```{r scripts_boosting, include=FALSE}
 # loading required steps before performing the analysis
 source("./scripts/step_01_create_functions.R")
 source("./scripts/step_02_data_ingestion.R")
@@ -75,7 +75,7 @@ This dataset is joined with Loan, Client, Credit Card, District, Account and Acc
 We ended up having a data set with **118 variables**.
 
 
-```{r variables, echo=TRUE}
+```{r variables_boosting, echo=TRUE}
 
 loan_dataset_boost <- source_dataset
 
@@ -93,7 +93,7 @@ We will only remove **x_prop_old_age_pension** that we know beforehand to have n
 This model is also not sensible to outliers, missing values and multicollinearity.
 
 
-```{r variable_selecion, echo=TRUE}
+```{r variable_selecion_boosting, echo=TRUE}
 
 loan_dataset_boost <- dplyr::select(loan_dataset_boost, -x_prop_old_age_pension)
 
@@ -109,7 +109,7 @@ The available data in Loan Dataset is split into Train and Testing data on the f
 
 We are selecting exact the same samples for all models to allow comparison between then.
 
-```{r sampling, echo=TRUE}
+```{r sampling_boosting, echo=TRUE}
 
 SplitDataset <- source_train_test_dataset
 data.train_boost <- SplitDataset$data.train
@@ -135,7 +135,7 @@ With the final cleaned dataset, we got from above steps fit our Boosting Model f
 
 We made a lot of tests playing with control parameters trying to reduce the errors and we decided to keep **mfinal = 100**, **minbucket = 25** and **maxdepth = 1 **.
 
-```{r fit_boots_model, eval=FALSE}
+```{r fit_boots_model_boosting, eval=FALSE}
 
 names  <- names(data.train_boost) # saving the name of all vars to put on formula
 f_full <- as.formula(paste("y_loan_defaulter ~",
@@ -149,13 +149,13 @@ saveRDS(boost, "./models/boosting.rds")
 
 ```
 
-```{r load_boots_model, include=FALSE}
+```{r load_boots_model_boosting, include=FALSE}
 
 boost <- readRDS("./models/boosting.rds")
 
 ```
 
-```{r plot_boots_model, echo=TRUE, out.width= '100%'}
+```{r plot_boots_model_boosting, echo=TRUE, out.width= '100%'}
 
 plot(errorevol(boost, data.train_boost))
 
@@ -185,7 +185,7 @@ A comparison against all the models will be provided in the Final Report session
 
 We started this step by making predictions using our model on the X's variables in our Train and Test datasets.
 
-```{r get_scores, echo=TRUE, out.width= '100%'}
+```{r get_scores_boosting, echo=TRUE, out.width= '100%'}
 ## making preditions for each model and consolidating in a single data frame
 
 prob.full = list()
@@ -217,7 +217,7 @@ In this exercise we decide to not prioritize the accuracy on predicting Defaulte
 
 With the returned object from this function we can plot the comparison between TPR (True Positive Rate) and TNR (True Negative Rate) to find the best cut off.
 
-```{r get_measures, echo=TRUE, out.width= '100%'}
+```{r get_measures_boosting, echo=TRUE, out.width= '100%'}
 ## getting measures -----------------------------------------------------------------
 metricsByCutoff.test_boost  <- modelMetrics(prob.test$boosting.actual, 
                                             prob.test$boosting.predicted, 
@@ -227,7 +227,7 @@ metricsByCutoff.test_boost$Plot
 
 With the optimized cut off we calculate the full set of model metrics using the function HMeasure from hmeasure library.
 
-```{r get_measures_full, echo=TRUE, out.width= '100%', warning=FALSE}
+```{r get_measures_full_boosting, echo=TRUE, out.width= '100%', warning=FALSE}
 # Boosting
 measures.boosting.train <- HMeasure(prob.train$boosting.actual, 
                                     prob.train$boosting.predicted, 
@@ -250,7 +250,7 @@ measures <- dplyr::select(measures, metric, everything())
 ```
 
 Below are the metrics on the train and test dataset:
-```{r see_train_measures, echo=TRUE, out.width= '100%'}
+```{r see_train_measures_boosting, echo=TRUE, out.width= '100%'}
 kable(measures, row.names = FALSE)
 ```
 
@@ -260,7 +260,7 @@ This model delivered the best discrimination f all models done here (KS = 0.63)!
 
 Below the confusion matrix and general performance of the model:
 
-```{r see_accuracy_1, echo=TRUE, out.width= '100%'}
+```{r see_accuracy_1_boosting, echo=TRUE, out.width= '100%'}
 # accuracy metrics ---------------------------------------------------------------
 # boosting
 accuracy(score = prob.test$boosting.predicted, 
@@ -270,7 +270,7 @@ accuracy(score = prob.test$boosting.predicted,
 
 We finally look at the score distribution charts to check how well the model is able to discriminate Defaulters and Non-Defaulters.
 
-```{r model_plots, echo=TRUE, out.width= '100%'}
+```{r model_plots_boosting, echo=TRUE, out.width= '100%'}
 p1 <- Score_Histograms(prob.test, 
               prob.test$boosting.predicted,
               prob.test$boosting.actual,

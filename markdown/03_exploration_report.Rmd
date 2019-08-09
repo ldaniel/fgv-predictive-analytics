@@ -27,7 +27,7 @@ library(leaflet)
 library(geojsonio)
 ```
 
-```{r include=FALSE}
+```{r scripts_exploration, include=FALSE}
 # loading required steps before performing the analysis
 source("./scripts/step_01_create_functions.R")
 source("./scripts/step_02_data_ingestion.R")
