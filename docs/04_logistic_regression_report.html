@@ -7,6 +7,7 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 
@@ -108,7 +109,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
       if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -326,18 +327,6 @@ $(document).ready(function () {
 }
 </style>
 
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
-});
-</script>
-
 <!-- code folding -->
 
 
@@ -466,7 +455,7 @@ $(document).ready(function () {
 </ul></li>
 <li><a href="#looking-for-outliers"><span class="toc-section-number">2.3</span> Looking for outliers</a></li>
 <li><a href="#sample-split-into-test-and-training-data"><span class="toc-section-number">2.4</span> Sample split into Test and Training Data</a></li>
-<li><a href="#fit-the-logistic-model"><span class="toc-section-number">2.5</span> Fit the logistic model</a></li>
+<li><a href="#fit-the-logistic-regression-model"><span class="toc-section-number">2.5</span> Fit the Logistic Regression model</a></li>
 </ul></li>
 <li><a href="#interpreting-model-output"><span class="toc-section-number">3</span> Interpreting model output</a></li>
 <li><a href="#evaluating-the-model-performance"><span class="toc-section-number">4</span> Evaluating the model performance</a><ul>
@@ -1369,7 +1358,7 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb6-18" title="18"><span class="kw">print</span>(high_VIF_correlogram_before)</a></code></pre></div>
 <p><img src="04_logistic_regression_report_files/figure-html/check_correl_2-1.png" width="100%" /></p>
 <p>We will now exclude the variables with High VIF maintaining only the variables that are not correlated.</p>
-<p>We will use the pairwise correlation indexes to choose the variable to reject, code below will exclude the variable in the pair that have the greater correlation index sum against the other predictor not in the pair.</p>
+<p>We will use the pairwise correlation indexes to choose the variable to reject, code below will exclude the variable in the pair that have the greater correlation index sum against the other predictors not in the pair beeing evaluated.</p>
 <p>At the end we will have only variables that have a correlation index smaller than our selected <strong>threshold (0.6)</strong>.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">correl_threshold &lt;-<span class="st"> </span><span class="fl">0.6</span></a>
 <a class="sourceLine" id="cb7-2" title="2"></a>
@@ -1666,8 +1655,8 @@ $(document).ready(function () {
 <p>This split was saved in disk using the function described in the Data Prep session to be reused in the other models fitted in this exercise.</p>
 <p>This will ensure consistency when comparing the models against each other.</p>
 </div>
-<div id="fit-the-logistic-model" class="section level2">
-<h2><span class="header-section-number">2.5</span> Fit the logistic model</h2>
+<div id="fit-the-logistic-regression-model" class="section level2">
+<h2><span class="header-section-number">2.5</span> Fit the Logistic Regression model</h2>
 <p>With the final cleaned dataset, we got from above steps we fit our Logistic Regression model for <strong>y_loan_defaulter</strong> on all <strong>x_variables</strong>.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1"><span class="co"># fit model</span></a>
 <a class="sourceLine" id="cb17-2" title="2">logistic.full &lt;-<span class="st"> </span><span class="kw">glm</span>(<span class="dt">formula =</span> y_loan_defaulter <span class="op">~</span><span class="st"> </span>.,</a>
@@ -1727,7 +1716,7 @@ $(document).ready(function () {
 <h1><span class="header-section-number">3</span> Interpreting model output</h1>
 <p>Logistic Regression models are not only good for prediction but also for inference.</p>
 <p>Meaning that it can be used not only in predicting the classification into Defaulters and Non-Defaulters but also to understand the relationship between the predictors and the likelihood of delinquency.</p>
-<p>In the Logistic Regression the effect of an increase or decrease of a predictor is not linear, but we can see the predictors that have the greater influence and by its coefficient signal the associated with an increase or decrease on the likelihood of default.</p>
+<p>In the Logistic Regression the effect of an increase or decrease of a predictor is not linear, but we can see the predictors that have the greater influence and, by its coefficient signal, the association with an increase or decrease on the likelihood of default.</p>
 <p>The probability of default is given by below equation:</p>
 <p><span class="math display">\[P(Y = 1 | X_{n} = x_{n}) = \frac{1}{1 + e^{-(\beta_{0}+\beta_{1}x_{1}+\beta_{2}x_{2}+...+\beta_{n}x_{n} )}}\]</span></p>
 <p>Where each β is the coefficient estimate for each variable in the final model.</p>
@@ -1783,8 +1772,8 @@ $(document).ready(function () {
 <a class="sourceLine" id="cb21-4" title="4">                                            prob.test<span class="op">$</span>logistic.predicted, </a>
 <a class="sourceLine" id="cb21-5" title="5">                                            <span class="dt">plot_title =</span> <span class="st">&#39;Logistic Regression&#39;</span>)</a>
 <a class="sourceLine" id="cb21-6" title="6">metricsByCutoff.test_log<span class="op">$</span>Plot</a></code></pre></div>
-<div id="htmlwidget-22acb069090c865b95d4" style="width:100%;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-22acb069090c865b95d4">{"x":{"visdat":{"47843a24590b":["function () ","plotlyVisDat"]},"cur_data":"47843a24590b","attrs":{"47843a24590b":{"x":{},"y":{},"opacity":0.3,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"bar"},"47843a24590b.1":{"x":{},"y":{},"opacity":1,"name":"TPR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"47843a24590b.2":{"x":{},"y":{},"opacity":1,"name":"TNR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"title":"Cutoff Value"},"yaxis":{"domain":[0,1],"automargin":true,"title":"True Ratio (%)"},"annotations":[{"text":"<b>Logistic Regression<\/b>","x":0,"y":1.04,"yref":"paper","xref":"paper","xanchor":"left","yanchor":"top","showarrow":false,"font":{"size":15}},{"text":"<b>0.08<\/b>","x":0.08,"y":0.64,"showarrow":false,"bgcolor":"white","opacity":0.8}],"hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77],"y":[0.820335195530726,0.686256983240223,0.516871508379888,0.415418994413408,0.26927374301676,0.167821229050279,0.0319553072625699,0.0303910614525139,0.0918435754189943,0.130949720670391,0.147709497206704,0.215642458100559,0.277988826815642,0.311508379888268,0.357094972067039,0.36268156424581,0.413854748603352,0.419441340782123,0.465027932960894,0.521787709497207,0.527374301675978,0.567374301675978,0.57854748603352,0.61854748603352,0.629720670391061,0.635307262569832,0.640893854748603,0.640893854748603,0.640893854748603,0.646480446927374,0.646480446927374,0.646480446927374,0.692067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.783240223463687,0.823240223463687,0.863240223463687,0.903240223463687,0.903240223463687,0.903240223463687,0.903240223463687,0.908826815642458,0.908826815642458,0.908826815642458,0.908826815642458,0.914413407821229,0.914413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.96],"opacity":0.3,"name":"Abs. Diff.","type":"bar","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77],"y":[0.96,0.96,0.88,0.84,0.8,0.76,0.68,0.64,0.64,0.64,0.64,0.6,0.56,0.56,0.52,0.52,0.48,0.48,0.44,0.4,0.4,0.36,0.36,0.32,0.32,0.32,0.32,0.32,0.32,0.32,0.32,0.32,0.28,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.16,0.12,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04],"opacity":1,"name":"TPR","type":"scatter","mode":"lines","marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"line":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77],"y":[0.139664804469274,0.273743016759777,0.363128491620112,0.424581005586592,0.53072625698324,0.592178770949721,0.64804469273743,0.670391061452514,0.731843575418994,0.770949720670391,0.787709497206704,0.815642458100559,0.837988826815642,0.871508379888268,0.877094972067039,0.88268156424581,0.893854748603352,0.899441340782123,0.905027932960894,0.921787709497207,0.927374301675978,0.927374301675978,0.93854748603352,0.93854748603352,0.949720670391061,0.955307262569832,0.960893854748603,0.960893854748603,0.960893854748603,0.966480446927374,0.966480446927374,0.966480446927374,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.988826815642458,0.988826815642458,0.988826815642458,0.988826815642458,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,1],"opacity":1,"name":"TNR","type":"scatter","mode":"lines","marker":{"color":"rgba(44,160,44,1)","line":{"color":"rgba(44,160,44,1)"}},"error_y":{"color":"rgba(44,160,44,1)"},"error_x":{"color":"rgba(44,160,44,1)"},"line":{"color":"rgba(44,160,44,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-950ee59f4f2a052650bd" style="width:100%;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-950ee59f4f2a052650bd">{"x":{"visdat":{"7c04689d3950":["function () ","plotlyVisDat"]},"cur_data":"7c04689d3950","attrs":{"7c04689d3950":{"x":{},"y":{},"opacity":0.3,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"bar"},"7c04689d3950.1":{"x":{},"y":{},"opacity":1,"name":"TPR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"7c04689d3950.2":{"x":{},"y":{},"opacity":1,"name":"TNR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"title":"Cutoff Value"},"yaxis":{"domain":[0,1],"automargin":true,"title":"True Ratio (%)"},"annotations":[{"text":"<b>Logistic Regression<\/b>","x":0,"y":1.04,"yref":"paper","xref":"paper","xanchor":"left","yanchor":"top","showarrow":false,"font":{"size":15}},{"text":"<b>0.08<\/b>","x":0.08,"y":0.64,"showarrow":false,"bgcolor":"white","opacity":0.8}],"hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77],"y":[0.820335195530726,0.686256983240223,0.516871508379888,0.415418994413408,0.26927374301676,0.167821229050279,0.0319553072625699,0.0303910614525139,0.0918435754189943,0.130949720670391,0.147709497206704,0.215642458100559,0.277988826815642,0.311508379888268,0.357094972067039,0.36268156424581,0.413854748603352,0.419441340782123,0.465027932960894,0.521787709497207,0.527374301675978,0.567374301675978,0.57854748603352,0.61854748603352,0.629720670391061,0.635307262569832,0.640893854748603,0.640893854748603,0.640893854748603,0.646480446927374,0.646480446927374,0.646480446927374,0.692067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.783240223463687,0.823240223463687,0.863240223463687,0.903240223463687,0.903240223463687,0.903240223463687,0.903240223463687,0.908826815642458,0.908826815642458,0.908826815642458,0.908826815642458,0.914413407821229,0.914413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.96],"opacity":0.3,"name":"Abs. Diff.","type":"bar","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77],"y":[0.96,0.96,0.88,0.84,0.8,0.76,0.68,0.64,0.64,0.64,0.64,0.6,0.56,0.56,0.52,0.52,0.48,0.48,0.44,0.4,0.4,0.36,0.36,0.32,0.32,0.32,0.32,0.32,0.32,0.32,0.32,0.32,0.28,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.16,0.12,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04],"opacity":1,"name":"TPR","type":"scatter","mode":"lines","marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"line":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77],"y":[0.139664804469274,0.273743016759777,0.363128491620112,0.424581005586592,0.53072625698324,0.592178770949721,0.64804469273743,0.670391061452514,0.731843575418994,0.770949720670391,0.787709497206704,0.815642458100559,0.837988826815642,0.871508379888268,0.877094972067039,0.88268156424581,0.893854748603352,0.899441340782123,0.905027932960894,0.921787709497207,0.927374301675978,0.927374301675978,0.93854748603352,0.93854748603352,0.949720670391061,0.955307262569832,0.960893854748603,0.960893854748603,0.960893854748603,0.966480446927374,0.966480446927374,0.966480446927374,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.988826815642458,0.988826815642458,0.988826815642458,0.988826815642458,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,1],"opacity":1,"name":"TNR","type":"scatter","mode":"lines","marker":{"color":"rgba(44,160,44,1)","line":{"color":"rgba(44,160,44,1)"}},"error_y":{"color":"rgba(44,160,44,1)"},"error_x":{"color":"rgba(44,160,44,1)"},"line":{"color":"rgba(44,160,44,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 <p>With the optimized cut off we calculate the full set of model metrics using the function HMeasure from hmeasure library.</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1"><span class="co"># logistic regression</span></a>
 <a class="sourceLine" id="cb22-2" title="2">measures.logistic.train &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.train<span class="op">$</span>logistic.actual, </a>
@@ -1989,6 +1978,23 @@ $(document).ready(function () {
 
 
 </script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>

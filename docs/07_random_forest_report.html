@@ -7,6 +7,7 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 
@@ -108,7 +109,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
       if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -326,18 +327,6 @@ $(document).ready(function () {
 }
 </style>
 
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
-});
-</script>
-
 <!-- code folding -->
 
 
@@ -481,8 +470,8 @@ The fundamental concept behind random forest is a simple but powerful one — th
 — Tony Yiu
 </footer>
 </blockquote>
-<p>The RF algorithm is a supervised algorithm that, even though it can be used for regression purposes, it was initially conceived as a classification tool.</p>
-<p>The method follows the same concept as a decision tree but with the power of the crowd. So, basically, instead of using one big, deep and complex tree, the method relies on multiple randomly different (in multiple ways) trees voting for a class. This method usually perform better better than one very well trained tree even if, individually, the trees are not as good classifiers, thus refering to the forementioned wisdom of the crowds.</p>
+<p>The Random Forest algorithm is a supervised algorithm that, even though it can be used for regression purposes, it was initially conceived as a classification tool.</p>
+<p>The method follows the same concept as a decision tree but with the power of the crowd. So, basically, instead of using one big, deep and complex tree, the method relies on multiple randomly different (in multiple ways) trees voting for a class. This method usually perform better than one very well trained tree even if, individually, the trees are not as good classifiers, thus refering to the forementioned wisdom of the crowds.</p>
 <blockquote>
 Random forest thrives even in scenarios, when there is an abundance of chaos, i.e. many predictors. It’s hard to know which predictor is important and which is not. All the other traditional statistical techniques might fail or struggle when we have an incredibly high number of independent variables.
 <footer>
@@ -932,9 +921,9 @@ Now, if you think for a second, this is the way direct democracy works: each vot
 <h1><span class="header-section-number">3</span> Selecting the best parameters values for the Random Forest</h1>
 <p>The R community is a one of R’s best features. There are many community members doing awesome improvements on existent libraries as well as sharing and spreading knowledge to the four corners of the Earth (if you still think the Earth is flat and square as I do).</p>
 <p>Th algorithm selected from <strong>randomForest package</strong> (Please, see <a href="https://ldaniel.github.io/Predictive-Analytics/09_references.html"><strong>References</strong></a> to reach out this amazing package) have two main parameters for random forest algorithm tuning: <strong>mtry</strong> representing the number of variables randomly sampled as candidates at each split (or the size of the trees) and <strong>ntree</strong> representing the number of trees to grow (or the size of the forest).</p>
-<p>Another great package for modeling is caret (<em>seriously</em>, check this one out in <a href="https://ldaniel.github.io/Predictive-Analytics/09_references.html"><strong>references</strong></a>, it is fantastic in so many ways!) and, for the sake of our sanity, it has already implemented a good method for randomForest’s package parameter tuning (cheers to them!). This, with the expanded grid search (also from caret package), provides a high performance, friendly and intelligent way of testing parameters. Unfortunately, it is not a perfect world and the implemented method only tune <strong>mtry</strong> parameter.</p>
+<p>Another great package for modeling is caret (<em>seriously</em>, check this one out in <a href="https://ldaniel.github.io/Predictive-Analytics/09_references.html"><strong>References</strong></a>, it is fantastic in so many ways!) and, for the sake of our sanity, it has already implemented a good method for randomForest’s package parameter tuning (cheers to them!). This, with the expanded grid search (also from caret package), provides a high performance, friendly and intelligent way of testing parameters. Unfortunately, it is not a perfect world and the implemented method only tune <strong>mtry</strong> parameter.</p>
 <p>In order to have both parameters tuned using expanded grid search we need to extend caret’s methodology, creating a custom method for parameter tuning and, for that, even under the risk of being repetitive, we must say: we can be saved by the grace of of R’s community!</p>
-<p>There are a lot of implementations accross the internet, however, a good example (and apparently an original one) is provided by Jason Brownlee, who created this customized function supports <strong>mtry</strong> AND <strong>ntree</strong> parameter tuning together. Please, see <a href="https://ldaniel.github.io/Predictive-Analytics/09_references.html"><strong>references</strong></a> page for Jason’s credits (cheers to him!).</p>
+<p>There are a lot of implementations accross the internet, however, a good example (and apparently an original one) is provided by Jason Brownlee, who created this customized function supports <strong>mtry</strong> AND <strong>ntree</strong> parameter tuning together. Please, see <a href="https://ldaniel.github.io/Predictive-Analytics/09_references.html"><strong>References</strong></a> page for Jason’s credits (cheers to him!).</p>
 <p>Below is his implementation to be further used in our RF training.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">customRF &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">type =</span> <span class="st">&quot;Classification&quot;</span>, <span class="dt">library =</span> <span class="st">&quot;randomForest&quot;</span>, <span class="dt">loop =</span> <span class="ot">NULL</span>)</a>
 <a class="sourceLine" id="cb5-2" title="2"></a>
@@ -1046,8 +1035,8 @@ Now, if you think for a second, this is the way direct democracy works: each vot
 <a class="sourceLine" id="cb10-3" title="3">                                                   prob.test<span class="op">$</span>randomforest.predicted, </a>
 <a class="sourceLine" id="cb10-4" title="4">                                                   <span class="dt">plot_title =</span> <span class="st">&#39;Random Forest&#39;</span>)</a>
 <a class="sourceLine" id="cb10-5" title="5">metricsByCutoff.test_randomforest<span class="op">$</span>Plot</a></code></pre></div>
-<div id="htmlwidget-cade0a2f86882513d043" style="width:100%;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-cade0a2f86882513d043">{"x":{"visdat":{"47842b692e41":["function () ","plotlyVisDat"]},"cur_data":"47842b692e41","attrs":{"47842b692e41":{"x":{},"y":{},"opacity":0.3,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"bar"},"47842b692e41.1":{"x":{},"y":{},"opacity":1,"name":"TPR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"47842b692e41.2":{"x":{},"y":{},"opacity":1,"name":"TNR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"title":"Cutoff Value"},"yaxis":{"domain":[0,1],"automargin":true,"title":"True Ratio (%)"},"annotations":[{"text":"<b>Random Forest<\/b>","x":0,"y":1.04,"yref":"paper","xref":"paper","xanchor":"left","yanchor":"top","showarrow":false,"font":{"size":15}},{"text":"<b>0.12<\/b>","x":0.12,"y":0.76,"showarrow":false,"bgcolor":"white","opacity":0.8}],"hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77,0.78],"y":[0.747709497206704,0.647150837988827,0.529832402234637,0.462793296089385,0.361340782122905,0.33340782122905,0.288715083798883,0.255195530726257,0.227262569832402,0.0969832402234636,0.0858100558659217,0.010949720670391,0.016536312849162,0.0621229050279329,0.153296089385475,0.18122905027933,0.249162011173184,0.260335195530726,0.305921787709497,0.317094972067039,0.36268156424581,0.368268156424581,0.430614525139665,0.436201117318436,0.476201117318436,0.527374301675978,0.532960893854749,0.572960893854749,0.62413407821229,0.62413407821229,0.629720670391061,0.629720670391061,0.686480446927374,0.686480446927374,0.686480446927374,0.697653631284916,0.703240223463687,0.708826815642458,0.708826815642458,0.748826815642458,0.754413407821229,0.754413407821229,0.794413407821229,0.794413407821229,0.794413407821229,0.834413407821229,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.88,0.88,0.88,0.88,0.88,0.88,0.88,0.88,0.88,0.88,0.88,0.92,0.96,0.96,0.96,0.96,0.96],"opacity":0.3,"name":"Abs. Diff.","type":"bar","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77,0.78],"y":[0.96,0.96,0.96,0.96,0.92,0.92,0.92,0.92,0.92,0.84,0.84,0.76,0.76,0.72,0.64,0.64,0.6,0.6,0.56,0.56,0.52,0.52,0.48,0.48,0.44,0.4,0.4,0.36,0.32,0.32,0.32,0.32,0.28,0.28,0.28,0.28,0.28,0.28,0.28,0.24,0.24,0.24,0.2,0.2,0.2,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.08,0.04,0.04,0.04,0.04,0.04],"opacity":1,"name":"TPR","type":"scatter","mode":"lines","marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"line":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77,0.78],"y":[0.212290502793296,0.312849162011173,0.430167597765363,0.497206703910615,0.558659217877095,0.58659217877095,0.631284916201117,0.664804469273743,0.692737430167598,0.743016759776536,0.754189944134078,0.770949720670391,0.776536312849162,0.782122905027933,0.793296089385475,0.82122905027933,0.849162011173184,0.860335195530726,0.865921787709497,0.877094972067039,0.88268156424581,0.888268156424581,0.910614525139665,0.916201117318436,0.916201117318436,0.927374301675978,0.932960893854749,0.932960893854749,0.94413407821229,0.94413407821229,0.949720670391061,0.949720670391061,0.966480446927374,0.966480446927374,0.966480446927374,0.977653631284916,0.983240223463687,0.988826815642458,0.988826815642458,0.988826815642458,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],"opacity":1,"name":"TNR","type":"scatter","mode":"lines","marker":{"color":"rgba(44,160,44,1)","line":{"color":"rgba(44,160,44,1)"}},"error_y":{"color":"rgba(44,160,44,1)"},"error_x":{"color":"rgba(44,160,44,1)"},"line":{"color":"rgba(44,160,44,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-4fb3366e14571a8edb9c" style="width:100%;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-4fb3366e14571a8edb9c">{"x":{"visdat":{"7c04488e6b01":["function () ","plotlyVisDat"]},"cur_data":"7c04488e6b01","attrs":{"7c04488e6b01":{"x":{},"y":{},"opacity":0.3,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"bar"},"7c04488e6b01.1":{"x":{},"y":{},"opacity":1,"name":"TPR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"7c04488e6b01.2":{"x":{},"y":{},"opacity":1,"name":"TNR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"title":"Cutoff Value"},"yaxis":{"domain":[0,1],"automargin":true,"title":"True Ratio (%)"},"annotations":[{"text":"<b>Random Forest<\/b>","x":0,"y":1.04,"yref":"paper","xref":"paper","xanchor":"left","yanchor":"top","showarrow":false,"font":{"size":15}},{"text":"<b>0.12<\/b>","x":0.12,"y":0.76,"showarrow":false,"bgcolor":"white","opacity":0.8}],"hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77,0.78],"y":[0.747709497206704,0.647150837988827,0.529832402234637,0.462793296089385,0.361340782122905,0.33340782122905,0.288715083798883,0.255195530726257,0.227262569832402,0.0969832402234636,0.0858100558659217,0.010949720670391,0.016536312849162,0.0621229050279329,0.153296089385475,0.18122905027933,0.249162011173184,0.260335195530726,0.305921787709497,0.317094972067039,0.36268156424581,0.368268156424581,0.430614525139665,0.436201117318436,0.476201117318436,0.527374301675978,0.532960893854749,0.572960893854749,0.62413407821229,0.62413407821229,0.629720670391061,0.629720670391061,0.686480446927374,0.686480446927374,0.686480446927374,0.697653631284916,0.703240223463687,0.708826815642458,0.708826815642458,0.748826815642458,0.754413407821229,0.754413407821229,0.794413407821229,0.794413407821229,0.794413407821229,0.834413407821229,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.84,0.88,0.88,0.88,0.88,0.88,0.88,0.88,0.88,0.88,0.88,0.88,0.92,0.96,0.96,0.96,0.96,0.96],"opacity":0.3,"name":"Abs. Diff.","type":"bar","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77,0.78],"y":[0.96,0.96,0.96,0.96,0.92,0.92,0.92,0.92,0.92,0.84,0.84,0.76,0.76,0.72,0.64,0.64,0.6,0.6,0.56,0.56,0.52,0.52,0.48,0.48,0.44,0.4,0.4,0.36,0.32,0.32,0.32,0.32,0.28,0.28,0.28,0.28,0.28,0.28,0.28,0.24,0.24,0.24,0.2,0.2,0.2,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.16,0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.08,0.04,0.04,0.04,0.04,0.04],"opacity":1,"name":"TPR","type":"scatter","mode":"lines","marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"line":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77,0.78],"y":[0.212290502793296,0.312849162011173,0.430167597765363,0.497206703910615,0.558659217877095,0.58659217877095,0.631284916201117,0.664804469273743,0.692737430167598,0.743016759776536,0.754189944134078,0.770949720670391,0.776536312849162,0.782122905027933,0.793296089385475,0.82122905027933,0.849162011173184,0.860335195530726,0.865921787709497,0.877094972067039,0.88268156424581,0.888268156424581,0.910614525139665,0.916201117318436,0.916201117318436,0.927374301675978,0.932960893854749,0.932960893854749,0.94413407821229,0.94413407821229,0.949720670391061,0.949720670391061,0.966480446927374,0.966480446927374,0.966480446927374,0.977653631284916,0.983240223463687,0.988826815642458,0.988826815642458,0.988826815642458,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],"opacity":1,"name":"TNR","type":"scatter","mode":"lines","marker":{"color":"rgba(44,160,44,1)","line":{"color":"rgba(44,160,44,1)"}},"error_y":{"color":"rgba(44,160,44,1)"},"error_x":{"color":"rgba(44,160,44,1)"},"line":{"color":"rgba(44,160,44,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 <p>With the optimized cut off we calculate the full set of model metrics using the function HMeasure from hmeasure library (another very good package! Don’t forget to check for our <a href="https://ldaniel.github.io/Predictive-Analytics/09_references.html"><strong>references</strong></a>).</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="co"># Random Forest</span></a>
 <a class="sourceLine" id="cb11-2" title="2">measures.randomforest.train &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.train<span class="op">$</span>randomforest.actual, </a>
@@ -1191,7 +1180,7 @@ Now, if you think for a second, this is the way direct democracy works: each vot
 </tr>
 </tbody>
 </table>
-<p>Our RF model clearly overfitted (as we can see by most of metrics, AUC of 1.0 in train set and 0.84 in test set, for example). This happened mainly because of the size of our dataset.</p>
+<p>Our Random Forest model clearly overfitted (as we can see by most of metrics, AUC of 1.0 in train set and 0.84 in test set, for example). This happened mainly because of the size of our dataset.</p>
 </div>
 <div id="evaluating-classification-performance" class="section level2">
 <h2><span class="header-section-number">5.2</span> Evaluating classification performance</h2>
@@ -1234,7 +1223,7 @@ Now, if you think for a second, this is the way direct democracy works: each vot
 <p>The box plot also shows a clear discrimination between Defaulters and Non-Defaulters.</p>
 <p>Finally, the KS metric is also presented a good result for a reliable classification purpose.</p>
 <p>In the Final Report session, we will look more closely on the AUC and Gini metrics by plotting the ROC curve and comparing against other models.</p>
-<p>Stay tuned!!!</p>
+<p>More to come in the final report!!!</p>
 </div>
 </div>
 
@@ -1255,6 +1244,23 @@ $(document).ready(function () {
 
 
 </script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
