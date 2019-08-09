@@ -176,7 +176,7 @@ rpart.plot(tree.prune, cex = 1.3, type = 0,
 ```
 
 On performing the pruning process in our decision tree, we end up with a tree with only one node split.
-This is because splitting the train data set of just one node provide an overall accuracy greater than any other combination.
+This is because splitting the train data set into just one node provide an overall accuracy greater than any other combination.
 
 Here the technique falls short for this dataset, we would be interest in give a greater weight on correctly predict the real defaulters than the general accuracy of the model.
 
