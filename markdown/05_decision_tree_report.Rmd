@@ -292,7 +292,7 @@ Below the confusion matrix and general performance of the model:
 
 ```{r see_accuracy_1, echo=TRUE, out.width= '100%'}
 # accuracy metrics ---------------------------------------------------------------
-# logistic regression
+# decision tree
 accuracy(score = prob.test$decision.tree.predicted, 
          actual = prob.test$decision.tree.actual, 
          threshold = metricsByCutoff.test_DT[["BestCut"]][["Cut"]])
