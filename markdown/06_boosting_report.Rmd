@@ -299,4 +299,4 @@ The KS metric .63 is considered good for this classification model.
 
 In the Final Report session, we will look more closely on the AUC and Gini metrics by plotting the ROC curve and comparing against other models.
 
-Stay tuned!!!
+Stay with us!!!
