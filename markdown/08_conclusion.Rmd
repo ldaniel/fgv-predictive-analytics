@@ -371,7 +371,7 @@ print(ROC_test)
 
 ### Acurracy
 
-We finally look at the Confusion Matrix at the best cut off each model to get a sense of the accuracy we were able to get in this exercise.
+We finally look at the Confusion Matrix at the best cut off of each model to get a sense of the accuracy we were able to get in this exercise.
 
 We will use the custom functions described in Auxiliary metrics functions topic in the Data Preparation session of this site.
 
