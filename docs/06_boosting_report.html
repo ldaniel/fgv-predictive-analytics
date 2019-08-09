@@ -50,7 +50,7 @@ a.sourceLine { text-indent: -1em; padding-left: 1em; }
 pre.numberSource a.sourceLine
   { position: relative; left: -4em; }
 pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
+  { content: attr(title);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
     border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
@@ -483,9 +483,9 @@ $(document).ready(function () {
 <p>Using the vanilla transaction dataset, we calculated several derived variables for each account as described in the Data Preparation session.</p>
 <p>This dataset is joined with Loan, Client, Credit Card, District, Account and Account Balance tables.</p>
 <p>We ended up having a data set with <strong>118 variables</strong>.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">loan_dataset_boost &lt;-<span class="st"> </span>source_dataset</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw">kable</span>(<span class="kw">tibble</span>(<span class="dt">variables =</span> <span class="kw">names</span>(loan_dataset_boost)))</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">loan_dataset_boost &lt;-<span class="st"> </span>source_dataset</a>
+<a class="sourceLine" id="cb1-2" title="2"></a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="kw">kable</span>(<span class="kw">tibble</span>(<span class="dt">variables =</span> <span class="kw">names</span>(loan_dataset_boost)))</a></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -855,7 +855,7 @@ $(document).ready(function () {
 <p>One advantage of Boosting models is that it does not require heavy feature engineering.</p>
 <p>We will only remove <strong>x_prop_old_age_pension</strong> that we know beforehand to have no variance in the dataset.</p>
 <p>This model is also not sensible to outliers, missing values and multicollinearity.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">loan_dataset_boost &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(loan_dataset_boost, <span class="op">-</span>x_prop_old_age_pension)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">loan_dataset_boost &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(loan_dataset_boost, <span class="op">-</span>x_prop_old_age_pension)</a></code></pre></div>
 </div>
 <div id="sample-split-into-test-and-training-data" class="section level2">
 <h2><span class="header-section-number">2.3</span> Sample split into Test and Training Data</h2>
@@ -865,11 +865,11 @@ $(document).ready(function () {
 <li><strong>Test Dataset </strong> (30% 204 obs).</li>
 </ul>
 <p>We are selecting exact the same samples for all models to allow comparison between then.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">SplitDataset &lt;-<span class="st"> </span>source_train_test_dataset</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2">data.train_boost &lt;-<span class="st"> </span>SplitDataset<span class="op">$</span>data.train</a>
-<a class="sourceLine" id="cb3-3" data-line-number="3">data.test_boost &lt;-<span class="st"> </span>SplitDataset<span class="op">$</span>data.test</a>
-<a class="sourceLine" id="cb3-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="kw">kable</span>(SplitDataset<span class="op">$</span>event.proportion)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">SplitDataset &lt;-<span class="st"> </span>source_train_test_dataset</a>
+<a class="sourceLine" id="cb3-2" title="2">data.train_boost &lt;-<span class="st"> </span>SplitDataset<span class="op">$</span>data.train</a>
+<a class="sourceLine" id="cb3-3" title="3">data.test_boost &lt;-<span class="st"> </span>SplitDataset<span class="op">$</span>data.test</a>
+<a class="sourceLine" id="cb3-4" title="4"></a>
+<a class="sourceLine" id="cb3-5" title="5"><span class="kw">kable</span>(SplitDataset<span class="op">$</span>event.proportion)</a></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -896,28 +896,28 @@ $(document).ready(function () {
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">loan_dataset_boost<span class="op">$</span>y_loan_defaulter &lt;-<span class="st"> </span><span class="kw">as.factor</span>(loan_dataset_boost<span class="op">$</span>y_loan_defaulter)</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2">data.train_boost<span class="op">$</span>y_loan_defaulter   &lt;-<span class="st"> </span><span class="kw">as.factor</span>(data.train_boost<span class="op">$</span>y_loan_defaulter)</a>
-<a class="sourceLine" id="cb4-3" data-line-number="3">data.test_boost<span class="op">$</span>y_loan_defaulter    &lt;-<span class="st"> </span><span class="kw">as.factor</span>(data.test_boost<span class="op">$</span>y_loan_defaulter)</a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb4-5" data-line-number="5">data.train_boost &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(data.train_boost, <span class="kw">names</span>(loan_dataset_boost))</a>
-<a class="sourceLine" id="cb4-6" data-line-number="6">data.test_boost &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(data.test_boost, <span class="kw">names</span>(loan_dataset_boost))</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">loan_dataset_boost<span class="op">$</span>y_loan_defaulter &lt;-<span class="st"> </span><span class="kw">as.factor</span>(loan_dataset_boost<span class="op">$</span>y_loan_defaulter)</a>
+<a class="sourceLine" id="cb4-2" title="2">data.train_boost<span class="op">$</span>y_loan_defaulter   &lt;-<span class="st"> </span><span class="kw">as.factor</span>(data.train_boost<span class="op">$</span>y_loan_defaulter)</a>
+<a class="sourceLine" id="cb4-3" title="3">data.test_boost<span class="op">$</span>y_loan_defaulter    &lt;-<span class="st"> </span><span class="kw">as.factor</span>(data.test_boost<span class="op">$</span>y_loan_defaulter)</a>
+<a class="sourceLine" id="cb4-4" title="4"></a>
+<a class="sourceLine" id="cb4-5" title="5">data.train_boost &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(data.train_boost, <span class="kw">names</span>(loan_dataset_boost))</a>
+<a class="sourceLine" id="cb4-6" title="6">data.test_boost &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(data.test_boost, <span class="kw">names</span>(loan_dataset_boost))</a></code></pre></div>
 <p>Both datasets keep the same proportion for the explained variable around 11%.</p>
 </div>
 <div id="fiting-the-boosting-model" class="section level2">
 <h2><span class="header-section-number">2.4</span> Fiting the Boosting model</h2>
 <p>With the final cleaned dataset, we got from above steps fit our Boosting Model for y_loan_defaulter on all x variables.</p>
 <p>We made a lot of tests playing with control parameters trying to reduce the errors and we decided to keep <strong>mfinal = 100</strong>, <strong>minbucket = 25</strong> and <strong>maxdepth = 1 </strong>.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">names  &lt;-<span class="st"> </span><span class="kw">names</span>(data.train_boost) <span class="co"># saving the name of all vars to put on formula</span></a>
-<a class="sourceLine" id="cb5-2" data-line-number="2">f_full &lt;-<span class="st"> </span><span class="kw">as.formula</span>(<span class="kw">paste</span>(<span class="st">&quot;y_loan_defaulter ~&quot;</span>,</a>
-<a class="sourceLine" id="cb5-3" data-line-number="3">                           <span class="kw">paste</span>(names[<span class="op">!</span>names <span class="op">%in%</span><span class="st"> &quot;y_loan_defaulter&quot;</span>], <span class="dt">collapse =</span> <span class="st">&quot; + &quot;</span>)))</a>
-<a class="sourceLine" id="cb5-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb5-5" data-line-number="5">boost &lt;-<span class="st"> </span><span class="kw">boosting</span>(f_full, <span class="dt">data=</span> data.train_boost, <span class="dt">mfinal=</span> <span class="dv">100</span>, </a>
-<a class="sourceLine" id="cb5-6" data-line-number="6">                   <span class="dt">coeflearn =</span> <span class="st">&quot;Freund&quot;</span>, </a>
-<a class="sourceLine" id="cb5-7" data-line-number="7">                   <span class="dt">control =</span> <span class="kw">rpart.control</span>(<span class="dt">minbucket=</span> <span class="dv">25</span>,<span class="dt">maxdepth =</span> <span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb5-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb5-9" data-line-number="9"><span class="kw">saveRDS</span>(boost, <span class="st">&quot;./models/boosting.rds&quot;</span>)</a></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">plot</span>(<span class="kw">errorevol</span>(boost, data.train_boost))</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">names  &lt;-<span class="st"> </span><span class="kw">names</span>(data.train_boost) <span class="co"># saving the name of all vars to put on formula</span></a>
+<a class="sourceLine" id="cb5-2" title="2">f_full &lt;-<span class="st"> </span><span class="kw">as.formula</span>(<span class="kw">paste</span>(<span class="st">&quot;y_loan_defaulter ~&quot;</span>,</a>
+<a class="sourceLine" id="cb5-3" title="3">                           <span class="kw">paste</span>(names[<span class="op">!</span>names <span class="op">%in%</span><span class="st"> &quot;y_loan_defaulter&quot;</span>], <span class="dt">collapse =</span> <span class="st">&quot; + &quot;</span>)))</a>
+<a class="sourceLine" id="cb5-4" title="4"></a>
+<a class="sourceLine" id="cb5-5" title="5">boost &lt;-<span class="st"> </span><span class="kw">boosting</span>(f_full, <span class="dt">data=</span> data.train_boost, <span class="dt">mfinal=</span> <span class="dv">100</span>, </a>
+<a class="sourceLine" id="cb5-6" title="6">                   <span class="dt">coeflearn =</span> <span class="st">&quot;Freund&quot;</span>, </a>
+<a class="sourceLine" id="cb5-7" title="7">                   <span class="dt">control =</span> <span class="kw">rpart.control</span>(<span class="dt">minbucket=</span> <span class="dv">25</span>,<span class="dt">maxdepth =</span> <span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb5-8" title="8"></a>
+<a class="sourceLine" id="cb5-9" title="9"><span class="kw">saveRDS</span>(boost, <span class="st">&quot;./models/boosting.rds&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw">plot</span>(<span class="kw">errorevol</span>(boost, data.train_boost))</a></code></pre></div>
 <p><img src="06_boosting_report_files/figure-html/plot_boots_model-1.png" width="100%" /></p>
 <hr />
 </div>
@@ -939,61 +939,61 @@ $(document).ready(function () {
 <p>Here we will perform basically the same steps we did in the Logistic Regression and Decision Tree models.</p>
 <p>A comparison against all the models will be provided in the Final Report session of this exercise.</p>
 <p>We started this step by making predictions using our model on the X’s variables in our Train and Test datasets.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="co">## making preditions for each model and consolidating in a single data frame</span></a>
-<a class="sourceLine" id="cb7-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb7-3" data-line-number="3">prob.full =<span class="st"> </span><span class="kw">list</span>()</a>
-<a class="sourceLine" id="cb7-4" data-line-number="4">prob.train =<span class="st"> </span><span class="kw">list</span>()</a>
-<a class="sourceLine" id="cb7-5" data-line-number="5">prob.test =<span class="st"> </span><span class="kw">list</span>()</a>
-<a class="sourceLine" id="cb7-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb7-7" data-line-number="7">prob.full<span class="op">$</span>boosting.actual         &lt;-<span class="st"> </span>loan_dataset_boost<span class="op">$</span>y_loan_defaulter</a>
-<a class="sourceLine" id="cb7-8" data-line-number="8">prob.full<span class="op">$</span>boosting.predicted      &lt;-<span class="st"> </span><span class="kw">predict.boosting</span>(boost, </a>
-<a class="sourceLine" id="cb7-9" data-line-number="9">                                                      <span class="dt">newdata =</span> loan_dataset_boost)<span class="op">$</span>prob[, <span class="dv">2</span>]</a>
-<a class="sourceLine" id="cb7-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb7-11" data-line-number="11">prob.train<span class="op">$</span>boosting.actual         &lt;-<span class="st"> </span>data.train_boost<span class="op">$</span>y_loan_defaulter</a>
-<a class="sourceLine" id="cb7-12" data-line-number="12">prob.train<span class="op">$</span>boosting.predicted      &lt;-<span class="st"> </span><span class="kw">predict.boosting</span>(boost, <span class="dt">newdata =</span> </a>
-<a class="sourceLine" id="cb7-13" data-line-number="13">                                                          data.train_boost)<span class="op">$</span>prob[, <span class="dv">2</span>]</a>
-<a class="sourceLine" id="cb7-14" data-line-number="14"></a>
-<a class="sourceLine" id="cb7-15" data-line-number="15">prob.test<span class="op">$</span>boosting.actual         &lt;-<span class="st"> </span>data.test_boost<span class="op">$</span>y_loan_defaulter</a>
-<a class="sourceLine" id="cb7-16" data-line-number="16">prob.test<span class="op">$</span>boosting.predicted      &lt;-<span class="st"> </span><span class="kw">predict.boosting</span>(boost, <span class="dt">newdata =</span> </a>
-<a class="sourceLine" id="cb7-17" data-line-number="17">                                                         data.test_boost)<span class="op">$</span>prob[, <span class="dv">2</span>]</a>
-<a class="sourceLine" id="cb7-18" data-line-number="18"></a>
-<a class="sourceLine" id="cb7-19" data-line-number="19">prob.full   &lt;-<span class="st"> </span>prob.full <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a>
-<a class="sourceLine" id="cb7-20" data-line-number="20">prob.train  &lt;-<span class="st"> </span>prob.train <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a>
-<a class="sourceLine" id="cb7-21" data-line-number="21">prob.test   &lt;-<span class="st"> </span>prob.test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="co">## making preditions for each model and consolidating in a single data frame</span></a>
+<a class="sourceLine" id="cb7-2" title="2"></a>
+<a class="sourceLine" id="cb7-3" title="3">prob.full =<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb7-4" title="4">prob.train =<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb7-5" title="5">prob.test =<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb7-6" title="6"></a>
+<a class="sourceLine" id="cb7-7" title="7">prob.full<span class="op">$</span>boosting.actual         &lt;-<span class="st"> </span>loan_dataset_boost<span class="op">$</span>y_loan_defaulter</a>
+<a class="sourceLine" id="cb7-8" title="8">prob.full<span class="op">$</span>boosting.predicted      &lt;-<span class="st"> </span><span class="kw">predict.boosting</span>(boost, </a>
+<a class="sourceLine" id="cb7-9" title="9">                                                      <span class="dt">newdata =</span> loan_dataset_boost)<span class="op">$</span>prob[, <span class="dv">2</span>]</a>
+<a class="sourceLine" id="cb7-10" title="10"></a>
+<a class="sourceLine" id="cb7-11" title="11">prob.train<span class="op">$</span>boosting.actual         &lt;-<span class="st"> </span>data.train_boost<span class="op">$</span>y_loan_defaulter</a>
+<a class="sourceLine" id="cb7-12" title="12">prob.train<span class="op">$</span>boosting.predicted      &lt;-<span class="st"> </span><span class="kw">predict.boosting</span>(boost, <span class="dt">newdata =</span> </a>
+<a class="sourceLine" id="cb7-13" title="13">                                                          data.train_boost)<span class="op">$</span>prob[, <span class="dv">2</span>]</a>
+<a class="sourceLine" id="cb7-14" title="14"></a>
+<a class="sourceLine" id="cb7-15" title="15">prob.test<span class="op">$</span>boosting.actual         &lt;-<span class="st"> </span>data.test_boost<span class="op">$</span>y_loan_defaulter</a>
+<a class="sourceLine" id="cb7-16" title="16">prob.test<span class="op">$</span>boosting.predicted      &lt;-<span class="st"> </span><span class="kw">predict.boosting</span>(boost, <span class="dt">newdata =</span> </a>
+<a class="sourceLine" id="cb7-17" title="17">                                                         data.test_boost)<span class="op">$</span>prob[, <span class="dv">2</span>]</a>
+<a class="sourceLine" id="cb7-18" title="18"></a>
+<a class="sourceLine" id="cb7-19" title="19">prob.full   &lt;-<span class="st"> </span>prob.full <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a>
+<a class="sourceLine" id="cb7-20" title="20">prob.train  &lt;-<span class="st"> </span>prob.train <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a>
+<a class="sourceLine" id="cb7-21" title="21">prob.test   &lt;-<span class="st"> </span>prob.test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a></code></pre></div>
 <div id="getting-performance-measures" class="section level2">
 <h2><span class="header-section-number">4.1</span> Getting Performance Measures</h2>
 <p>To calculate the performance measures, derived from the confusion matrix, we need to find the score cut off that best split our test dataset into Defaulters and Non-Defaulters.</p>
 <p>In this exercise we decide to not prioritize the accuracy on predicting Defaulters and Non-Defaulters, therefore we are looking for the score cut off that best predict each class equally.</p>
 <p>With the returned object from this function we can plot the comparison between TPR (True Positive Rate) and TNR (True Negative Rate) to find the best cut off.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="co">## getting measures -----------------------------------------------------------------</span></a>
-<a class="sourceLine" id="cb8-2" data-line-number="2">metricsByCutoff.test_boost  &lt;-<span class="st"> </span><span class="kw">modelMetrics</span>(prob.test<span class="op">$</span>boosting.actual, </a>
-<a class="sourceLine" id="cb8-3" data-line-number="3">                                            prob.test<span class="op">$</span>boosting.predicted, </a>
-<a class="sourceLine" id="cb8-4" data-line-number="4">                                            <span class="dt">plot_title =</span> <span class="st">&#39;Boosting&#39;</span>)</a>
-<a class="sourceLine" id="cb8-5" data-line-number="5">metricsByCutoff.test_boost<span class="op">$</span>Plot</a></code></pre></div>
-<div id="htmlwidget-77e4c84075f9633c1b9e" style="width:100%;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-77e4c84075f9633c1b9e">{"x":{"visdat":{"2c772ad0808":["function () ","plotlyVisDat"]},"cur_data":"2c772ad0808","attrs":{"2c772ad0808":{"x":{},"y":{},"opacity":0.3,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"bar"},"2c772ad0808.1":{"x":{},"y":{},"opacity":1,"name":"TPR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"2c772ad0808.2":{"x":{},"y":{},"opacity":1,"name":"TNR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"2c772ad0808.3":{"x":0.42,"y":0.84,"opacity":1,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","text":0.42,"mode":"text","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"title":"Cutoff Value"},"yaxis":{"domain":[0,1],"automargin":true,"title":"True Ratio (%)"},"title":"Boosting","hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63],"y":[0.983240223463687,0.960893854748603,0.955307262569832,0.94413407821229,0.932960893854749,0.927374301675978,0.905027932960894,0.849162011173184,0.810055865921788,0.691843575418994,0.652737430167598,0.613631284916201,0.563351955307263,0.489832402234637,0.428379888268156,0.366033519553073,0.321340782122905,0.265474860335196,0.23195530726257,0.204022346368715,0.102569832402235,0.0690502793296089,0.0844692737430168,0.203575418994413,0.225921787709497,0.305027932960894,0.390614525139665,0.487374301675978,0.504134078212291,0.612067039106145,0.663240223463687,0.703240223463687,0.823240223463687,0.828826815642458,0.914413407821229,0.96,0.96,0.96,0.96,0.96,0.96,0.96,0.96],"opacity":0.3,"name":"Abs. Diff.","type":"bar","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63],"y":[1,1,1,1,1,1,1,1,1,0.96,0.96,0.96,0.96,0.92,0.92,0.88,0.88,0.88,0.88,0.88,0.84,0.84,0.72,0.64,0.64,0.6,0.52,0.44,0.44,0.36,0.32,0.28,0.16,0.16,0.08,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04],"opacity":1,"name":"TPR","type":"scatter","mode":"lines","marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"line":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63],"y":[0.0167597765363128,0.0391061452513966,0.0446927374301676,0.0558659217877095,0.0670391061452514,0.0726256983240224,0.0949720670391061,0.150837988826816,0.189944134078212,0.268156424581006,0.307262569832402,0.346368715083799,0.396648044692737,0.430167597765363,0.491620111731844,0.513966480446927,0.558659217877095,0.614525139664804,0.64804469273743,0.675977653631285,0.737430167597765,0.770949720670391,0.804469273743017,0.843575418994413,0.865921787709497,0.905027932960894,0.910614525139665,0.927374301675978,0.94413407821229,0.972067039106145,0.983240223463687,0.983240223463687,0.983240223463687,0.988826815642458,0.994413407821229,1,1,1,1,1,1,1,1],"opacity":1,"name":"TNR","type":"scatter","mode":"lines","marker":{"color":"rgba(44,160,44,1)","line":{"color":"rgba(44,160,44,1)"}},"error_y":{"color":"rgba(44,160,44,1)"},"error_x":{"color":"rgba(44,160,44,1)"},"line":{"color":"rgba(44,160,44,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.42],"y":[0.84],"opacity":1,"name":"Abs. Diff.","type":"scatter","text":0.42,"mode":"text","marker":{"color":"rgba(214,39,40,1)","line":{"color":"rgba(214,39,40,1)"}},"error_y":{"color":"rgba(214,39,40,1)"},"error_x":{"color":"rgba(214,39,40,1)"},"line":{"color":"rgba(214,39,40,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="co">## getting measures -----------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb8-2" title="2">metricsByCutoff.test_boost  &lt;-<span class="st"> </span><span class="kw">modelMetrics</span>(prob.test<span class="op">$</span>boosting.actual, </a>
+<a class="sourceLine" id="cb8-3" title="3">                                            prob.test<span class="op">$</span>boosting.predicted, </a>
+<a class="sourceLine" id="cb8-4" title="4">                                            <span class="dt">plot_title =</span> <span class="st">&#39;Boosting&#39;</span>)</a>
+<a class="sourceLine" id="cb8-5" title="5">metricsByCutoff.test_boost<span class="op">$</span>Plot</a></code></pre></div>
+<div id="htmlwidget-52a5c7c621079fdf3d10" style="width:100%;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-52a5c7c621079fdf3d10">{"x":{"visdat":{"478441fb5ae9":["function () ","plotlyVisDat"]},"cur_data":"478441fb5ae9","attrs":{"478441fb5ae9":{"x":{},"y":{},"opacity":0.3,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"bar"},"478441fb5ae9.1":{"x":{},"y":{},"opacity":1,"name":"TPR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"478441fb5ae9.2":{"x":{},"y":{},"opacity":1,"name":"TNR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"title":"Cutoff Value"},"yaxis":{"domain":[0,1],"automargin":true,"title":"True Ratio (%)"},"annotations":[{"text":"<b>Boosting<\/b>","x":0,"y":1.04,"yref":"paper","xref":"paper","xanchor":"left","yanchor":"top","showarrow":false,"font":{"size":15}},{"text":"<b>0.42<\/b>","x":0.42,"y":0.84,"showarrow":false,"bgcolor":"white","opacity":0.8}],"hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63],"y":[0.983240223463687,0.960893854748603,0.955307262569832,0.94413407821229,0.932960893854749,0.927374301675978,0.905027932960894,0.849162011173184,0.810055865921788,0.691843575418994,0.652737430167598,0.613631284916201,0.563351955307263,0.489832402234637,0.428379888268156,0.366033519553073,0.321340782122905,0.265474860335196,0.23195530726257,0.204022346368715,0.102569832402235,0.0690502793296089,0.0844692737430168,0.203575418994413,0.225921787709497,0.305027932960894,0.390614525139665,0.487374301675978,0.504134078212291,0.612067039106145,0.663240223463687,0.703240223463687,0.823240223463687,0.828826815642458,0.914413407821229,0.96,0.96,0.96,0.96,0.96,0.96,0.96,0.96],"opacity":0.3,"name":"Abs. Diff.","type":"bar","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63],"y":[1,1,1,1,1,1,1,1,1,0.96,0.96,0.96,0.96,0.92,0.92,0.88,0.88,0.88,0.88,0.88,0.84,0.84,0.72,0.64,0.64,0.6,0.52,0.44,0.44,0.36,0.32,0.28,0.16,0.16,0.08,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04],"opacity":1,"name":"TPR","type":"scatter","mode":"lines","marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"line":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63],"y":[0.0167597765363128,0.0391061452513966,0.0446927374301676,0.0558659217877095,0.0670391061452514,0.0726256983240224,0.0949720670391061,0.150837988826816,0.189944134078212,0.268156424581006,0.307262569832402,0.346368715083799,0.396648044692737,0.430167597765363,0.491620111731844,0.513966480446927,0.558659217877095,0.614525139664804,0.64804469273743,0.675977653631285,0.737430167597765,0.770949720670391,0.804469273743017,0.843575418994413,0.865921787709497,0.905027932960894,0.910614525139665,0.927374301675978,0.94413407821229,0.972067039106145,0.983240223463687,0.983240223463687,0.983240223463687,0.988826815642458,0.994413407821229,1,1,1,1,1,1,1,1],"opacity":1,"name":"TNR","type":"scatter","mode":"lines","marker":{"color":"rgba(44,160,44,1)","line":{"color":"rgba(44,160,44,1)"}},"error_y":{"color":"rgba(44,160,44,1)"},"error_x":{"color":"rgba(44,160,44,1)"},"line":{"color":"rgba(44,160,44,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 <p>With the optimized cut off we calculate the full set of model metrics using the function HMeasure from hmeasure library.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="co"># Boosting</span></a>
-<a class="sourceLine" id="cb9-2" data-line-number="2">measures.boosting.train &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.train<span class="op">$</span>boosting.actual, </a>
-<a class="sourceLine" id="cb9-3" data-line-number="3">                                    prob.train<span class="op">$</span>boosting.predicted, </a>
-<a class="sourceLine" id="cb9-4" data-line-number="4">                                    <span class="dt">threshold =</span> metricsByCutoff.test_boost<span class="op">$</span>BestCut[<span class="st">&#39;Cut&#39;</span>])</a>
-<a class="sourceLine" id="cb9-5" data-line-number="5">measures.boosting.test  &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.test<span class="op">$</span>boosting.actual, </a>
-<a class="sourceLine" id="cb9-6" data-line-number="6">                                    prob.test<span class="op">$</span>boosting.predicted, </a>
-<a class="sourceLine" id="cb9-7" data-line-number="7">                                    <span class="dt">threshold =</span> metricsByCutoff.test_boost<span class="op">$</span>BestCut[<span class="st">&#39;Cut&#39;</span>])</a>
-<a class="sourceLine" id="cb9-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb9-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb9-10" data-line-number="10"><span class="co"># join measures in a single data frame</span></a>
-<a class="sourceLine" id="cb9-11" data-line-number="11">measures &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">bind_rows</span>(measures.boosting.train<span class="op">$</span>metrics,</a>
-<a class="sourceLine" id="cb9-12" data-line-number="12">                        measures.boosting.test<span class="op">$</span>metrics</a>
-<a class="sourceLine" id="cb9-13" data-line-number="13">                        )) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>(., <span class="dt">rownames =</span> <span class="ot">NA</span>)</a>
-<a class="sourceLine" id="cb9-14" data-line-number="14"></a>
-<a class="sourceLine" id="cb9-15" data-line-number="15"><span class="kw">colnames</span>(measures) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;boosting - train&#39;</span>, <span class="st">&#39;boosting - test&#39;</span>)</a>
-<a class="sourceLine" id="cb9-16" data-line-number="16"></a>
-<a class="sourceLine" id="cb9-17" data-line-number="17">measures<span class="op">$</span>metric =<span class="st"> </span><span class="kw">rownames</span>(measures)</a>
-<a class="sourceLine" id="cb9-18" data-line-number="18"></a>
-<a class="sourceLine" id="cb9-19" data-line-number="19">measures &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(measures, metric, <span class="kw">everything</span>())</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="co"># Boosting</span></a>
+<a class="sourceLine" id="cb9-2" title="2">measures.boosting.train &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.train<span class="op">$</span>boosting.actual, </a>
+<a class="sourceLine" id="cb9-3" title="3">                                    prob.train<span class="op">$</span>boosting.predicted, </a>
+<a class="sourceLine" id="cb9-4" title="4">                                    <span class="dt">threshold =</span> metricsByCutoff.test_boost<span class="op">$</span>BestCut[<span class="st">&#39;Cut&#39;</span>])</a>
+<a class="sourceLine" id="cb9-5" title="5">measures.boosting.test  &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.test<span class="op">$</span>boosting.actual, </a>
+<a class="sourceLine" id="cb9-6" title="6">                                    prob.test<span class="op">$</span>boosting.predicted, </a>
+<a class="sourceLine" id="cb9-7" title="7">                                    <span class="dt">threshold =</span> metricsByCutoff.test_boost<span class="op">$</span>BestCut[<span class="st">&#39;Cut&#39;</span>])</a>
+<a class="sourceLine" id="cb9-8" title="8"></a>
+<a class="sourceLine" id="cb9-9" title="9"></a>
+<a class="sourceLine" id="cb9-10" title="10"><span class="co"># join measures in a single data frame</span></a>
+<a class="sourceLine" id="cb9-11" title="11">measures &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">bind_rows</span>(measures.boosting.train<span class="op">$</span>metrics,</a>
+<a class="sourceLine" id="cb9-12" title="12">                        measures.boosting.test<span class="op">$</span>metrics</a>
+<a class="sourceLine" id="cb9-13" title="13">                        )) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>(., <span class="dt">rownames =</span> <span class="ot">NA</span>)</a>
+<a class="sourceLine" id="cb9-14" title="14"></a>
+<a class="sourceLine" id="cb9-15" title="15"><span class="kw">colnames</span>(measures) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;boosting - train&#39;</span>, <span class="st">&#39;boosting - test&#39;</span>)</a>
+<a class="sourceLine" id="cb9-16" title="16"></a>
+<a class="sourceLine" id="cb9-17" title="17">measures<span class="op">$</span>metric =<span class="st"> </span><span class="kw">rownames</span>(measures)</a>
+<a class="sourceLine" id="cb9-18" title="18"></a>
+<a class="sourceLine" id="cb9-19" title="19">measures &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(measures, metric, <span class="kw">everything</span>())</a></code></pre></div>
 <p>Below are the metrics on the train and test dataset:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw">kable</span>(measures, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">kable</span>(measures, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1120,11 +1120,11 @@ $(document).ready(function () {
 <h2><span class="header-section-number">4.2</span> Evaluating classification performance</h2>
 <p>This model delivered the better accuracy of all models done here (76.96%)! We will compare how it performed against other classes of models in the Final Report session.</p>
 <p>Below the confusion matrix and general performance of the model:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="co"># accuracy metrics ---------------------------------------------------------------</span></a>
-<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="co"># boosting</span></a>
-<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="kw">accuracy</span>(<span class="dt">score =</span> prob.test<span class="op">$</span>boosting.predicted, </a>
-<a class="sourceLine" id="cb11-4" data-line-number="4">         <span class="dt">actual =</span> prob.test<span class="op">$</span>boosting.actual, </a>
-<a class="sourceLine" id="cb11-5" data-line-number="5">         <span class="dt">threshold =</span> metricsByCutoff.test_boost[[<span class="st">&quot;BestCut&quot;</span>]][[<span class="st">&quot;Cut&quot;</span>]])</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="co"># accuracy metrics ---------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb11-2" title="2"><span class="co"># boosting</span></a>
+<a class="sourceLine" id="cb11-3" title="3"><span class="kw">accuracy</span>(<span class="dt">score =</span> prob.test<span class="op">$</span>boosting.predicted, </a>
+<a class="sourceLine" id="cb11-4" title="4">         <span class="dt">actual =</span> prob.test<span class="op">$</span>boosting.actual, </a>
+<a class="sourceLine" id="cb11-5" title="5">         <span class="dt">threshold =</span> metricsByCutoff.test_boost[[<span class="st">&quot;BestCut&quot;</span>]][[<span class="st">&quot;Cut&quot;</span>]])</a></code></pre></div>
 <pre><code>## 
 ## 
 ##             pred.1   pred.0
@@ -1135,24 +1135,24 @@ $(document).ready(function () {
 ## [1] &quot;Model General Accuracy of: 77.94%&quot;
 ## [1] &quot;True Positive Rate of    : 84%&quot;</code></pre>
 <p>We finally look at the score distribution charts to check how well the model is able to discriminate Defaulters and Non-Defaulters.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">p1 &lt;-<span class="st"> </span><span class="kw">Score_Histograms</span>(prob.test, </a>
-<a class="sourceLine" id="cb13-2" data-line-number="2">              prob.test<span class="op">$</span>boosting.predicted,</a>
-<a class="sourceLine" id="cb13-3" data-line-number="3">              prob.test<span class="op">$</span>boosting.actual,</a>
-<a class="sourceLine" id="cb13-4" data-line-number="4">             <span class="st">&#39;Density Plot&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.title.y =</span> <span class="kw">element_blank</span>())</a>
-<a class="sourceLine" id="cb13-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb13-6" data-line-number="6">p2 &lt;-<span class="st"> </span><span class="kw">Score_Boxplot</span>(prob.test, </a>
-<a class="sourceLine" id="cb13-7" data-line-number="7">              prob.test<span class="op">$</span>boosting.predicted, </a>
-<a class="sourceLine" id="cb13-8" data-line-number="8">              prob.test<span class="op">$</span>boosting.actual,</a>
-<a class="sourceLine" id="cb13-9" data-line-number="9">              <span class="st">&#39;Score Boxplot&#39;</span>)</a>
-<a class="sourceLine" id="cb13-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb13-11" data-line-number="11">p3 &lt;-<span class="st"> </span><span class="kw">KS_Plot</span>(prob.test<span class="op">$</span>boosting.predicted[prob.test<span class="op">$</span>boosting.actual <span class="op">==</span><span class="st"> </span><span class="dv">0</span>],</a>
-<a class="sourceLine" id="cb13-12" data-line-number="12">          prob.test<span class="op">$</span>boosting.predicted[prob.test<span class="op">$</span>boosting.actual <span class="op">==</span><span class="st"> </span><span class="dv">1</span>],</a>
-<a class="sourceLine" id="cb13-13" data-line-number="13">        <span class="st">&#39;KS Plot&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.title.y =</span> <span class="kw">element_blank</span>(),</a>
-<a class="sourceLine" id="cb13-14" data-line-number="14">                           <span class="dt">axis.text.y =</span> <span class="kw">element_blank</span>())</a>
-<a class="sourceLine" id="cb13-15" data-line-number="15"></a>
-<a class="sourceLine" id="cb13-16" data-line-number="16"><span class="kw">ggarrange</span>(p1, p2, <span class="dt">nrow =</span> <span class="dv">2</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1">p1 &lt;-<span class="st"> </span><span class="kw">Score_Histograms</span>(prob.test, </a>
+<a class="sourceLine" id="cb13-2" title="2">              prob.test<span class="op">$</span>boosting.predicted,</a>
+<a class="sourceLine" id="cb13-3" title="3">              prob.test<span class="op">$</span>boosting.actual,</a>
+<a class="sourceLine" id="cb13-4" title="4">             <span class="st">&#39;Density Plot&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.title.y =</span> <span class="kw">element_blank</span>())</a>
+<a class="sourceLine" id="cb13-5" title="5"></a>
+<a class="sourceLine" id="cb13-6" title="6">p2 &lt;-<span class="st"> </span><span class="kw">Score_Boxplot</span>(prob.test, </a>
+<a class="sourceLine" id="cb13-7" title="7">              prob.test<span class="op">$</span>boosting.predicted, </a>
+<a class="sourceLine" id="cb13-8" title="8">              prob.test<span class="op">$</span>boosting.actual,</a>
+<a class="sourceLine" id="cb13-9" title="9">              <span class="st">&#39;Score Boxplot&#39;</span>)</a>
+<a class="sourceLine" id="cb13-10" title="10"></a>
+<a class="sourceLine" id="cb13-11" title="11">p3 &lt;-<span class="st"> </span><span class="kw">KS_Plot</span>(prob.test<span class="op">$</span>boosting.predicted[prob.test<span class="op">$</span>boosting.actual <span class="op">==</span><span class="st"> </span><span class="dv">0</span>],</a>
+<a class="sourceLine" id="cb13-12" title="12">          prob.test<span class="op">$</span>boosting.predicted[prob.test<span class="op">$</span>boosting.actual <span class="op">==</span><span class="st"> </span><span class="dv">1</span>],</a>
+<a class="sourceLine" id="cb13-13" title="13">        <span class="st">&#39;KS Plot&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.title.y =</span> <span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb13-14" title="14">                           <span class="dt">axis.text.y =</span> <span class="kw">element_blank</span>())</a>
+<a class="sourceLine" id="cb13-15" title="15"></a>
+<a class="sourceLine" id="cb13-16" title="16"><span class="kw">ggarrange</span>(p1, p2, <span class="dt">nrow =</span> <span class="dv">2</span>)</a></code></pre></div>
 <p><img src="06_boosting_report_files/figure-html/model_plots-1.png" width="100%" /></p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">p3</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1">p3</a></code></pre></div>
 <p><img src="06_boosting_report_files/figure-html/model_plots-2.png" width="100%" /></p>
 <p>By the score density we can see that the boosting model is not as narrow as the decision tree on the scores it assigns to the observations.</p>
 <p>The box plot can show us a clear discrimination between Defaulters and Non-Defaulters.</p>

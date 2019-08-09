@@ -50,7 +50,7 @@ a.sourceLine { text-indent: -1em; padding-left: 1em; }
 pre.numberSource a.sourceLine
   { position: relative; left: -4em; }
 pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
+  { content: attr(title);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
     border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
@@ -488,9 +488,9 @@ $(document).ready(function () {
 <p>Using the vanilla transaction dataset, we calculated several derived variables for each account as described in the Data Preparation session.</p>
 <p>This dataset is joined with Loan, Client, Credit Card, District, Account and Account Balance tables.</p>
 <p>We ended up having a data set with <strong>118 variables</strong>.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">loan_dataset_logistic &lt;-<span class="st"> </span>source_dataset</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw">kable</span>(<span class="kw">tibble</span>(<span class="dt">variables =</span> <span class="kw">names</span>(loan_dataset_logistic)))</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">loan_dataset_logistic &lt;-<span class="st"> </span>source_dataset</a>
+<a class="sourceLine" id="cb1-2" title="2"></a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="kw">kable</span>(<span class="kw">tibble</span>(<span class="dt">variables =</span> <span class="kw">names</span>(loan_dataset_logistic)))</a></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -862,22 +862,22 @@ $(document).ready(function () {
 <h3><span class="header-section-number">2.2.1</span> Dummy variables</h3>
 <p>Starting with the dummy variables. We will keep only dummies that has the event in at least 5% of the observation in the dataset.</p>
 <p>The below table shows the dummy variables that will be kept in the model:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">dummy_variables &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(loan_dataset_logistic, </a>
-<a class="sourceLine" id="cb2-2" data-line-number="2">                                 <span class="kw">starts_with</span>(<span class="st">&#39;x_client_gender&#39;</span>), </a>
-<a class="sourceLine" id="cb2-3" data-line-number="3">                                 <span class="kw">starts_with</span>(<span class="st">&#39;x_district_name&#39;</span>),</a>
-<a class="sourceLine" id="cb2-4" data-line-number="4">                                 <span class="kw">starts_with</span>(<span class="st">&#39;x_region&#39;</span>),</a>
-<a class="sourceLine" id="cb2-5" data-line-number="5">                                 <span class="kw">starts_with</span>(<span class="st">&#39;x_card_type&#39;</span>))</a>
-<a class="sourceLine" id="cb2-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb2-7" data-line-number="7">dummy_variables_high &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">variables =</span> <span class="kw">names</span>(dummy_variables),</a>
-<a class="sourceLine" id="cb2-8" data-line-number="8">       <span class="dt">zeros =</span> <span class="kw">sapply</span>(dummy_variables, </a>
-<a class="sourceLine" id="cb2-9" data-line-number="9">                      <span class="cf">function</span>(x) <span class="kw">table</span>(<span class="kw">as.character</span>(x) <span class="op">==</span><span class="st"> </span><span class="dv">0</span>)[<span class="st">&quot;TRUE&quot;</span>]),</a>
-<a class="sourceLine" id="cb2-10" data-line-number="10">       <span class="dt">ones =</span> <span class="kw">sapply</span>(dummy_variables, </a>
-<a class="sourceLine" id="cb2-11" data-line-number="11">                     <span class="cf">function</span>(x) <span class="kw">table</span>(<span class="kw">as.character</span>(x) <span class="op">==</span><span class="st"> </span><span class="dv">1</span>)[<span class="st">&quot;TRUE&quot;</span>])) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb2-12" data-line-number="12"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">prop_ones =</span> <span class="kw">round</span>(ones <span class="op">/</span><span class="st"> </span>(zeros <span class="op">+</span><span class="st"> </span>ones) <span class="op">*</span><span class="st"> </span><span class="dv">100</span>, <span class="dv">2</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb2-13" data-line-number="13"><span class="st">  </span><span class="kw">arrange</span>(prop_ones) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb2-14" data-line-number="14"><span class="st">  </span><span class="kw">filter</span>(prop_ones  <span class="op">&gt;</span><span class="st"> </span><span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb2-15" data-line-number="15"></a>
-<a class="sourceLine" id="cb2-16" data-line-number="16"><span class="kw">kable</span>(dummy_variables_high)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">dummy_variables &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(loan_dataset_logistic, </a>
+<a class="sourceLine" id="cb2-2" title="2">                                 <span class="kw">starts_with</span>(<span class="st">&#39;x_client_gender&#39;</span>), </a>
+<a class="sourceLine" id="cb2-3" title="3">                                 <span class="kw">starts_with</span>(<span class="st">&#39;x_district_name&#39;</span>),</a>
+<a class="sourceLine" id="cb2-4" title="4">                                 <span class="kw">starts_with</span>(<span class="st">&#39;x_region&#39;</span>),</a>
+<a class="sourceLine" id="cb2-5" title="5">                                 <span class="kw">starts_with</span>(<span class="st">&#39;x_card_type&#39;</span>))</a>
+<a class="sourceLine" id="cb2-6" title="6"></a>
+<a class="sourceLine" id="cb2-7" title="7">dummy_variables_high &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">variables =</span> <span class="kw">names</span>(dummy_variables),</a>
+<a class="sourceLine" id="cb2-8" title="8">       <span class="dt">zeros =</span> <span class="kw">sapply</span>(dummy_variables, </a>
+<a class="sourceLine" id="cb2-9" title="9">                      <span class="cf">function</span>(x) <span class="kw">table</span>(<span class="kw">as.character</span>(x) <span class="op">==</span><span class="st"> </span><span class="dv">0</span>)[<span class="st">&quot;TRUE&quot;</span>]),</a>
+<a class="sourceLine" id="cb2-10" title="10">       <span class="dt">ones =</span> <span class="kw">sapply</span>(dummy_variables, </a>
+<a class="sourceLine" id="cb2-11" title="11">                     <span class="cf">function</span>(x) <span class="kw">table</span>(<span class="kw">as.character</span>(x) <span class="op">==</span><span class="st"> </span><span class="dv">1</span>)[<span class="st">&quot;TRUE&quot;</span>])) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb2-12" title="12"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">prop_ones =</span> <span class="kw">round</span>(ones <span class="op">/</span><span class="st"> </span>(zeros <span class="op">+</span><span class="st"> </span>ones) <span class="op">*</span><span class="st"> </span><span class="dv">100</span>, <span class="dv">2</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb2-13" title="13"><span class="st">  </span><span class="kw">arrange</span>(prop_ones) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb2-14" title="14"><span class="st">  </span><span class="kw">filter</span>(prop_ones  <span class="op">&gt;</span><span class="st"> </span><span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb2-15" title="15"></a>
+<a class="sourceLine" id="cb2-16" title="16"><span class="kw">kable</span>(dummy_variables_high)</a></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -955,12 +955,12 @@ $(document).ready(function () {
 <div id="transaction-type-proportion-variables" class="section level3">
 <h3><span class="header-section-number">2.2.2</span> Transaction type proportion variables</h3>
 <p>After we investigated the low variability in the dummies, we take care of the calculated variables on the transaction type proportion we calculated during the data enhancement process.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">prop_variables &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(loan_dataset_logistic, </a>
-<a class="sourceLine" id="cb3-2" data-line-number="2">                                <span class="kw">starts_with</span>(<span class="st">&#39;x_prop&#39;</span>))</a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb3-4" data-line-number="4">prop_variables &lt;-<span class="st"> </span><span class="kw">summary</span>(prop_variables)</a>
-<a class="sourceLine" id="cb3-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="kw">kable</span>(<span class="kw">t</span>(prop_variables))</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">prop_variables &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(loan_dataset_logistic, </a>
+<a class="sourceLine" id="cb3-2" title="2">                                <span class="kw">starts_with</span>(<span class="st">&#39;x_prop&#39;</span>))</a>
+<a class="sourceLine" id="cb3-3" title="3"></a>
+<a class="sourceLine" id="cb3-4" title="4">prop_variables &lt;-<span class="st"> </span><span class="kw">summary</span>(prop_variables)</a>
+<a class="sourceLine" id="cb3-5" title="5"></a>
+<a class="sourceLine" id="cb3-6" title="6"><span class="kw">kable</span>(<span class="kw">t</span>(prop_variables))</a></code></pre></div>
 <table>
 <tbody>
 <tr class="odd">
@@ -1028,7 +1028,7 @@ $(document).ready(function () {
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">loan_dataset_logistic &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(loan_dataset_logistic, <span class="op">-</span>x_prop_old_age_pension)</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">loan_dataset_logistic &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(loan_dataset_logistic, <span class="op">-</span>x_prop_old_age_pension)</a></code></pre></div>
 <p>The variable <strong>x_prop_old_age_pension</strong> is also excluded from the dataset as it has not a single observation in this sample.</p>
 <p>We ended up having a data set with <strong>40 variables</strong>.</p>
 <table>
@@ -1169,14 +1169,14 @@ $(document).ready(function () {
 <p>Just looking at correlation indexes among pairs of predictors is limited as it is possible that the pairwise correlations are small, and yet a linear dependence exists among three or more variables.</p>
 <p>That’s why we will rely on a test called Variance Inflation Factors, VIF for short, to detect multicollinearity.</p>
 <p>Multicollinearity is poison for Regression algorithms!!!</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">vars.quant &lt;-<span class="st"> </span><span class="kw">select_if</span>(loan_dataset_logistic, is.numeric)</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2">VIF &lt;-<span class="st"> </span><span class="kw">imcdiag</span>(vars.quant, loan_dataset_logistic<span class="op">$</span>y_loan_defaulter)</a>
-<a class="sourceLine" id="cb5-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb5-4" data-line-number="4">VIF_Table_Before &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">variable =</span> <span class="kw">names</span>(VIF<span class="op">$</span>idiags[,<span class="dv">1</span>]),</a>
-<a class="sourceLine" id="cb5-5" data-line-number="5">                    <span class="dt">VIF =</span> VIF<span class="op">$</span>idiags[,<span class="dv">1</span>]) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="st">             </span><span class="kw">arrange</span>(<span class="kw">desc</span>(VIF))</a>
-<a class="sourceLine" id="cb5-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb5-8" data-line-number="8">knitr<span class="op">::</span><span class="kw">kable</span>(VIF_Table_Before)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">vars.quant &lt;-<span class="st"> </span><span class="kw">select_if</span>(loan_dataset_logistic, is.numeric)</a>
+<a class="sourceLine" id="cb5-2" title="2">VIF &lt;-<span class="st"> </span><span class="kw">imcdiag</span>(vars.quant, loan_dataset_logistic<span class="op">$</span>y_loan_defaulter)</a>
+<a class="sourceLine" id="cb5-3" title="3"></a>
+<a class="sourceLine" id="cb5-4" title="4">VIF_Table_Before &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">variable =</span> <span class="kw">names</span>(VIF<span class="op">$</span>idiags[,<span class="dv">1</span>]),</a>
+<a class="sourceLine" id="cb5-5" title="5">                    <span class="dt">VIF =</span> VIF<span class="op">$</span>idiags[,<span class="dv">1</span>]) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb5-6" title="6"><span class="st">             </span><span class="kw">arrange</span>(<span class="kw">desc</span>(VIF))</a>
+<a class="sourceLine" id="cb5-7" title="7"></a>
+<a class="sourceLine" id="cb5-8" title="8">knitr<span class="op">::</span><span class="kw">kable</span>(VIF_Table_Before)</a></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1349,50 +1349,50 @@ $(document).ready(function () {
 </table>
 <p>Having identified the predictors with high VIF we look at the correlogram on those variables.</p>
 <p>Here we are hiding the variable names for readability.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">low_VIF &lt;-<span class="st"> </span><span class="kw">filter</span>(VIF_Table_Before, VIF <span class="op">&lt;=</span><span class="st"> </span><span class="dv">5</span>)<span class="op">$</span>variable</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2">high_VIF &lt;-<span class="st"> </span><span class="kw">filter</span>(VIF_Table_Before, VIF <span class="op">&gt;</span><span class="st"> </span><span class="dv">5</span>)<span class="op">$</span>variable</a>
-<a class="sourceLine" id="cb6-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb6-4" data-line-number="4">high_VIF_dataset &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(loan_dataset_logistic, high_VIF)</a>
-<a class="sourceLine" id="cb6-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb6-6" data-line-number="6">cor_mtx_high_VIF &lt;-<span class="st"> </span><span class="kw">cor</span>(high_VIF_dataset)</a>
-<a class="sourceLine" id="cb6-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb6-8" data-line-number="8">high_VIF_correlogram_before &lt;-<span class="st"> </span><span class="kw">ggcorrplot</span>(cor_mtx_high_VIF, </a>
-<a class="sourceLine" id="cb6-9" data-line-number="9">                                <span class="dt">hc.order =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb6-10" data-line-number="10">                                <span class="dt">lab =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb6-11" data-line-number="11">                                <span class="dt">lab_size =</span> <span class="dv">3</span>, </a>
-<a class="sourceLine" id="cb6-12" data-line-number="12">                                <span class="dt">method=</span><span class="st">&quot;square&quot;</span>,</a>
-<a class="sourceLine" id="cb6-13" data-line-number="13">                                <span class="dt">colors =</span> <span class="kw">c</span>(<span class="st">&quot;tomato2&quot;</span>, <span class="st">&quot;white&quot;</span>, <span class="st">&quot;springgreen3&quot;</span>),</a>
-<a class="sourceLine" id="cb6-14" data-line-number="14">                                <span class="dt">title=</span><span class="st">&quot;Correlation Matrix of Loan Dataset Variables with high VIF&quot;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb6-15" data-line-number="15"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text =</span> <span class="kw">element_blank</span>(),</a>
-<a class="sourceLine" id="cb6-16" data-line-number="16">        <span class="dt">legend.position =</span> <span class="dv">0</span>)</a>
-<a class="sourceLine" id="cb6-17" data-line-number="17"></a>
-<a class="sourceLine" id="cb6-18" data-line-number="18"><span class="kw">print</span>(high_VIF_correlogram_before)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">low_VIF &lt;-<span class="st"> </span><span class="kw">filter</span>(VIF_Table_Before, VIF <span class="op">&lt;=</span><span class="st"> </span><span class="dv">5</span>)<span class="op">$</span>variable</a>
+<a class="sourceLine" id="cb6-2" title="2">high_VIF &lt;-<span class="st"> </span><span class="kw">filter</span>(VIF_Table_Before, VIF <span class="op">&gt;</span><span class="st"> </span><span class="dv">5</span>)<span class="op">$</span>variable</a>
+<a class="sourceLine" id="cb6-3" title="3"></a>
+<a class="sourceLine" id="cb6-4" title="4">high_VIF_dataset &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(loan_dataset_logistic, high_VIF)</a>
+<a class="sourceLine" id="cb6-5" title="5"></a>
+<a class="sourceLine" id="cb6-6" title="6">cor_mtx_high_VIF &lt;-<span class="st"> </span><span class="kw">cor</span>(high_VIF_dataset)</a>
+<a class="sourceLine" id="cb6-7" title="7"></a>
+<a class="sourceLine" id="cb6-8" title="8">high_VIF_correlogram_before &lt;-<span class="st"> </span><span class="kw">ggcorrplot</span>(cor_mtx_high_VIF, </a>
+<a class="sourceLine" id="cb6-9" title="9">                                <span class="dt">hc.order =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb6-10" title="10">                                <span class="dt">lab =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb6-11" title="11">                                <span class="dt">lab_size =</span> <span class="dv">3</span>, </a>
+<a class="sourceLine" id="cb6-12" title="12">                                <span class="dt">method=</span><span class="st">&quot;square&quot;</span>,</a>
+<a class="sourceLine" id="cb6-13" title="13">                                <span class="dt">colors =</span> <span class="kw">c</span>(<span class="st">&quot;tomato2&quot;</span>, <span class="st">&quot;white&quot;</span>, <span class="st">&quot;springgreen3&quot;</span>),</a>
+<a class="sourceLine" id="cb6-14" title="14">                                <span class="dt">title=</span><span class="st">&quot;Correlation Matrix of Loan Dataset Variables with high VIF&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb6-15" title="15"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text =</span> <span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb6-16" title="16">        <span class="dt">legend.position =</span> <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb6-17" title="17"></a>
+<a class="sourceLine" id="cb6-18" title="18"><span class="kw">print</span>(high_VIF_correlogram_before)</a></code></pre></div>
 <p><img src="04_logistic_regression_report_files/figure-html/check_correl_2-1.png" width="100%" /></p>
 <p>We will now exclude the variables with High VIF maintaining only the variables that are not correlated.</p>
 <p>We will use the pairwise correlation indexes to choose the variable to reject, code below will exclude the variable in the pair that have the greater correlation index sum against the other predictor not in the pair.</p>
 <p>At the end we will have only variables that have a correlation index smaller than our selected <strong>threshold (0.6)</strong>.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">correl_threshold &lt;-<span class="st"> </span><span class="fl">0.6</span></a>
-<a class="sourceLine" id="cb7-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb7-3" data-line-number="3">reject_variables_vector &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">var_1 =</span> <span class="kw">row.names</span>(cor_mtx_high_VIF)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="st">  </span><span class="kw">bind_cols</span>(<span class="kw">as_tibble</span>(cor_mtx_high_VIF)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="st">  </span><span class="kw">melt</span>(<span class="dt">id =</span> <span class="kw">c</span>(<span class="st">&quot;var_1&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="st">  </span><span class="kw">filter</span>(var_<span class="dv">1</span> <span class="op">!=</span><span class="st"> </span>variable) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">abs_value =</span> <span class="kw">abs</span>(value)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="st">  </span><span class="kw">filter</span>(abs_value <span class="op">&gt;</span><span class="st"> </span>correl_threshold) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="st">  </span><span class="kw">group_by</span>(var_<span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sum_1 =</span> <span class="kw">sum</span>(abs_value)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="st">  </span><span class="kw">ungroup</span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-12" data-line-number="12"><span class="st">  </span><span class="kw">group_by</span>(variable) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-13" data-line-number="13"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sum_2 =</span> <span class="kw">sum</span>(abs_value)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-14" data-line-number="14"><span class="st">  </span><span class="kw">ungroup</span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-15" data-line-number="15"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">reject =</span> <span class="kw">ifelse</span>(sum_<span class="dv">1</span> <span class="op">&gt;</span><span class="st"> </span>sum_<span class="dv">2</span>, var_<span class="dv">1</span>, <span class="kw">as.character</span>(variable))) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-16" data-line-number="16"><span class="st">  </span><span class="kw">distinct</span>(reject)</a>
-<a class="sourceLine" id="cb7-17" data-line-number="17"></a>
-<a class="sourceLine" id="cb7-18" data-line-number="18">reject_variables_vector &lt;-<span class="st"> </span>reject_variables_vector<span class="op">$</span>reject</a>
-<a class="sourceLine" id="cb7-19" data-line-number="19"></a>
-<a class="sourceLine" id="cb7-20" data-line-number="20">clean_dataset &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(loan_dataset_logistic, <span class="op">-</span>reject_variables_vector)</a>
-<a class="sourceLine" id="cb7-21" data-line-number="21"></a>
-<a class="sourceLine" id="cb7-22" data-line-number="22"><span class="kw">kable</span>(reject_variables_vector)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">correl_threshold &lt;-<span class="st"> </span><span class="fl">0.6</span></a>
+<a class="sourceLine" id="cb7-2" title="2"></a>
+<a class="sourceLine" id="cb7-3" title="3">reject_variables_vector &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">var_1 =</span> <span class="kw">row.names</span>(cor_mtx_high_VIF)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-4" title="4"><span class="st">  </span><span class="kw">bind_cols</span>(<span class="kw">as_tibble</span>(cor_mtx_high_VIF)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-5" title="5"><span class="st">  </span><span class="kw">melt</span>(<span class="dt">id =</span> <span class="kw">c</span>(<span class="st">&quot;var_1&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-6" title="6"><span class="st">  </span><span class="kw">filter</span>(var_<span class="dv">1</span> <span class="op">!=</span><span class="st"> </span>variable) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb7-7" title="7"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">abs_value =</span> <span class="kw">abs</span>(value)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb7-8" title="8"><span class="st">  </span><span class="kw">filter</span>(abs_value <span class="op">&gt;</span><span class="st"> </span>correl_threshold) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb7-9" title="9"><span class="st">  </span><span class="kw">group_by</span>(var_<span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-10" title="10"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sum_1 =</span> <span class="kw">sum</span>(abs_value)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-11" title="11"><span class="st">  </span><span class="kw">ungroup</span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-12" title="12"><span class="st">  </span><span class="kw">group_by</span>(variable) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-13" title="13"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sum_2 =</span> <span class="kw">sum</span>(abs_value)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-14" title="14"><span class="st">  </span><span class="kw">ungroup</span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-15" title="15"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">reject =</span> <span class="kw">ifelse</span>(sum_<span class="dv">1</span> <span class="op">&gt;</span><span class="st"> </span>sum_<span class="dv">2</span>, var_<span class="dv">1</span>, <span class="kw">as.character</span>(variable))) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-16" title="16"><span class="st">  </span><span class="kw">distinct</span>(reject)</a>
+<a class="sourceLine" id="cb7-17" title="17"></a>
+<a class="sourceLine" id="cb7-18" title="18">reject_variables_vector &lt;-<span class="st"> </span>reject_variables_vector<span class="op">$</span>reject</a>
+<a class="sourceLine" id="cb7-19" title="19"></a>
+<a class="sourceLine" id="cb7-20" title="20">clean_dataset &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(loan_dataset_logistic, <span class="op">-</span>reject_variables_vector)</a>
+<a class="sourceLine" id="cb7-21" title="21"></a>
+<a class="sourceLine" id="cb7-22" title="22"><span class="kw">kable</span>(reject_variables_vector)</a></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1437,66 +1437,66 @@ $(document).ready(function () {
 </table>
 <p>After the high VIF predictors exclusion we reevaluate the correlation matrix of the original dataset and the cleaned dataset.</p>
 <p>Variable names are hidden for readability. Trust us, there is no correlation greater than 0.6 here.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">cor_mtx_full &lt;-<span class="st"> </span><span class="kw">cor</span>(loan_dataset_logistic)</a>
-<a class="sourceLine" id="cb8-2" data-line-number="2">cor_mtx_clean &lt;-<span class="st"> </span><span class="kw">cor</span>(clean_dataset,)</a>
-<a class="sourceLine" id="cb8-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb8-4" data-line-number="4">full =<span class="st"> </span><span class="kw">ggcorrplot</span>(cor_mtx_full, <span class="dt">hc.order =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb8-5" data-line-number="5">           <span class="dt">lab =</span> <span class="ot">FALSE</span>, </a>
-<a class="sourceLine" id="cb8-6" data-line-number="6">           <span class="dt">lab_size =</span> <span class="dv">3</span>, </a>
-<a class="sourceLine" id="cb8-7" data-line-number="7">           <span class="dt">method=</span><span class="st">&quot;square&quot;</span>, </a>
-<a class="sourceLine" id="cb8-8" data-line-number="8">           <span class="dt">colors =</span> <span class="kw">c</span>(<span class="st">&quot;tomato2&quot;</span>, <span class="st">&quot;white&quot;</span>, <span class="st">&quot;springgreen3&quot;</span>),</a>
-<a class="sourceLine" id="cb8-9" data-line-number="9">           <span class="dt">title=</span><span class="st">&quot;Correlation Matrix of Full Loan Dataset&quot;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb8-10" data-line-number="10"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text =</span> <span class="kw">element_blank</span>(),</a>
-<a class="sourceLine" id="cb8-11" data-line-number="11">        <span class="dt">legend.position =</span> <span class="dv">0</span>)</a>
-<a class="sourceLine" id="cb8-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb8-13" data-line-number="13">clean =<span class="st"> </span><span class="kw">ggcorrplot</span>(cor_mtx_clean, <span class="dt">hc.order =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb8-14" data-line-number="14">           <span class="dt">lab =</span> <span class="ot">FALSE</span>, </a>
-<a class="sourceLine" id="cb8-15" data-line-number="15">           <span class="dt">lab_size =</span> <span class="dv">3</span>, </a>
-<a class="sourceLine" id="cb8-16" data-line-number="16">           <span class="dt">method=</span><span class="st">&quot;square&quot;</span>, </a>
-<a class="sourceLine" id="cb8-17" data-line-number="17">           <span class="dt">colors =</span> <span class="kw">c</span>(<span class="st">&quot;tomato2&quot;</span>, <span class="st">&quot;white&quot;</span>, <span class="st">&quot;springgreen3&quot;</span>),</a>
-<a class="sourceLine" id="cb8-18" data-line-number="18">           <span class="dt">title=</span><span class="st">&quot;Correlation Matrix of Clean Loan Dataset&quot;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb8-19" data-line-number="19"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text =</span> <span class="kw">element_blank</span>(),</a>
-<a class="sourceLine" id="cb8-20" data-line-number="20">        <span class="dt">legend.position =</span> <span class="dv">0</span>)</a>
-<a class="sourceLine" id="cb8-21" data-line-number="21"></a>
-<a class="sourceLine" id="cb8-22" data-line-number="22"><span class="kw">print</span>(<span class="kw">ggarrange</span>(full, clean))</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">cor_mtx_full &lt;-<span class="st"> </span><span class="kw">cor</span>(loan_dataset_logistic)</a>
+<a class="sourceLine" id="cb8-2" title="2">cor_mtx_clean &lt;-<span class="st"> </span><span class="kw">cor</span>(clean_dataset,)</a>
+<a class="sourceLine" id="cb8-3" title="3"></a>
+<a class="sourceLine" id="cb8-4" title="4">full =<span class="st"> </span><span class="kw">ggcorrplot</span>(cor_mtx_full, <span class="dt">hc.order =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb8-5" title="5">           <span class="dt">lab =</span> <span class="ot">FALSE</span>, </a>
+<a class="sourceLine" id="cb8-6" title="6">           <span class="dt">lab_size =</span> <span class="dv">3</span>, </a>
+<a class="sourceLine" id="cb8-7" title="7">           <span class="dt">method=</span><span class="st">&quot;square&quot;</span>, </a>
+<a class="sourceLine" id="cb8-8" title="8">           <span class="dt">colors =</span> <span class="kw">c</span>(<span class="st">&quot;tomato2&quot;</span>, <span class="st">&quot;white&quot;</span>, <span class="st">&quot;springgreen3&quot;</span>),</a>
+<a class="sourceLine" id="cb8-9" title="9">           <span class="dt">title=</span><span class="st">&quot;Correlation Matrix of Full Loan Dataset&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-10" title="10"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text =</span> <span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb8-11" title="11">        <span class="dt">legend.position =</span> <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb8-12" title="12"></a>
+<a class="sourceLine" id="cb8-13" title="13">clean =<span class="st"> </span><span class="kw">ggcorrplot</span>(cor_mtx_clean, <span class="dt">hc.order =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb8-14" title="14">           <span class="dt">lab =</span> <span class="ot">FALSE</span>, </a>
+<a class="sourceLine" id="cb8-15" title="15">           <span class="dt">lab_size =</span> <span class="dv">3</span>, </a>
+<a class="sourceLine" id="cb8-16" title="16">           <span class="dt">method=</span><span class="st">&quot;square&quot;</span>, </a>
+<a class="sourceLine" id="cb8-17" title="17">           <span class="dt">colors =</span> <span class="kw">c</span>(<span class="st">&quot;tomato2&quot;</span>, <span class="st">&quot;white&quot;</span>, <span class="st">&quot;springgreen3&quot;</span>),</a>
+<a class="sourceLine" id="cb8-18" title="18">           <span class="dt">title=</span><span class="st">&quot;Correlation Matrix of Clean Loan Dataset&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-19" title="19"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text =</span> <span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb8-20" title="20">        <span class="dt">legend.position =</span> <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb8-21" title="21"></a>
+<a class="sourceLine" id="cb8-22" title="22"><span class="kw">print</span>(<span class="kw">ggarrange</span>(full, clean))</a></code></pre></div>
 <p><img src="04_logistic_regression_report_files/figure-html/check_correl_4-1.png" width="100%" /></p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">loan_dataset_logistic &lt;-<span class="st"> </span>clean_dataset</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">loan_dataset_logistic &lt;-<span class="st"> </span>clean_dataset</a></code></pre></div>
 <p>Once again let’s look on the VIF estimates.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">vars.quant &lt;-<span class="st"> </span><span class="kw">select_if</span>(loan_dataset_logistic, is.numeric)</a>
-<a class="sourceLine" id="cb10-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb10-3" data-line-number="3">VIF &lt;-<span class="st"> </span><span class="kw">imcdiag</span>(vars.quant, loan_dataset_logistic<span class="op">$</span>y_loan_defaulter)</a>
-<a class="sourceLine" id="cb10-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb10-5" data-line-number="5">VIF_Table_After &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">variable =</span> <span class="kw">names</span>(VIF<span class="op">$</span>idiags[,<span class="dv">1</span>]),</a>
-<a class="sourceLine" id="cb10-6" data-line-number="6">                          <span class="dt">VIF =</span> VIF<span class="op">$</span>idiags[,<span class="dv">1</span>]) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb10-7" data-line-number="7"><span class="st">  </span><span class="kw">arrange</span>(<span class="kw">desc</span>(VIF))</a>
-<a class="sourceLine" id="cb10-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb10-9" data-line-number="9"><span class="kw">ggplot</span>(VIF_Table_After, <span class="kw">aes</span>(<span class="dt">x =</span> <span class="kw">fct_reorder</span>(variable, VIF), </a>
-<a class="sourceLine" id="cb10-10" data-line-number="10">                            <span class="dt">y =</span> <span class="kw">log</span>(VIF), <span class="dt">label =</span> <span class="kw">round</span>(VIF, <span class="dv">2</span>))) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb10-11" data-line-number="11"><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">stat=</span><span class="st">&#39;identity&#39;</span>, <span class="dt">fill=</span><span class="st">&quot;black&quot;</span>, <span class="dt">size=</span><span class="dv">15</span>)  <span class="op">+</span></a>
-<a class="sourceLine" id="cb10-12" data-line-number="12"><span class="st">  </span><span class="kw">geom_segment</span>(<span class="kw">aes</span>(<span class="dt">y =</span> <span class="dv">0</span>, </a>
-<a class="sourceLine" id="cb10-13" data-line-number="13">                   <span class="dt">yend =</span> <span class="kw">log</span>(VIF), </a>
-<a class="sourceLine" id="cb10-14" data-line-number="14">                   <span class="dt">xend =</span> variable), </a>
-<a class="sourceLine" id="cb10-15" data-line-number="15">               <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb10-16" data-line-number="16"><span class="st">  </span><span class="kw">geom_text</span>(<span class="dt">color=</span><span class="st">&quot;white&quot;</span>, <span class="dt">size=</span><span class="dv">4</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb10-17" data-line-number="17"><span class="st">  </span><span class="kw">geom_hline</span>(<span class="kw">aes</span>(<span class="dt">yintercept =</span> <span class="kw">log</span>(<span class="dv">5</span>)), <span class="dt">color =</span> <span class="st">&#39;red&#39;</span>, <span class="dt">size =</span> <span class="dv">2</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb10-18" data-line-number="18"><span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels =</span> <span class="ot">NULL</span>, <span class="dt">breaks =</span> <span class="ot">NULL</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb10-19" data-line-number="19"><span class="st">  </span><span class="kw">coord_flip</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb10-20" data-line-number="20"><span class="st">  </span><span class="kw">theme_economist</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb10-21" data-line-number="21"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&#39;none&#39;</span>, </a>
-<a class="sourceLine" id="cb10-22" data-line-number="22">        <span class="dt">panel.grid.major =</span> <span class="kw">element_blank</span>(), </a>
-<a class="sourceLine" id="cb10-23" data-line-number="23">        <span class="dt">panel.grid.minor =</span> <span class="kw">element_blank</span>()) <span class="op">+</span></a>
-<a class="sourceLine" id="cb10-24" data-line-number="24"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&#39;Variable&#39;</span>,</a>
-<a class="sourceLine" id="cb10-25" data-line-number="25">       <span class="dt">y =</span> <span class="ot">NULL</span>,</a>
-<a class="sourceLine" id="cb10-26" data-line-number="26">       <span class="dt">title =</span> <span class="st">&#39;Variance Inflation Factor&#39;</span>,</a>
-<a class="sourceLine" id="cb10-27" data-line-number="27">       <span class="dt">subtitle=</span><span class="st">&quot;Checking for multicolinearity in X&#39;s variables.</span></a>
-<a class="sourceLine" id="cb10-28" data-line-number="28"><span class="st">       Variables with VIF more than 5 will be droped from the model&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">vars.quant &lt;-<span class="st"> </span><span class="kw">select_if</span>(loan_dataset_logistic, is.numeric)</a>
+<a class="sourceLine" id="cb10-2" title="2"></a>
+<a class="sourceLine" id="cb10-3" title="3">VIF &lt;-<span class="st"> </span><span class="kw">imcdiag</span>(vars.quant, loan_dataset_logistic<span class="op">$</span>y_loan_defaulter)</a>
+<a class="sourceLine" id="cb10-4" title="4"></a>
+<a class="sourceLine" id="cb10-5" title="5">VIF_Table_After &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">variable =</span> <span class="kw">names</span>(VIF<span class="op">$</span>idiags[,<span class="dv">1</span>]),</a>
+<a class="sourceLine" id="cb10-6" title="6">                          <span class="dt">VIF =</span> VIF<span class="op">$</span>idiags[,<span class="dv">1</span>]) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb10-7" title="7"><span class="st">  </span><span class="kw">arrange</span>(<span class="kw">desc</span>(VIF))</a>
+<a class="sourceLine" id="cb10-8" title="8"></a>
+<a class="sourceLine" id="cb10-9" title="9"><span class="kw">ggplot</span>(VIF_Table_After, <span class="kw">aes</span>(<span class="dt">x =</span> <span class="kw">fct_reorder</span>(variable, VIF), </a>
+<a class="sourceLine" id="cb10-10" title="10">                            <span class="dt">y =</span> <span class="kw">log</span>(VIF), <span class="dt">label =</span> <span class="kw">round</span>(VIF, <span class="dv">2</span>))) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb10-11" title="11"><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">stat=</span><span class="st">&#39;identity&#39;</span>, <span class="dt">fill=</span><span class="st">&quot;black&quot;</span>, <span class="dt">size=</span><span class="dv">15</span>)  <span class="op">+</span></a>
+<a class="sourceLine" id="cb10-12" title="12"><span class="st">  </span><span class="kw">geom_segment</span>(<span class="kw">aes</span>(<span class="dt">y =</span> <span class="dv">0</span>, </a>
+<a class="sourceLine" id="cb10-13" title="13">                   <span class="dt">yend =</span> <span class="kw">log</span>(VIF), </a>
+<a class="sourceLine" id="cb10-14" title="14">                   <span class="dt">xend =</span> variable), </a>
+<a class="sourceLine" id="cb10-15" title="15">               <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb10-16" title="16"><span class="st">  </span><span class="kw">geom_text</span>(<span class="dt">color=</span><span class="st">&quot;white&quot;</span>, <span class="dt">size=</span><span class="dv">4</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb10-17" title="17"><span class="st">  </span><span class="kw">geom_hline</span>(<span class="kw">aes</span>(<span class="dt">yintercept =</span> <span class="kw">log</span>(<span class="dv">5</span>)), <span class="dt">color =</span> <span class="st">&#39;red&#39;</span>, <span class="dt">size =</span> <span class="dv">2</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb10-18" title="18"><span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels =</span> <span class="ot">NULL</span>, <span class="dt">breaks =</span> <span class="ot">NULL</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb10-19" title="19"><span class="st">  </span><span class="kw">coord_flip</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb10-20" title="20"><span class="st">  </span><span class="kw">theme_economist</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb10-21" title="21"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&#39;none&#39;</span>, </a>
+<a class="sourceLine" id="cb10-22" title="22">        <span class="dt">panel.grid.major =</span> <span class="kw">element_blank</span>(), </a>
+<a class="sourceLine" id="cb10-23" title="23">        <span class="dt">panel.grid.minor =</span> <span class="kw">element_blank</span>()) <span class="op">+</span></a>
+<a class="sourceLine" id="cb10-24" title="24"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&#39;Variable&#39;</span>,</a>
+<a class="sourceLine" id="cb10-25" title="25">       <span class="dt">y =</span> <span class="ot">NULL</span>,</a>
+<a class="sourceLine" id="cb10-26" title="26">       <span class="dt">title =</span> <span class="st">&#39;Variance Inflation Factor&#39;</span>,</a>
+<a class="sourceLine" id="cb10-27" title="27">       <span class="dt">subtitle=</span><span class="st">&quot;Checking for multicolinearity in X&#39;s variables.</span></a>
+<a class="sourceLine" id="cb10-28" title="28"><span class="st">       Variables with VIF more than 5 will be droped from the model&quot;</span>)</a></code></pre></div>
 <p><img src="04_logistic_regression_report_files/figure-html/check_correl_5-1.png" width="100%" /></p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">loan_dataset_logistic &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(loan_dataset_logistic, <span class="op">-</span>x_average_salary)</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">loan_dataset_logistic &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(loan_dataset_logistic, <span class="op">-</span>x_average_salary)</a></code></pre></div>
 <p>Although <strong>x_average_salary</strong> have no correlation index greater than our defined <strong>threshold (0.6)</strong> it still have a VIF greater than 5, and for pure methodological puritanism we decided to exclude this variable as well.</p>
 <p>We did try to keep it, but it had no real difference.</p>
 <p><img src="04_logistic_regression_report_files/figure-html/check_correl_6-1.png" width="100%" /></p>
 <p>After all this work we end up having <strong>28 variables</strong> in the dataset.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw">kable</span>(<span class="kw">tibble</span>(<span class="dt">variables =</span> <span class="kw">names</span>(loan_dataset_logistic)))</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="kw">kable</span>(<span class="kw">tibble</span>(<span class="dt">variables =</span> <span class="kw">names</span>(loan_dataset_logistic)))</a></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1598,28 +1598,28 @@ $(document).ready(function () {
 <p>Regression algorithms are known for its sensitivity for outliers. So, before we go for the modeling juice, we will look for those bastards!!!</p>
 <p>Looking at the plots we see no significant deviation in the quantitative variables.</p>
 <p><strong>x_last_transaction_age_days</strong> looks to have a discrepancy, but it is ranging from 0 to 30 days, so it is not real outliers.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="co"># outliers ----------------------------------------------------------------------------</span></a>
-<a class="sourceLine" id="cb13-2" data-line-number="2">  <span class="kw">attach</span>(loan_dataset_logistic)</a>
-<a class="sourceLine" id="cb13-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb13-4" data-line-number="4">  <span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">3</span>))</a>
-<a class="sourceLine" id="cb13-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb13-6" data-line-number="6">  <span class="kw">plot</span>(x_last_transaction_age_days, <span class="dt">main =</span> <span class="st">&quot;x_last_transaction_age_days&quot;</span>, <span class="dt">ylab =</span> <span class="st">&#39;&#39;</span>)</a>
-<a class="sourceLine" id="cb13-7" data-line-number="7">  <span class="kw">plot</span>(x_avg_account_balance, <span class="dt">main =</span> <span class="st">&quot;x_avg_account_balance&quot;</span>, <span class="dt">ylab =</span> <span class="st">&#39;&#39;</span>)</a>
-<a class="sourceLine" id="cb13-8" data-line-number="8">  <span class="kw">plot</span>(x_account_balance, <span class="dt">main =</span> <span class="st">&quot;x_account_balance&quot;</span>, <span class="dt">ylab =</span> <span class="st">&#39;&#39;</span>)</a>
-<a class="sourceLine" id="cb13-9" data-line-number="9">  <span class="kw">plot</span>(x_card_age_month, <span class="dt">main =</span> <span class="st">&quot;x_card_age_month&quot;</span>, <span class="dt">ylab =</span> <span class="st">&#39;&#39;</span>)</a>
-<a class="sourceLine" id="cb13-10" data-line-number="10">  <span class="kw">plot</span>(x_client_age, <span class="dt">main =</span> <span class="st">&quot;x_client_age&quot;</span>, <span class="dt">ylab =</span> <span class="st">&#39;&#39;</span>)</a>
-<a class="sourceLine" id="cb13-11" data-line-number="11">  <span class="kw">plot</span>(x_loan_amount, <span class="dt">main =</span> <span class="st">&quot;x_loan_amount&quot;</span>, <span class="dt">ylab =</span> <span class="st">&#39;&#39;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1"><span class="co"># outliers ----------------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb13-2" title="2">  <span class="kw">attach</span>(loan_dataset_logistic)</a>
+<a class="sourceLine" id="cb13-3" title="3"></a>
+<a class="sourceLine" id="cb13-4" title="4">  <span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">3</span>))</a>
+<a class="sourceLine" id="cb13-5" title="5"></a>
+<a class="sourceLine" id="cb13-6" title="6">  <span class="kw">plot</span>(x_last_transaction_age_days, <span class="dt">main =</span> <span class="st">&quot;x_last_transaction_age_days&quot;</span>, <span class="dt">ylab =</span> <span class="st">&#39;&#39;</span>)</a>
+<a class="sourceLine" id="cb13-7" title="7">  <span class="kw">plot</span>(x_avg_account_balance, <span class="dt">main =</span> <span class="st">&quot;x_avg_account_balance&quot;</span>, <span class="dt">ylab =</span> <span class="st">&#39;&#39;</span>)</a>
+<a class="sourceLine" id="cb13-8" title="8">  <span class="kw">plot</span>(x_account_balance, <span class="dt">main =</span> <span class="st">&quot;x_account_balance&quot;</span>, <span class="dt">ylab =</span> <span class="st">&#39;&#39;</span>)</a>
+<a class="sourceLine" id="cb13-9" title="9">  <span class="kw">plot</span>(x_card_age_month, <span class="dt">main =</span> <span class="st">&quot;x_card_age_month&quot;</span>, <span class="dt">ylab =</span> <span class="st">&#39;&#39;</span>)</a>
+<a class="sourceLine" id="cb13-10" title="10">  <span class="kw">plot</span>(x_client_age, <span class="dt">main =</span> <span class="st">&quot;x_client_age&quot;</span>, <span class="dt">ylab =</span> <span class="st">&#39;&#39;</span>)</a>
+<a class="sourceLine" id="cb13-11" title="11">  <span class="kw">plot</span>(x_loan_amount, <span class="dt">main =</span> <span class="st">&quot;x_loan_amount&quot;</span>, <span class="dt">ylab =</span> <span class="st">&#39;&#39;</span>)</a></code></pre></div>
 <p><img src="04_logistic_regression_report_files/figure-html/outliers-1.png" width="100%" /></p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">  <span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">3</span>))</a>
-<a class="sourceLine" id="cb14-2" data-line-number="2">  </a>
-<a class="sourceLine" id="cb14-3" data-line-number="3">  <span class="kw">plot</span>(x_loan_duration, <span class="dt">main =</span> <span class="st">&quot;x_loan_duration&quot;</span>, <span class="dt">ylab =</span> <span class="st">&#39;&#39;</span>)</a>
-<a class="sourceLine" id="cb14-4" data-line-number="4">  <span class="kw">plot</span>(x_loan_payments, <span class="dt">main =</span> <span class="st">&quot;x_loan_payments&quot;</span>, <span class="dt">ylab =</span> <span class="st">&#39;&#39;</span>)</a>
-<a class="sourceLine" id="cb14-5" data-line-number="5">  <span class="kw">plot</span>(x_prop_interest_credited, <span class="dt">main =</span> <span class="st">&quot;x_prop_interest_credited&quot;</span>, <span class="dt">ylab =</span> <span class="st">&#39;&#39;</span>)</a>
-<a class="sourceLine" id="cb14-6" data-line-number="6">  <span class="kw">plot</span>(x_prop_loan_payment, <span class="dt">main =</span> <span class="st">&quot;x_prop_loan_payment&quot;</span>, <span class="dt">ylab =</span> <span class="st">&#39;&#39;</span>)</a>
-<a class="sourceLine" id="cb14-7" data-line-number="7">  <span class="kw">plot</span>(x_prop_statement, <span class="dt">main =</span> <span class="st">&quot;x_prop_statement&quot;</span>, <span class="dt">ylab =</span> <span class="st">&#39;&#39;</span>)</a>
-<a class="sourceLine" id="cb14-8" data-line-number="8">  <span class="kw">plot</span>(x_prop_insurance_payment, <span class="dt">main =</span> <span class="st">&quot;x_prop_insurance_payment&quot;</span>, <span class="dt">ylab =</span> <span class="st">&#39;&#39;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1">  <span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">3</span>))</a>
+<a class="sourceLine" id="cb14-2" title="2">  </a>
+<a class="sourceLine" id="cb14-3" title="3">  <span class="kw">plot</span>(x_loan_duration, <span class="dt">main =</span> <span class="st">&quot;x_loan_duration&quot;</span>, <span class="dt">ylab =</span> <span class="st">&#39;&#39;</span>)</a>
+<a class="sourceLine" id="cb14-4" title="4">  <span class="kw">plot</span>(x_loan_payments, <span class="dt">main =</span> <span class="st">&quot;x_loan_payments&quot;</span>, <span class="dt">ylab =</span> <span class="st">&#39;&#39;</span>)</a>
+<a class="sourceLine" id="cb14-5" title="5">  <span class="kw">plot</span>(x_prop_interest_credited, <span class="dt">main =</span> <span class="st">&quot;x_prop_interest_credited&quot;</span>, <span class="dt">ylab =</span> <span class="st">&#39;&#39;</span>)</a>
+<a class="sourceLine" id="cb14-6" title="6">  <span class="kw">plot</span>(x_prop_loan_payment, <span class="dt">main =</span> <span class="st">&quot;x_prop_loan_payment&quot;</span>, <span class="dt">ylab =</span> <span class="st">&#39;&#39;</span>)</a>
+<a class="sourceLine" id="cb14-7" title="7">  <span class="kw">plot</span>(x_prop_statement, <span class="dt">main =</span> <span class="st">&quot;x_prop_statement&quot;</span>, <span class="dt">ylab =</span> <span class="st">&#39;&#39;</span>)</a>
+<a class="sourceLine" id="cb14-8" title="8">  <span class="kw">plot</span>(x_prop_insurance_payment, <span class="dt">main =</span> <span class="st">&quot;x_prop_insurance_payment&quot;</span>, <span class="dt">ylab =</span> <span class="st">&#39;&#39;</span>)</a></code></pre></div>
 <p><img src="04_logistic_regression_report_files/figure-html/outliers-2.png" width="100%" /></p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">  <span class="kw">detach</span>(loan_dataset_logistic)</a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1">  <span class="kw">detach</span>(loan_dataset_logistic)</a></code></pre></div>
 </div>
 <div id="sample-split-into-test-and-training-data" class="section level2">
 <h2><span class="header-section-number">2.4</span> Sample split into Test and Training Data</h2>
@@ -1628,14 +1628,14 @@ $(document).ready(function () {
 <li><strong>Train Dataset</strong> (70% 478 obs);</li>
 <li><strong>Test Dataset </strong> (30% 204 obs).</li>
 </ul>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">SplitDataset &lt;-<span class="st"> </span>source_train_test_dataset</a>
-<a class="sourceLine" id="cb16-2" data-line-number="2">data.train_logistic &lt;-<span class="st"> </span>SplitDataset<span class="op">$</span>data.train</a>
-<a class="sourceLine" id="cb16-3" data-line-number="3">data.test_logistic &lt;-<span class="st"> </span>SplitDataset<span class="op">$</span>data.test</a>
-<a class="sourceLine" id="cb16-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb16-5" data-line-number="5">data.train_logistic &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(data.train_logistic, <span class="kw">names</span>(loan_dataset_logistic))</a>
-<a class="sourceLine" id="cb16-6" data-line-number="6">data.test_logistic &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(data.test_logistic, <span class="kw">names</span>(loan_dataset_logistic))</a>
-<a class="sourceLine" id="cb16-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb16-8" data-line-number="8"><span class="kw">kable</span>(SplitDataset<span class="op">$</span>event.proportion)</a></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1">SplitDataset &lt;-<span class="st"> </span>source_train_test_dataset</a>
+<a class="sourceLine" id="cb16-2" title="2">data.train_logistic &lt;-<span class="st"> </span>SplitDataset<span class="op">$</span>data.train</a>
+<a class="sourceLine" id="cb16-3" title="3">data.test_logistic &lt;-<span class="st"> </span>SplitDataset<span class="op">$</span>data.test</a>
+<a class="sourceLine" id="cb16-4" title="4"></a>
+<a class="sourceLine" id="cb16-5" title="5">data.train_logistic &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(data.train_logistic, <span class="kw">names</span>(loan_dataset_logistic))</a>
+<a class="sourceLine" id="cb16-6" title="6">data.test_logistic &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(data.test_logistic, <span class="kw">names</span>(loan_dataset_logistic))</a>
+<a class="sourceLine" id="cb16-7" title="7"></a>
+<a class="sourceLine" id="cb16-8" title="8"><span class="kw">kable</span>(SplitDataset<span class="op">$</span>event.proportion)</a></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1669,26 +1669,26 @@ $(document).ready(function () {
 <div id="fit-the-logistic-model" class="section level2">
 <h2><span class="header-section-number">2.5</span> Fit the logistic model</h2>
 <p>With the final cleaned dataset, we got from above steps we fit our Logistic Regression model for <strong>y_loan_defaulter</strong> on all <strong>x_variables</strong>.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="co"># fit model</span></a>
-<a class="sourceLine" id="cb17-2" data-line-number="2">logistic.full &lt;-<span class="st"> </span><span class="kw">glm</span>(<span class="dt">formula =</span> y_loan_defaulter <span class="op">~</span><span class="st"> </span>.,</a>
-<a class="sourceLine" id="cb17-3" data-line-number="3">                     <span class="dt">data=</span> data.train_logistic, </a>
-<a class="sourceLine" id="cb17-4" data-line-number="4">                     <span class="dt">family=</span> <span class="kw">binomial</span>(<span class="dt">link=</span><span class="st">&#39;logit&#39;</span>))</a>
-<a class="sourceLine" id="cb17-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb17-6" data-line-number="6"><span class="kw">names</span>(logistic.full<span class="op">$</span>coefficients) &lt;-<span class="st"> </span>stringr<span class="op">::</span><span class="kw">str_sub</span>(<span class="kw">names</span>(logistic.full<span class="op">$</span>coefficients), <span class="dv">1</span>, <span class="dv">25</span>)</a>
-<a class="sourceLine" id="cb17-7" data-line-number="7"><span class="kw">summary</span>(logistic.full)</a>
-<a class="sourceLine" id="cb17-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb17-9" data-line-number="9"><span class="co"># save model</span></a>
-<a class="sourceLine" id="cb17-10" data-line-number="10"><span class="kw">saveRDS</span>(logistic.full, <span class="st">&#39;./models/logistic_full.rds&#39;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1"><span class="co"># fit model</span></a>
+<a class="sourceLine" id="cb17-2" title="2">logistic.full &lt;-<span class="st"> </span><span class="kw">glm</span>(<span class="dt">formula =</span> y_loan_defaulter <span class="op">~</span><span class="st"> </span>.,</a>
+<a class="sourceLine" id="cb17-3" title="3">                     <span class="dt">data=</span> data.train_logistic, </a>
+<a class="sourceLine" id="cb17-4" title="4">                     <span class="dt">family=</span> <span class="kw">binomial</span>(<span class="dt">link=</span><span class="st">&#39;logit&#39;</span>))</a>
+<a class="sourceLine" id="cb17-5" title="5"></a>
+<a class="sourceLine" id="cb17-6" title="6"><span class="kw">names</span>(logistic.full<span class="op">$</span>coefficients) &lt;-<span class="st"> </span>stringr<span class="op">::</span><span class="kw">str_sub</span>(<span class="kw">names</span>(logistic.full<span class="op">$</span>coefficients), <span class="dv">1</span>, <span class="dv">25</span>)</a>
+<a class="sourceLine" id="cb17-7" title="7"><span class="kw">summary</span>(logistic.full)</a>
+<a class="sourceLine" id="cb17-8" title="8"></a>
+<a class="sourceLine" id="cb17-9" title="9"><span class="co"># save model</span></a>
+<a class="sourceLine" id="cb17-10" title="10"><span class="kw">saveRDS</span>(logistic.full, <span class="st">&#39;./models/logistic_full.rds&#39;</span>)</a></code></pre></div>
 <p>With the full model fitted we will run the stepwise method to automate the selection of predictors using the <strong>(Akaike Information Criterion)</strong> AIC for short.</p>
 <p>This is a broadly used estimator that evaluates the relative quality of statistical methods for a given set of data.</p>
 <p>The lower the AIC the better.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">logistic.step &lt;-<span class="st"> </span><span class="kw">step</span>(logistic.full, <span class="dt">direction =</span> <span class="st">&quot;both&quot;</span>, <span class="dt">test =</span> <span class="st">&quot;F&quot;</span>)</a>
-<a class="sourceLine" id="cb18-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb18-3" data-line-number="3"><span class="kw">names</span>(logistic.step<span class="op">$</span>coefficients) &lt;-<span class="st"> </span>stringr<span class="op">::</span><span class="kw">str_sub</span>(<span class="kw">names</span>(logistic.step<span class="op">$</span>coefficients), <span class="dv">1</span>, <span class="dv">25</span>)</a>
-<a class="sourceLine" id="cb18-4" data-line-number="4"><span class="kw">summary</span>(logistic.step)</a>
-<a class="sourceLine" id="cb18-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb18-6" data-line-number="6"><span class="co"># save model</span></a>
-<a class="sourceLine" id="cb18-7" data-line-number="7"><span class="kw">saveRDS</span>(logistic.step, <span class="st">&#39;./models/logistic_step.rds&#39;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1">logistic.step &lt;-<span class="st"> </span><span class="kw">step</span>(logistic.full, <span class="dt">direction =</span> <span class="st">&quot;both&quot;</span>, <span class="dt">test =</span> <span class="st">&quot;F&quot;</span>)</a>
+<a class="sourceLine" id="cb18-2" title="2"></a>
+<a class="sourceLine" id="cb18-3" title="3"><span class="kw">names</span>(logistic.step<span class="op">$</span>coefficients) &lt;-<span class="st"> </span>stringr<span class="op">::</span><span class="kw">str_sub</span>(<span class="kw">names</span>(logistic.step<span class="op">$</span>coefficients), <span class="dv">1</span>, <span class="dv">25</span>)</a>
+<a class="sourceLine" id="cb18-4" title="4"><span class="kw">summary</span>(logistic.step)</a>
+<a class="sourceLine" id="cb18-5" title="5"></a>
+<a class="sourceLine" id="cb18-6" title="6"><span class="co"># save model</span></a>
+<a class="sourceLine" id="cb18-7" title="7"><span class="kw">saveRDS</span>(logistic.step, <span class="st">&#39;./models/logistic_step.rds&#39;</span>)</a></code></pre></div>
 <pre><code>## 
 ## Call:
 ## glm(formula = y_loan_defaulter ~ x_card_type_classic + x_loan_amount + 
@@ -1750,62 +1750,62 @@ $(document).ready(function () {
 <div id="evaluating-the-model-performance" class="section level1">
 <h1><span class="header-section-number">4</span> Evaluating the model performance</h1>
 <p>We started this step by making predictions using our model on the X’s variables in our Train and Test datasets.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="co">## making predictions for each model and consolidating in a single data frame</span></a>
-<a class="sourceLine" id="cb20-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb20-3" data-line-number="3">prob.full   =<span class="st"> </span><span class="kw">list</span>()</a>
-<a class="sourceLine" id="cb20-4" data-line-number="4">prob.train  =<span class="st"> </span><span class="kw">list</span>()</a>
-<a class="sourceLine" id="cb20-5" data-line-number="5">prob.test   =<span class="st"> </span><span class="kw">list</span>()</a>
-<a class="sourceLine" id="cb20-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb20-7" data-line-number="7">prob.full<span class="op">$</span>logistic.actual     &lt;-<span class="st"> </span>loan_dataset_logistic<span class="op">$</span>y_loan_defaulter</a>
-<a class="sourceLine" id="cb20-8" data-line-number="8">prob.full<span class="op">$</span>logistic.predicted  &lt;-<span class="st"> </span><span class="kw">predict</span>(logistic.step, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>, </a>
-<a class="sourceLine" id="cb20-9" data-line-number="9">                                         <span class="dt">newdata =</span> loan_dataset_logistic)</a>
-<a class="sourceLine" id="cb20-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb20-11" data-line-number="11">prob.train<span class="op">$</span>logistic.actual    &lt;-<span class="st"> </span>data.train_logistic<span class="op">$</span>y_loan_defaulter</a>
-<a class="sourceLine" id="cb20-12" data-line-number="12">prob.train<span class="op">$</span>logistic.predicted &lt;-<span class="st"> </span><span class="kw">predict</span>(logistic.step, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>, </a>
-<a class="sourceLine" id="cb20-13" data-line-number="13">                                         <span class="dt">newdata =</span> data.train_logistic)</a>
-<a class="sourceLine" id="cb20-14" data-line-number="14"></a>
-<a class="sourceLine" id="cb20-15" data-line-number="15">prob.test<span class="op">$</span>logistic.actual     &lt;-<span class="st"> </span>data.test_logistic<span class="op">$</span>y_loan_defaulter</a>
-<a class="sourceLine" id="cb20-16" data-line-number="16">prob.test<span class="op">$</span>logistic.predicted  &lt;-<span class="st"> </span><span class="kw">predict</span>(logistic.step, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>, </a>
-<a class="sourceLine" id="cb20-17" data-line-number="17">                                         <span class="dt">newdata =</span> data.test_logistic)</a>
-<a class="sourceLine" id="cb20-18" data-line-number="18"></a>
-<a class="sourceLine" id="cb20-19" data-line-number="19">prob.full   &lt;-<span class="st"> </span>prob.full  <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a>
-<a class="sourceLine" id="cb20-20" data-line-number="20">prob.train  &lt;-<span class="st"> </span>prob.train <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a>
-<a class="sourceLine" id="cb20-21" data-line-number="21">prob.test   &lt;-<span class="st"> </span>prob.test  <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1"><span class="co">## making predictions for each model and consolidating in a single data frame</span></a>
+<a class="sourceLine" id="cb20-2" title="2"></a>
+<a class="sourceLine" id="cb20-3" title="3">prob.full   =<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb20-4" title="4">prob.train  =<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb20-5" title="5">prob.test   =<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb20-6" title="6"></a>
+<a class="sourceLine" id="cb20-7" title="7">prob.full<span class="op">$</span>logistic.actual     &lt;-<span class="st"> </span>loan_dataset_logistic<span class="op">$</span>y_loan_defaulter</a>
+<a class="sourceLine" id="cb20-8" title="8">prob.full<span class="op">$</span>logistic.predicted  &lt;-<span class="st"> </span><span class="kw">predict</span>(logistic.step, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>, </a>
+<a class="sourceLine" id="cb20-9" title="9">                                         <span class="dt">newdata =</span> loan_dataset_logistic)</a>
+<a class="sourceLine" id="cb20-10" title="10"></a>
+<a class="sourceLine" id="cb20-11" title="11">prob.train<span class="op">$</span>logistic.actual    &lt;-<span class="st"> </span>data.train_logistic<span class="op">$</span>y_loan_defaulter</a>
+<a class="sourceLine" id="cb20-12" title="12">prob.train<span class="op">$</span>logistic.predicted &lt;-<span class="st"> </span><span class="kw">predict</span>(logistic.step, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>, </a>
+<a class="sourceLine" id="cb20-13" title="13">                                         <span class="dt">newdata =</span> data.train_logistic)</a>
+<a class="sourceLine" id="cb20-14" title="14"></a>
+<a class="sourceLine" id="cb20-15" title="15">prob.test<span class="op">$</span>logistic.actual     &lt;-<span class="st"> </span>data.test_logistic<span class="op">$</span>y_loan_defaulter</a>
+<a class="sourceLine" id="cb20-16" title="16">prob.test<span class="op">$</span>logistic.predicted  &lt;-<span class="st"> </span><span class="kw">predict</span>(logistic.step, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>, </a>
+<a class="sourceLine" id="cb20-17" title="17">                                         <span class="dt">newdata =</span> data.test_logistic)</a>
+<a class="sourceLine" id="cb20-18" title="18"></a>
+<a class="sourceLine" id="cb20-19" title="19">prob.full   &lt;-<span class="st"> </span>prob.full  <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a>
+<a class="sourceLine" id="cb20-20" title="20">prob.train  &lt;-<span class="st"> </span>prob.train <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a>
+<a class="sourceLine" id="cb20-21" title="21">prob.test   &lt;-<span class="st"> </span>prob.test  <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>()</a></code></pre></div>
 <div id="getting-performance-measures" class="section level2">
 <h2><span class="header-section-number">4.1</span> Getting Performance Measures</h2>
 <p>To calculate the performance measures, derived from the confusion matrix, we need to find the score cut off that best split our test dataset into Defaulters and Non-Defaulters.</p>
 <p>In this exercise we decide to not prioritize the accuracy on predicting Defaulters and Non-Defaulters, therefore we are looking for the score cut off that best predict each class equally.</p>
 <p>We will use the custom functions described in Auxiliary metrics functions topic in the Data Preparation session of this site.</p>
 <p>With the returned object from this function we can plot the comparison between TPR (True Positive Rate) and TNR (True Negative Rate) to find the best cut off.</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="co">## getting measures -----------------------------------------------------------------</span></a>
-<a class="sourceLine" id="cb21-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb21-3" data-line-number="3">metricsByCutoff.test_log    &lt;-<span class="st"> </span><span class="kw">modelMetrics</span>(prob.test<span class="op">$</span>logistic.actual, </a>
-<a class="sourceLine" id="cb21-4" data-line-number="4">                                            prob.test<span class="op">$</span>logistic.predicted, </a>
-<a class="sourceLine" id="cb21-5" data-line-number="5">                                            <span class="dt">plot_title =</span> <span class="st">&#39;Logistic Regression&#39;</span>)</a>
-<a class="sourceLine" id="cb21-6" data-line-number="6">metricsByCutoff.test_log<span class="op">$</span>Plot</a></code></pre></div>
-<div id="htmlwidget-94d88dec1fd61cf21784" style="width:100%;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-94d88dec1fd61cf21784">{"x":{"visdat":{"2c7ca91434":["function () ","plotlyVisDat"]},"cur_data":"2c7ca91434","attrs":{"2c7ca91434":{"x":{},"y":{},"opacity":0.3,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"bar"},"2c7ca91434.1":{"x":{},"y":{},"opacity":1,"name":"TPR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"2c7ca91434.2":{"x":{},"y":{},"opacity":1,"name":"TNR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"2c7ca91434.3":{"x":0.08,"y":0.64,"opacity":1,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","text":0.08,"mode":"text","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"title":"Cutoff Value"},"yaxis":{"domain":[0,1],"automargin":true,"title":"True Ratio (%)"},"title":"Logistic Regression","hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77],"y":[0.820335195530726,0.686256983240223,0.516871508379888,0.415418994413408,0.26927374301676,0.167821229050279,0.0319553072625699,0.0303910614525139,0.0918435754189943,0.130949720670391,0.147709497206704,0.215642458100559,0.277988826815642,0.311508379888268,0.357094972067039,0.36268156424581,0.413854748603352,0.419441340782123,0.465027932960894,0.521787709497207,0.527374301675978,0.567374301675978,0.57854748603352,0.61854748603352,0.629720670391061,0.635307262569832,0.640893854748603,0.640893854748603,0.640893854748603,0.646480446927374,0.646480446927374,0.646480446927374,0.692067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.783240223463687,0.823240223463687,0.863240223463687,0.903240223463687,0.903240223463687,0.903240223463687,0.903240223463687,0.908826815642458,0.908826815642458,0.908826815642458,0.908826815642458,0.914413407821229,0.914413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.96],"opacity":0.3,"name":"Abs. Diff.","type":"bar","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77],"y":[0.96,0.96,0.88,0.84,0.8,0.76,0.68,0.64,0.64,0.64,0.64,0.6,0.56,0.56,0.52,0.52,0.48,0.48,0.44,0.4,0.4,0.36,0.36,0.32,0.32,0.32,0.32,0.32,0.32,0.32,0.32,0.32,0.28,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.16,0.12,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04],"opacity":1,"name":"TPR","type":"scatter","mode":"lines","marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"line":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77],"y":[0.139664804469274,0.273743016759777,0.363128491620112,0.424581005586592,0.53072625698324,0.592178770949721,0.64804469273743,0.670391061452514,0.731843575418994,0.770949720670391,0.787709497206704,0.815642458100559,0.837988826815642,0.871508379888268,0.877094972067039,0.88268156424581,0.893854748603352,0.899441340782123,0.905027932960894,0.921787709497207,0.927374301675978,0.927374301675978,0.93854748603352,0.93854748603352,0.949720670391061,0.955307262569832,0.960893854748603,0.960893854748603,0.960893854748603,0.966480446927374,0.966480446927374,0.966480446927374,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.988826815642458,0.988826815642458,0.988826815642458,0.988826815642458,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,1],"opacity":1,"name":"TNR","type":"scatter","mode":"lines","marker":{"color":"rgba(44,160,44,1)","line":{"color":"rgba(44,160,44,1)"}},"error_y":{"color":"rgba(44,160,44,1)"},"error_x":{"color":"rgba(44,160,44,1)"},"line":{"color":"rgba(44,160,44,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.08],"y":[0.64],"opacity":1,"name":"Abs. Diff.","type":"scatter","text":0.08,"mode":"text","marker":{"color":"rgba(214,39,40,1)","line":{"color":"rgba(214,39,40,1)"}},"error_y":{"color":"rgba(214,39,40,1)"},"error_x":{"color":"rgba(214,39,40,1)"},"line":{"color":"rgba(214,39,40,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1"><span class="co">## getting measures -----------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb21-2" title="2"></a>
+<a class="sourceLine" id="cb21-3" title="3">metricsByCutoff.test_log    &lt;-<span class="st"> </span><span class="kw">modelMetrics</span>(prob.test<span class="op">$</span>logistic.actual, </a>
+<a class="sourceLine" id="cb21-4" title="4">                                            prob.test<span class="op">$</span>logistic.predicted, </a>
+<a class="sourceLine" id="cb21-5" title="5">                                            <span class="dt">plot_title =</span> <span class="st">&#39;Logistic Regression&#39;</span>)</a>
+<a class="sourceLine" id="cb21-6" title="6">metricsByCutoff.test_log<span class="op">$</span>Plot</a></code></pre></div>
+<div id="htmlwidget-22acb069090c865b95d4" style="width:100%;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-22acb069090c865b95d4">{"x":{"visdat":{"47843a24590b":["function () ","plotlyVisDat"]},"cur_data":"47843a24590b","attrs":{"47843a24590b":{"x":{},"y":{},"opacity":0.3,"name":"Abs. Diff.","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"bar"},"47843a24590b.1":{"x":{},"y":{},"opacity":1,"name":"TPR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true},"47843a24590b.2":{"x":{},"y":{},"opacity":1,"name":"TNR","alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"xaxis":{"domain":[0,1],"automargin":true,"title":"Cutoff Value"},"yaxis":{"domain":[0,1],"automargin":true,"title":"True Ratio (%)"},"annotations":[{"text":"<b>Logistic Regression<\/b>","x":0,"y":1.04,"yref":"paper","xref":"paper","xanchor":"left","yanchor":"top","showarrow":false,"font":{"size":15}},{"text":"<b>0.08<\/b>","x":0.08,"y":0.64,"showarrow":false,"bgcolor":"white","opacity":0.8}],"hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77],"y":[0.820335195530726,0.686256983240223,0.516871508379888,0.415418994413408,0.26927374301676,0.167821229050279,0.0319553072625699,0.0303910614525139,0.0918435754189943,0.130949720670391,0.147709497206704,0.215642458100559,0.277988826815642,0.311508379888268,0.357094972067039,0.36268156424581,0.413854748603352,0.419441340782123,0.465027932960894,0.521787709497207,0.527374301675978,0.567374301675978,0.57854748603352,0.61854748603352,0.629720670391061,0.635307262569832,0.640893854748603,0.640893854748603,0.640893854748603,0.646480446927374,0.646480446927374,0.646480446927374,0.692067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.772067039106145,0.783240223463687,0.823240223463687,0.863240223463687,0.903240223463687,0.903240223463687,0.903240223463687,0.903240223463687,0.908826815642458,0.908826815642458,0.908826815642458,0.908826815642458,0.914413407821229,0.914413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.954413407821229,0.96],"opacity":0.3,"name":"Abs. Diff.","type":"bar","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77],"y":[0.96,0.96,0.88,0.84,0.8,0.76,0.68,0.64,0.64,0.64,0.64,0.6,0.56,0.56,0.52,0.52,0.48,0.48,0.44,0.4,0.4,0.36,0.36,0.32,0.32,0.32,0.32,0.32,0.32,0.32,0.32,0.32,0.28,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.16,0.12,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04],"opacity":1,"name":"TPR","type":"scatter","mode":"lines","marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"line":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2,0.21,0.22,0.23,0.24,0.25,0.26,0.27,0.28,0.29,0.3,0.31,0.32,0.33,0.34,0.35,0.36,0.37,0.38,0.39,0.4,0.41,0.42,0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.5,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.59,0.6,0.61,0.62,0.63,0.64,0.65,0.66,0.67,0.68,0.69,0.7,0.71,0.72,0.73,0.74,0.75,0.76,0.77],"y":[0.139664804469274,0.273743016759777,0.363128491620112,0.424581005586592,0.53072625698324,0.592178770949721,0.64804469273743,0.670391061452514,0.731843575418994,0.770949720670391,0.787709497206704,0.815642458100559,0.837988826815642,0.871508379888268,0.877094972067039,0.88268156424581,0.893854748603352,0.899441340782123,0.905027932960894,0.921787709497207,0.927374301675978,0.927374301675978,0.93854748603352,0.93854748603352,0.949720670391061,0.955307262569832,0.960893854748603,0.960893854748603,0.960893854748603,0.966480446927374,0.966480446927374,0.966480446927374,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.972067039106145,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.983240223463687,0.988826815642458,0.988826815642458,0.988826815642458,0.988826815642458,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,0.994413407821229,1],"opacity":1,"name":"TNR","type":"scatter","mode":"lines","marker":{"color":"rgba(44,160,44,1)","line":{"color":"rgba(44,160,44,1)"}},"error_y":{"color":"rgba(44,160,44,1)"},"error_x":{"color":"rgba(44,160,44,1)"},"line":{"color":"rgba(44,160,44,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 <p>With the optimized cut off we calculate the full set of model metrics using the function HMeasure from hmeasure library.</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1"><span class="co"># logistic regression</span></a>
-<a class="sourceLine" id="cb22-2" data-line-number="2">measures.logistic.train &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.train<span class="op">$</span>logistic.actual, </a>
-<a class="sourceLine" id="cb22-3" data-line-number="3">                                    prob.train<span class="op">$</span>logistic.predicted, </a>
-<a class="sourceLine" id="cb22-4" data-line-number="4">                                    <span class="dt">threshold =</span> metricsByCutoff.test_log<span class="op">$</span>BestCut[<span class="st">&#39;Cut&#39;</span>])</a>
-<a class="sourceLine" id="cb22-5" data-line-number="5">measures.logistic.test &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.test<span class="op">$</span>logistic.actual, </a>
-<a class="sourceLine" id="cb22-6" data-line-number="6">                                   prob.test<span class="op">$</span>logistic.predicted, </a>
-<a class="sourceLine" id="cb22-7" data-line-number="7">                                   <span class="dt">threshold =</span> metricsByCutoff.test_log<span class="op">$</span>BestCut[<span class="st">&#39;Cut&#39;</span>])</a>
-<a class="sourceLine" id="cb22-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb22-9" data-line-number="9"><span class="co"># join measures in a single data frame</span></a>
-<a class="sourceLine" id="cb22-10" data-line-number="10">measures &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">bind_rows</span>(measures.logistic.train<span class="op">$</span>metrics,</a>
-<a class="sourceLine" id="cb22-11" data-line-number="11">                        measures.logistic.test<span class="op">$</span>metrics)</a>
-<a class="sourceLine" id="cb22-12" data-line-number="12">              ) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>(., <span class="dt">rownames =</span> <span class="ot">NA</span>)</a>
-<a class="sourceLine" id="cb22-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb22-14" data-line-number="14"><span class="kw">colnames</span>(measures) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;logistic - train&#39;</span>, <span class="st">&#39;logistic - test&#39;</span>)</a>
-<a class="sourceLine" id="cb22-15" data-line-number="15"></a>
-<a class="sourceLine" id="cb22-16" data-line-number="16">measures<span class="op">$</span>metric =<span class="st"> </span><span class="kw">rownames</span>(measures)</a>
-<a class="sourceLine" id="cb22-17" data-line-number="17"></a>
-<a class="sourceLine" id="cb22-18" data-line-number="18">measures &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(measures, metric, <span class="kw">everything</span>())</a></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1"><span class="co"># logistic regression</span></a>
+<a class="sourceLine" id="cb22-2" title="2">measures.logistic.train &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.train<span class="op">$</span>logistic.actual, </a>
+<a class="sourceLine" id="cb22-3" title="3">                                    prob.train<span class="op">$</span>logistic.predicted, </a>
+<a class="sourceLine" id="cb22-4" title="4">                                    <span class="dt">threshold =</span> metricsByCutoff.test_log<span class="op">$</span>BestCut[<span class="st">&#39;Cut&#39;</span>])</a>
+<a class="sourceLine" id="cb22-5" title="5">measures.logistic.test &lt;-<span class="st"> </span><span class="kw">HMeasure</span>(prob.test<span class="op">$</span>logistic.actual, </a>
+<a class="sourceLine" id="cb22-6" title="6">                                   prob.test<span class="op">$</span>logistic.predicted, </a>
+<a class="sourceLine" id="cb22-7" title="7">                                   <span class="dt">threshold =</span> metricsByCutoff.test_log<span class="op">$</span>BestCut[<span class="st">&#39;Cut&#39;</span>])</a>
+<a class="sourceLine" id="cb22-8" title="8"></a>
+<a class="sourceLine" id="cb22-9" title="9"><span class="co"># join measures in a single data frame</span></a>
+<a class="sourceLine" id="cb22-10" title="10">measures &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">bind_rows</span>(measures.logistic.train<span class="op">$</span>metrics,</a>
+<a class="sourceLine" id="cb22-11" title="11">                        measures.logistic.test<span class="op">$</span>metrics)</a>
+<a class="sourceLine" id="cb22-12" title="12">              ) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as_tibble</span>(., <span class="dt">rownames =</span> <span class="ot">NA</span>)</a>
+<a class="sourceLine" id="cb22-13" title="13"></a>
+<a class="sourceLine" id="cb22-14" title="14"><span class="kw">colnames</span>(measures) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;logistic - train&#39;</span>, <span class="st">&#39;logistic - test&#39;</span>)</a>
+<a class="sourceLine" id="cb22-15" title="15"></a>
+<a class="sourceLine" id="cb22-16" title="16">measures<span class="op">$</span>metric =<span class="st"> </span><span class="kw">rownames</span>(measures)</a>
+<a class="sourceLine" id="cb22-17" title="17"></a>
+<a class="sourceLine" id="cb22-18" title="18">measures &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(measures, metric, <span class="kw">everything</span>())</a></code></pre></div>
 <p>Below are the metrics on the train and test dataset:</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1"><span class="kw">kable</span>(measures, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1"><span class="kw">kable</span>(measures, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1932,11 +1932,11 @@ $(document).ready(function () {
 <h2><span class="header-section-number">4.2</span> Evaluating classification performance</h2>
 <p>In general the Logistic Regression model is not delivering good accuracy, we will compare how it performed against other classes of models in the Final Report session</p>
 <p>Below the confusion matrix and general performance of the model using our custom function <strong>accuracy</strong> described in Auxiliary metrics functions topic in the Data Preparation session of this site.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1"><span class="co"># accuracy metrics ---------------------------------------------------------------</span></a>
-<a class="sourceLine" id="cb24-2" data-line-number="2"><span class="co"># logistic regression</span></a>
-<a class="sourceLine" id="cb24-3" data-line-number="3"><span class="kw">accuracy</span>(<span class="dt">score =</span> prob.test<span class="op">$</span>logistic.predicted, </a>
-<a class="sourceLine" id="cb24-4" data-line-number="4">         <span class="dt">actual =</span> prob.test<span class="op">$</span>logistic.actual, </a>
-<a class="sourceLine" id="cb24-5" data-line-number="5">         <span class="dt">threshold =</span> metricsByCutoff.test_log[[<span class="st">&quot;BestCut&quot;</span>]][[<span class="st">&quot;Cut&quot;</span>]])</a></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" title="1"><span class="co"># accuracy metrics ---------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb24-2" title="2"><span class="co"># logistic regression</span></a>
+<a class="sourceLine" id="cb24-3" title="3"><span class="kw">accuracy</span>(<span class="dt">score =</span> prob.test<span class="op">$</span>logistic.predicted, </a>
+<a class="sourceLine" id="cb24-4" title="4">         <span class="dt">actual =</span> prob.test<span class="op">$</span>logistic.actual, </a>
+<a class="sourceLine" id="cb24-5" title="5">         <span class="dt">threshold =</span> metricsByCutoff.test_log[[<span class="st">&quot;BestCut&quot;</span>]][[<span class="st">&quot;Cut&quot;</span>]])</a></code></pre></div>
 <pre><code>## 
 ## 
 ##             pred.1   pred.0
@@ -1947,23 +1947,23 @@ $(document).ready(function () {
 ## [1] &quot;Model General Accuracy of: 66.67%&quot;
 ## [1] &quot;True Positive Rate of    : 64%&quot;</code></pre>
 <p>We finally look at the score distribution charts to check how well the model is able to discriminate Defaulters and Non-Defaulters.</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1">p1 &lt;-<span class="st"> </span><span class="kw">Score_Histograms</span>(prob.test, </a>
-<a class="sourceLine" id="cb26-2" data-line-number="2">                 prob.test<span class="op">$</span>logistic.predicted,</a>
-<a class="sourceLine" id="cb26-3" data-line-number="3">                 prob.test<span class="op">$</span>logistic.actual,</a>
-<a class="sourceLine" id="cb26-4" data-line-number="4">                 <span class="st">&#39;Density Plot&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.title.y =</span> <span class="kw">element_blank</span>())</a>
-<a class="sourceLine" id="cb26-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb26-6" data-line-number="6">p2 &lt;-<span class="st"> </span><span class="kw">Score_Boxplot</span>(prob.test, </a>
-<a class="sourceLine" id="cb26-7" data-line-number="7">              prob.test<span class="op">$</span>logistic.predicted, </a>
-<a class="sourceLine" id="cb26-8" data-line-number="8">              prob.test<span class="op">$</span>logistic.actual,</a>
-<a class="sourceLine" id="cb26-9" data-line-number="9">              <span class="st">&#39;Score Boxplot&#39;</span>)</a>
-<a class="sourceLine" id="cb26-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb26-11" data-line-number="11">p3 &lt;-<span class="st"> </span><span class="kw">KS_Plot</span>(prob.test<span class="op">$</span>logistic.predicted[prob.test<span class="op">$</span>logistic.actual <span class="op">==</span><span class="st"> </span><span class="dv">0</span>],</a>
-<a class="sourceLine" id="cb26-12" data-line-number="12">        prob.test<span class="op">$</span>logistic.predicted[prob.test<span class="op">$</span>logistic.actual <span class="op">==</span><span class="st"> </span><span class="dv">1</span>],</a>
-<a class="sourceLine" id="cb26-13" data-line-number="13">        <span class="st">&#39;KS Plot&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.title.y =</span> <span class="kw">element_blank</span>(),</a>
-<a class="sourceLine" id="cb26-14" data-line-number="14">                           <span class="dt">axis.text.y =</span> <span class="kw">element_blank</span>())</a>
-<a class="sourceLine" id="cb26-15" data-line-number="15"><span class="kw">ggarrange</span>(p1, p2, <span class="dt">nrow =</span> <span class="dv">2</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1">p1 &lt;-<span class="st"> </span><span class="kw">Score_Histograms</span>(prob.test, </a>
+<a class="sourceLine" id="cb26-2" title="2">                 prob.test<span class="op">$</span>logistic.predicted,</a>
+<a class="sourceLine" id="cb26-3" title="3">                 prob.test<span class="op">$</span>logistic.actual,</a>
+<a class="sourceLine" id="cb26-4" title="4">                 <span class="st">&#39;Density Plot&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.title.y =</span> <span class="kw">element_blank</span>())</a>
+<a class="sourceLine" id="cb26-5" title="5"></a>
+<a class="sourceLine" id="cb26-6" title="6">p2 &lt;-<span class="st"> </span><span class="kw">Score_Boxplot</span>(prob.test, </a>
+<a class="sourceLine" id="cb26-7" title="7">              prob.test<span class="op">$</span>logistic.predicted, </a>
+<a class="sourceLine" id="cb26-8" title="8">              prob.test<span class="op">$</span>logistic.actual,</a>
+<a class="sourceLine" id="cb26-9" title="9">              <span class="st">&#39;Score Boxplot&#39;</span>)</a>
+<a class="sourceLine" id="cb26-10" title="10"></a>
+<a class="sourceLine" id="cb26-11" title="11">p3 &lt;-<span class="st"> </span><span class="kw">KS_Plot</span>(prob.test<span class="op">$</span>logistic.predicted[prob.test<span class="op">$</span>logistic.actual <span class="op">==</span><span class="st"> </span><span class="dv">0</span>],</a>
+<a class="sourceLine" id="cb26-12" title="12">        prob.test<span class="op">$</span>logistic.predicted[prob.test<span class="op">$</span>logistic.actual <span class="op">==</span><span class="st"> </span><span class="dv">1</span>],</a>
+<a class="sourceLine" id="cb26-13" title="13">        <span class="st">&#39;KS Plot&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.title.y =</span> <span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb26-14" title="14">                           <span class="dt">axis.text.y =</span> <span class="kw">element_blank</span>())</a>
+<a class="sourceLine" id="cb26-15" title="15"><span class="kw">ggarrange</span>(p1, p2, <span class="dt">nrow =</span> <span class="dv">2</span>)</a></code></pre></div>
 <p><img src="04_logistic_regression_report_files/figure-html/model_plots-1.png" width="100%" /></p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1">p3</a></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" title="1">p3</a></code></pre></div>
 <p><img src="04_logistic_regression_report_files/figure-html/model_plots-2.png" width="100%" /></p>
 <p>By the score density we see that our Logistic Regression model is very broad on the scores it assigns to the observations, especially for the real Defaulters not providing a good separation between each class.</p>
 <p>The box plot also does not show a clear discrimination between Defaulters and Non-Defaulters.</p>
