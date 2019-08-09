@@ -71,7 +71,15 @@ Random forest, in essence, consists of a large set of individual decision trees 
 
 The RF algorithm is a supervised algorithm that, even though it can be used for regression purposes, it was initially conceived as a classification tool.
 
-The method follows the same concept as a decision tree but with the power of the crowd. So, basically, instead of using one big, deep and complex tree, the method believes that multiple randomly different (in multiple ways) trees can perform better, even if individually the trees are not very good classifiers.
+The method follows the same concept as a decision tree but with the power of the crowd. So, basically, instead of using one big, deep and complex tree, the method relies on multiple randomly different (in multiple ways) trees voting for a class. This method usually perform better better than one very well trained tree even if, individually, the trees are not as good classifiers, thus refering to the forementioned wisdom of the crowds.
+
+>Random forest thrives even in scenarios, when there is an abundance of chaos, i.e. many predictors. It’s hard to know which predictor is important and which is not. All the other traditional statistical techniques might fail or struggle when we have an incredibly high number of independent variables.
+> `r tufte::quote_footer('--- Pranov Mishra')`
+
+Because of the voting system inherent to the method it is often said to be democratic algorithm.
+
+>Now, if you think for a second, this is the way direct democracy works: each voter has access to a subset of the information and only sees that subset from a particular perspective (their own unique perspective). By using a majority vote, we are actually implementing a Random Forest.
+> `r tufte::quote_footer('--- Pablo Duboue')`
 
 
 *******************************************************************************
@@ -84,7 +92,7 @@ Using the vanilla transaction dataset, we calculated several derived variables f
 
 This dataset is joined with Loan, Client, Credit Card, District, Account and Account Balance tables.
 
-We ended up having a data set with **118 variables**.
+We ended up having a dataset with **118 variables**.
 
 
 ```{r variables, echo=TRUE}
@@ -99,7 +107,7 @@ One advantage of Random Forest models is that it does not require heavy feature 
 
 We will only remove **x_prop_old_age_pension** that we know beforehand to have no variance in the dataset.
 
-This model is also not sensible to outliers, missing values and multicollinearity.
+Mainly beacause of the ramdomness in variable selection of random forest algorithm, this model is not sensible to outliers, missing values and multicollinearity.
 
 
 ```{r variable_selecion, echo=TRUE}
@@ -130,17 +138,23 @@ data.train_rf <- dplyr::select(data.train_rf, names(loan_dataset_rf))
 data.test_rf <- dplyr::select(data.test_rf, names(loan_dataset_rf))
 ```
 
-Both datasets keep the same proportion for the explained variable around 11%.
+Both datasets kept the same proportion for the explained variable at about 11%.
 
 *******************************************************************************
 
 # Selecting the best parameters values for the Random Forest
 
-The R community is a one of R's best features. There are many community members doing awesome improvements on the existent libraries. 
+The R community is a one of R's best features. There are many community members doing awesome improvements on existent libraries as well as sharing and spreading knowledge to the four corners of the Earth (if you still think the Earth is flat and square as I do).
 
-A good example is Jason Brownlee, who extended **Caret** library by adding a new approach that supports multiple tuning of multiple parameters. Please, see [**References**](https://ldaniel.github.io/Predictive-Analytics/09_references.html) page for further details and links.
+Th algorithm selected from **randomForest package** (Please, see [**References**](https://ldaniel.github.io/Predictive-Analytics/09_references.html) to reach out this amazing package) have two main parameters for random forest algorithm tuning: **mtry** representing the number of variables randomly sampled as candidates at each split (or the size of the trees) and **ntree** representing the number of trees to grow (or the size of the forest).
 
-He defined his own algorithm to use in caret by defining a list that contains a number of custom named elements that the caret package looks for, such as how to fit and how to predict. See below for a definition of a custom random forest algorithm for use with caret that takes both an mtry and ntree parameters.
+Another great package for modeling is caret (*seriously*, check this one out in [**references**](https://ldaniel.github.io/Predictive-Analytics/09_references.html), it is fantastic in so many ways!) and, for the sake of our sanity, it has already implemented a good method for randomForest's package parameter tuning (cheers to them!). This, with the expanded grid search (also from caret package), provides a high performance, friendly and intelligent way of testing parameters. Unfortunately, it is not a perfect world and the implemented method only tune **mtry** parameter.
+
+In order to have both parameters tuned using expanded grid search we need to extend caret's methodology, creating a custom method for parameter tuning and, for that, even under the risk of being repetitive, we must say: we can be saved by the grace of of R's community!
+
+There are a lot of implementations accross the internet, however, a good example (and apparently an original one) is provided by Jason Brownlee, who created this customized function supports **mtry** AND **ntree** parameter tuning together. Please, see [**references**](https://ldaniel.github.io/Predictive-Analytics/09_references.html) page for Jason's credits (cheers to him!).
+
+Below is his implementation to be further used in our RF training.
 
 ```{r extent_caret, echo=TRUE, eval=FALSE}
 customRF <- list(type = "Classification", library = "randomForest", loop = NULL)
@@ -166,7 +180,8 @@ customRF$sort <- function(x) x[order(x[,1]),]
 customRF$levels <- function(x) x$classes
 ```
 
-The following code is able to fit the random forest model using the caret customized train function above. Then, we just have to give some parameters values to be tested and after running this pretty code we can benefits from its results by having which parameters performed best.
+Moving further, we can now set up our expanded grid search using our customized RF train method to test multiple parameters and its different combinations. After that, caret's method will automatically select best model according to the metric we defined (in our case, accuracy).
+Moreover, to provide a reliable method of training to avoid (as well as we can) overfitting, we used repeated k-fold cross validation as train control - also provided by caret's package (we warned you, this is, indeed, an amazing package!).
 
 ```{r select_best_parameters, echo=TRUE, eval=FALSE}
 control <- trainControl(method="repeatedcv", 
@@ -200,7 +215,7 @@ summary(rf.full)
 plot(rf.full)
 ```
 
-After some time waiting for the results, about 5 hours, we ended up selecting the best parameters, as following: 
+After some cups of coffee (and maybe some time spent on your preferred streaming provider), we have the training finished. And the winners are...: 
 
 - **mtry = 85** 
 - **ntree = 3000**
@@ -282,7 +297,7 @@ metricsByCutoff.test_randomforest  <- modelMetrics(prob.test$randomforest.actual
 metricsByCutoff.test_randomforest$Plot
 ```
 
-With the optimized cut off we calculate the full set of model metrics using the function HMeasure from hmeasure library.
+With the optimized cut off we calculate the full set of model metrics using the function HMeasure from hmeasure library (another very good package! Don't forget to check for our [**references**](https://ldaniel.github.io/Predictive-Analytics/09_references.html)).
 
 ```{r get_measures_full, echo=TRUE, out.width= '100%', warning=FALSE}
 # Random Forest
@@ -312,6 +327,50 @@ Below are the metrics on the train and test dataset:
 kable(measures, row.names = FALSE)
 ```
 
+Our RF model clearly overfitted (as we can see by most of metrics, AUC of 1.0 in train set and 0.84 in test set, for example). This happened mainly because of the size of our dataset.
+
 ## Evaluating classification performance
 
-To-do.
+This model delivered an amazing result but not the best one (beaten by the boosting model). We have a full session to compare how it performed against other models in the Final Report session. But wait, you should't hurry, there are still some steps to evaluate RF algorithm.
+
+Below the confusion matrix and general performance of the model:
+
+```{r see_accuracy_1, echo=TRUE, out.width= '100%'}
+# accuracy metrics ---------------------------------------------------------------
+# random forest
+accuracy(score = prob.test$randomforest.predicted, 
+         actual = prob.test$randomforest.actual, 
+         threshold = metricsByCutoff.test_randomforest[["BestCut"]][["Cut"]])
+```
+
+We finally look at the score distribution charts to check how well the model is able to discriminate Defaulters and Non-Defaulters.
+
+```{r model_plots, echo=TRUE, out.width= '100%'}
+p1 <- Score_Histograms(prob.test, 
+                 prob.test$randomforest.predicted,
+                 prob.test$randomforest.actual,
+                 'Density Plot') + theme(axis.title.y = element_blank())
+
+p2 <- Score_Boxplot(prob.test, 
+              prob.test$randomforest.predicted, 
+              prob.test$randomforest.actual,
+              'Score Boxplot')
+
+p3 <-   KS_Plot(prob.test$randomforest.predicted[prob.test$randomforest.actual == 0],
+          prob.test$randomforest.predicted[prob.test$randomforest.actual == 1],
+          'Random Forest')
+
+ggarrange(p1, p2, nrow = 2)
+
+p3
+```
+
+By the score density we see that our Random Forest model provides a narrow and precise discrimination around defaulters.
+
+The box plot also shows a clear discrimination between Defaulters and Non-Defaulters.
+
+Finally, the KS metric is also presented a good result for a reliable classification purpose.
+
+In the Final Report session, we will look more closely on the AUC and Gini metrics by plotting the ROC curve and comparing against other models.
+
+Stay tuned!!!
