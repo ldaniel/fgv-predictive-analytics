@@ -447,7 +447,7 @@ Logistic Regression models are not only good for prediction but also for inferen
 
 Meaning that it can be used not only in predicting the classification into Defaulters and Non-Defaulters but also to understand the relationship between the predictors and the likelihood of delinquency.
 
-In the Logistic Regression the effect of an increase or decrease of a predictor is not linear, but we can see the predictors that have the greater influence and by its coefficient signal the associated with an increase or decrease on the likelihood of default.
+In the Logistic Regression the effect of an increase or decrease of a predictor is not linear, but we can see the predictors that have the greater influence and, by its coefficient signal, the association with an increase or decrease on the likelihood of default.
 
 The probability of default is given by below equation:
 
