@@ -66,9 +66,9 @@ This dataset is joined with Loan, Client, Credit Card, District, Account and Acc
 We ended up having a data set with **118 variables**.
 
 ```{r variables, echo=TRUE}
-loan_dataset_logistic <- source_dataset
+loan_dataset_DT <- source_dataset
 
-kable(tibble(variables = names(loan_dataset_logistic)))
+kable(tibble(variables = names(loan_dataset_DT)))
 ```
 
 ## Variable selection
