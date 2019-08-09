@@ -288,7 +288,7 @@ Let's now look at the score boxplots of each model side by side.
 
 This plot is a great way to visualize how well each model discriminate Defaulters and Non-Defaulters.
 
-Here we can see that Random Forest and boosting have an edge on the classification power against the other models. Both of them have not presented interquartile overlap in their box plot, another important sign of discrimination power of the models.
+Here we can see that Random Forest and Boosting have an edge on the classification power against the other models. Both of them have not presented interquartile overlap in their box plot, another important sign of discrimination power of the models.
 
 Our Decision Tree is right on the limit.
 
