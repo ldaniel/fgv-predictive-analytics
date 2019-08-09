@@ -36,9 +36,7 @@ source("./scripts/step_04_label_translation.R")
 source("./scripts/step_05_data_enhancement.R")
 ```
 
-# The explorations
-
-## Gender Exploration
+# Gender Exploration
 
 At first glance, gender equality is well balanced in the bank, even when observed over the decades. Even more impressive, gender equality is everywhere in the country.
 
@@ -96,7 +94,7 @@ ggplot(data = clientGenderAgeGroupByRegion,
   ggtitle("Region and age group by gender", "Equality is everywhere") 
 ```
 
-## Loan Exploration
+# Loan Exploration
 Here we investigate if there is any association between the region and the likelihood of default in the 682 loan observations in the dataset.
 
 ```{r Loan_status_by_region, echo=TRUE, out.width = '100%'}
@@ -185,7 +183,7 @@ left_join(loan, disposition, by = 'account_id') %>%
 
 It seems that none of these features, alone, are determinant on the odds of a client default.
 
-## Account Balance Exploration
+# Account Balance Exploration
 
 As we do not have the individual income of each client, we tried to perform a proxy of the client's wealth by calculating the average account balance of each account and investigating the distribution by region and age.
 
@@ -206,7 +204,7 @@ left_join(account_balance, disposition, by = 'account_id') %>%
 
 One interest pattern shows up, males in prague region tend to have a bigger average account balance them females, and the oposite trend in South, North and West Bohemia.
 
-## District exploration
+# District exploration
 
 Regarding the Czech regions, we can notice in the exploration below which regions are more likely to have defaulters based on the finished loans operations so far.
 
