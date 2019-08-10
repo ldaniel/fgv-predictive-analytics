@@ -2,10 +2,10 @@
 title: 'FGV MBA: Business Analytics & Big Data'
 output:
   pdf_document:
+    latex_engine: xelatex
+    highlight: tango
     keep_tex: yes
-    toc: yes
-  html_document:
-    df_print: paged
+    number_sections: yes
     toc: yes
 ---
 
