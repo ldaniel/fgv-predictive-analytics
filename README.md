@@ -6,7 +6,7 @@ In this project, we developed a set of models using a real anonymized Czech bank
 
 This website intends to present the work analysis for the *"Análise Preditiva"* class.
 
-See the final website report at: [https://ldaniel.github.io/Predictive-Analytics](https://ldaniel.github.io/Predictive-Analytics).
+See the final website report at: [https://ldaniel.github.io/fgv-predictive-analytics](https://ldaniel.github.io/fgv-predictive-analytics).
 
 ## Professor
 - João Rafael Dias
